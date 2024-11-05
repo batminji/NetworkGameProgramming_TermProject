@@ -19,6 +19,7 @@
 #include <stdio.h> 
 #include <stdlib.h>
 #include <atlImage.h>
+#include <unordered_map>
 #include "..\Kirby\resource.h"
 #pragma comment(lib, "ws2_32") // ws2_32.lib 링크
 
@@ -26,18 +27,18 @@
 enum PACKET // 패킷 타입 정의.
 {
 	// C to S
-	CS_LOGIN_PACKET,
-	CS_MOVE_PACKET,
-	CS_KEY_INPUT_PACKET,
-	CS_ROOM_STATE_PACKET,
+	CS_LOGIN,
+	CS_MOVE,
+	CS_KEY_INPUT,
+	CS_ROOM_STATE,
 
 	// S to C
-	SC_LOGIN_RESULT_PACKET,
-	SC_ROOM_CHANGE_PACKET,
-	SC_PLAYER_MOVE_PACKET,
-	SC_PLAYER_STATE_CHANGE_PACKET,
-	SC_OBJECT_MOVE_PACKET,
-	SC_OBJECT_CHANGE_PACKET
+	SC_LOGIN_RESULT,
+	SC_ROOM_CHANGE,
+	SC_PLAYER_MOVE,
+	SC_PLAYER_STATE_CHANGE,
+	SC_OBJECT_MOVE,
+	SC_OBJECT_CHANGE
 };
 
 enum OTYPE // 오브젝트 타입 정의.
@@ -93,4 +94,18 @@ void err_display(int errcode)
 		(char*)&lpMsgBuf, 0, NULL);
 	printf("[오류] %s\n", (char*)lpMsgBuf);
 	LocalFree(lpMsgBuf);
+}
+
+void client_info(SOCKET s, std::string str)
+{
+	// 클라이언트 주소 정보 확인
+	sockaddr_in clientAddr;
+	int addrLen = sizeof(clientAddr);
+	getpeername(s, (sockaddr*)&clientAddr, &addrLen);
+
+	// 클라이언트 정보 출력
+	std::cout << "Client connected - ID: " << str
+		<< ", IP: " << inet_ntoa(clientAddr.sin_addr)
+		<< ", Port: " << ntohs(clientAddr.sin_port)
+		<< ", Socket: " << s << std::endl;
 }
