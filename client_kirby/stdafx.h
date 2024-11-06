@@ -12,7 +12,7 @@
 #include <math.h>
 #include <vector>
 #include <atlImage.h>
-//#include "resource.h"
+#include "resource.h"
 #include "fmod.hpp"
 #include "fmod_errors.h"
 //#include "Common.h"
