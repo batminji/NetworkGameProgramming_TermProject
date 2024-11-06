@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="소스.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="test_scene.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Title_Scene.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="test_scene.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Title_Scene.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\리소스\start_button.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\main_screen.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\cartoon_background.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\cartoon6.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\cartoon5.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\cartoon4.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\cartoon3.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\cartoon2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\cartoon1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\title.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\start_screen.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\item_check.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\click_cursor.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\Kirby_fly_left.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\gameplay_background.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\heart.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\item4.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\item3.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\item2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\item1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\gameplay_background2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\basic_bullets.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\skill_dark.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\skill_color.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\리소스\skill_bullet.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\small.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\start_button.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\main_screen.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\cartoon_background.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\cartoon6.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\cartoon5.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\cartoon4.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\cartoon3.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\cartoon2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\cartoon1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\title.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\start_screen.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\item_check.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\click_cursor.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\gameplay_background.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\Kirby_fly_left.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\heart.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\basic_bullets.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\item4.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\item3.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\item2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\item1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\gameplay_background2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\skill_dark.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\skill_color.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\skill_bullet.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\mid_1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\mid_2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\mid_3.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\big.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\monster_bullets.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\number.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\HP_bar1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\HP_empty.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\Kirby_effects.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\Kirby_heart.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\Kirby_round.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\missile.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\missile_explode.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\warning.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\coin.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\over_number.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\GAMEOVER.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\spinkle.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\effects.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\Monster_die.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\rezero_bg.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="리소스\리소스\Kirby_die.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="리소스\리소스\cursor1.cur">
+      <Filter>리소스 파일</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -2,15 +2,7 @@
 
 Player::Player()
 {
-	if (job == 1) {
-		kirby_hit.LoadFromResource(g_hInst, MAKEINTRESOURCE(KIRBY_HIT));
-		kirby_zombie.LoadFromResource(g_hInst, MAKEINTRESOURCE(KIRBY_ZOMBIE));
-	}
-	else {
-		kirby_hit.LoadFromResource(g_hInst, MAKEINTRESOURCE(KIRBY_HIT));
-		kirby_zombie.LoadFromResource(g_hInst, MAKEINTRESOURCE(KIRBY_ZOMBIE));
 
-	}
 }
 
 void Player::render(HDC mdc)
