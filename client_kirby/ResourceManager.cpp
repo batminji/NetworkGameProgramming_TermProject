@@ -13,10 +13,12 @@ ResourceManager::ResourceManager(HINSTANCE g_hInst)
 	cartoon[4].LoadFromResource(g_hInst, MAKEINTRESOURCE(CARTOON_5));
 	cartoon[5].LoadFromResource(g_hInst, MAKEINTRESOURCE(CARTOON_6));
 	cartoon_bg.LoadFromResource(g_hInst, MAKEINTRESOURCE(CARTOON_BG));
+
 	main_screen.LoadFromResource(g_hInst, MAKEINTRESOURCE(MAIN_SCREEN));
 	start_button.LoadFromResource(g_hInst, MAKEINTRESOURCE(START_BUTTON));
 	item_check.LoadFromResource(g_hInst, MAKEINTRESOURCE(ITEM_CHECK));
 	click_cursor.LoadFromResource(g_hInst, MAKEINTRESOURCE(CLiCK_CURSOR));
+
 	game_bg.LoadFromResource(g_hInst, MAKEINTRESOURCE(GAME_BACKGROUND));
 	kirby_fly.LoadFromResource(g_hInst, MAKEINTRESOURCE(KIRBY_FLY_LEFT));
 	heart.LoadFromResource(g_hInst, MAKEINTRESOURCE(HEART));
@@ -26,9 +28,11 @@ ResourceManager::ResourceManager(HINSTANCE g_hInst)
 	item[1].LoadFromResource(g_hInst, MAKEINTRESOURCE(ITEM2));
 	item[2].LoadFromResource(g_hInst, MAKEINTRESOURCE(ITEM3));
 	item[3].LoadFromResource(g_hInst, MAKEINTRESOURCE(ITEM4));
+
 	skill.LoadFromResource(g_hInst, MAKEINTRESOURCE(SKILL));
 	skill_color.LoadFromResource(g_hInst, MAKEINTRESOURCE(SKILL_COLOR));
 	skill_bullet.LoadFromResource(g_hInst, MAKEINTRESOURCE(SKILL_BULLET));
+
 	m[0].LoadFromResource(g_hInst, MAKEINTRESOURCE(SMALL_MONSTER));
 	m[1].LoadFromResource(g_hInst, MAKEINTRESOURCE(MID1_MONSTER));
 	m[2].LoadFromResource(g_hInst, MAKEINTRESOURCE(MID2_MONSTER));
@@ -41,11 +45,14 @@ ResourceManager::ResourceManager(HINSTANCE g_hInst)
 	skill_effects.LoadFromResource(g_hInst, MAKEINTRESOURCE(SKILL_EFFECTS));
 	game_over.LoadFromResource(g_hInst, MAKEINTRESOURCE(GAME_OVER));
 	over_number.LoadFromResource(g_hInst, MAKEINTRESOURCE(OVER_NUMBER));
+
 	kirby_hit.LoadFromResource(g_hInst, MAKEINTRESOURCE(KIRBY_HIT));
 	kirby_zombie.LoadFromResource(g_hInst, MAKEINTRESOURCE(KIRBY_ZOMBIE));
+
 	warning.LoadFromResource(g_hInst, MAKEINTRESOURCE(WARNING));
 	missile_explosion.LoadFromResource(g_hInst, MAKEINTRESOURCE(MISSILE_EXPLOSION));
 	missile_bmp.LoadFromResource(g_hInst, MAKEINTRESOURCE(MISSILE));
+
 	coin_bmp.LoadFromResource(g_hInst, MAKEINTRESOURCE(COIN));
 	monster_create.LoadFromResource(g_hInst, MAKEINTRESOURCE(MONSTER_CREATE));
 	hit_effect.LoadFromResource(g_hInst, MAKEINTRESOURCE(HIT_EFFECT));
