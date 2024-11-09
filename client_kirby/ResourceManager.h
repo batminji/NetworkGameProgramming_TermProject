@@ -1,9 +1,24 @@
 #pragma once
 #include "stdafx.h"
+
 class ResourceManager
 {
 public:
-	//graphic resource
+	// ResourceManager의 인스턴스를 반환
+	static ResourceManager& getInstance()
+	{
+		static ResourceManager instance;
+		return instance;
+	}
+
+
+	void init(HINSTANCE g_hInst);
+
+
+	ResourceManager(const ResourceManager&) = delete;
+	ResourceManager& operator=(const ResourceManager&) = delete;
+
+	// 그래픽 리소스들 선언
 	CImage start_screen;
 	CImage title;
 	CImage cartoon[6];
@@ -40,7 +55,7 @@ public:
 	CImage kirby_die;
 	CImage item[4];
 
-	//sound resource
+	// 사운드 리소스들 선언
 	System* ssystem;
 	Sound* title_bgm;
 	Sound* main_bgm;
@@ -60,9 +75,9 @@ public:
 	FMOD_RESULT result;
 	void* extradriverdata = 0;
 
+private:
 
-	ResourceManager(HINSTANCE g_hInst);
+	ResourceManager() : initialized(false) {}
 
-
+	bool initialized; 
 };
-

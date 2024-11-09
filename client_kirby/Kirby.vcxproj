@@ -153,11 +153,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="Item.cpp" />
+    <ClCompile Include="Lobby_Scene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Play_Scene.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="Room_Scene.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="test_scene.cpp" />
     <ClCompile Include="Title_Scene.cpp" />
@@ -169,11 +173,16 @@
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="Item.h" />
+    <ClInclude Include="Lobby_Scene.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Play_Scene.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="Room_Scene.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="test_scene.h" />

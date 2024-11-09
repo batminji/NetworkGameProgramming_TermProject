@@ -8,6 +8,7 @@ public:
 	HDC m_hBufferDC;
 public:
 
+	Scene() {};
 	Scene(HWND hwnd,HBITMAP hBufferBitmap, HDC hBufferDC) {
 		m_hwnd = hwnd;
 		m_hBufferBitmap = hBufferBitmap;

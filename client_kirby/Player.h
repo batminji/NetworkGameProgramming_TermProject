@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "Bullet.h"
+#include "ResourceManager.h"
 
 class Player
 {
@@ -8,10 +9,10 @@ class Player
  public :
 	//SOCKET socket;
 
-	 CImage kirby_fly;
-	 CImage kirby_die;
-	 CImage kirby_hit;
-	 CImage kirby_zombie;
+	 CImage* kirby_fly;
+	 CImage* kirby_die;
+	 CImage* kirby_hit;
+	 CImage* kirby_zombie;
 	
 	short job;
 	

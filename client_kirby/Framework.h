@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "Title_Scene.h"
 
-
+#include "Play_Scene.h"
 #include "test_scene.h"
 
 
@@ -19,7 +19,7 @@ public:
 		m_hwnd = hwnd;
 		m_hBufferBitmap = hBufferBitmap;
 		m_hBufferDC = hBufferDC;
-		m_scene = new test_scene(m_hwnd,m_hBufferBitmap, m_hBufferDC);
+		m_scene = new Play_Scene(m_hwnd,m_hBufferBitmap, m_hBufferDC);
 	}
 public:
 	void render(LPVOID param);

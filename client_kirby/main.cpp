@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "Framework.h"
-
+#include "ResourceManager.h"
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 DWORD WINAPI client_render(LPVOID param);
@@ -15,7 +15,7 @@ Framework* m_framework;
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow) {
-   
+ 
     const wchar_t CLASS_NAME[] = L"Sample Window Class";
 
     WNDCLASS wc = {};
@@ -25,12 +25,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
 
     RegisterClass(&wc);
 
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+    resourceManager.init(hInstance); // hInstance를 전달하여 초기화
+
+   
+
+   
     HWND hwnd = CreateWindowEx(
-        0,
-        CLASS_NAME,
-        L"Rendering Thread Example",
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL,hInstance, NULL
+        0,                    // dwExStyle: 확장 창 스타일 (없으면 0)
+        CLASS_NAME,            // 클래스 이름
+        L"Kirby_don't_overeating",       // 윈도우 이름
+        WS_OVERLAPPEDWINDOW,  // 윈도우 스타일
+        0, 0,                 // 위치 (x, y)
+        800, 600,             // 크기 (width, height)
+        NULL,                 // 부모 윈도우 (없으면 NULL)
+        (HMENU)NULL,          // 메뉴 (없으면 NULL)
+        hInstance,            // 애플리케이션 인스턴스 핸들
+        NULL                  // 추가적인 데이터 (없으면 NULL)
     );
 
     if (hwnd == NULL) return 0;
