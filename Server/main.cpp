@@ -1,6 +1,11 @@
 #include "stdafx.h"
 #include "protocol.h"
 
+/*
+패킷 함수의 기본형 
+bool send_player_move_packet(SOCKET& s, std::string& id)
+*/
+
 class Player
 {
 private:
@@ -16,6 +21,9 @@ public:
     // getter - setter 부류
     bool isPlaying() { return inGame; }
     void setPlaying(bool x) { inGame = x; }
+    unsigned short getY() { return y; }
+    void setY(unsigned short y) { this->y = y; }
+    std::string getID() { return id; }
 };
 
 class Room
@@ -33,25 +41,101 @@ private:
 public:
     Room() {};
     ~Room() {};
+    
+    // Getter - Setter
+    unsigned short getP1Y() { return p1->getY(); }
+    unsigned short getP2Y() { return p2->getY(); }
+    std::string getP1ID() { return p1->getID(); }
+    std::string getP2ID() { return p2->getID(); }
+    void setP1(Player* p) { p1 = p; }
+    void setP2(Player* p) { p2 = p; }
+    void setisPlaying(bool a) { isPlaying = a; }
 };
 
 std::unordered_map<std::string, Room> roomInfo;
 std::unordered_map<std::string, Player> players;
 
-bool process_packet(char* packet)
+bool process_packet(char* packet, SOCKET& s, std::string& id)
 {
     switch (packet[2]) // 여기 정확하게 어디 들어오는지 봐야 할듯
     {
+    case CS_MOVE: // 플레이어 캐릭터의 이동 -> 나와 동료의 업데이트된 위치 정보 반환.
+    {
+        CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
+        players[id].setY(p->y);
+        send_player_move_packet(s, id);
+        break;
+    }
+    case CS_KEY_INPUT: // 플레이어의 키 입력(스킬 등)
+    {
+        CS_KEY_INPUT_PACKET* p = reinterpret_cast<CS_KEY_INPUT_PACKET*>(packet); // 얘는 바로 send 하지 말까?
+        break;
+    }
+    case CS_ROOM_STATE: // 방 정보 변경
+    {
+        CS_ROOM_STATE_PACKET* p = reinterpret_cast<CS_ROOM_STATE_PACKET*>(packet);
+        auto t_room = roomInfo[id];
+        if (p->isQuit)
+            if (t_room.getP1ID() == id) t_room.setP1(nullptr);
+            else t_room.setP2(nullptr);
+        if (p->isPlaying) t_room.setisPlaying(true);
+
+        // todo: 두 플레이어 둘다에게 발송해야 함
+
+        break;
+    }
     default:
         std::cout << "undefined packet" << std::endl;
         exit(-1);
     }
 }
 
+bool send_player_move_packet(SOCKET& s, std::string& id)
+{
+    SC_PLAYER_MOVE_PACKET res;
+    res.size = sizeof(SC_PLAYER_MOVE_PACKET);
+    res.type = SC_PLAYER_MOVE;
+    res.this_y = roomInfo[id].getP1Y();
+    res.other_y = roomInfo[id].getP2Y();
+    
+    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
+    if (ret == SOCKET_ERROR) { // 에러 처리
+        int error = WSAGetLastError();
+        err_display("send failed");
+        err_display(error);  // 오류 코드 출력
+        return false;
+    }
+    return true;
+}
+
+
+bool send_login_packet(SOCKET& s, CS_LOGIN_PACKET* p) // 로그인 패킷 보내는 함수 따로 뺌.
+{
+    SC_LOGIN_RESULT_PACKET res;
+    res.size = sizeof(SC_LOGIN_RESULT_PACKET);
+    res.type = SC_LOGIN_RESULT;
+    if (players[p->id].isPlaying()) { // 플레이어가 지금 접속중인가?
+        res.success = false;
+    }
+    else {
+        res.success = true;
+        players[p->id].setPlaying(true);
+    }
+
+    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_LOGIN_RESULT_PACKET), 0);
+    if (ret == SOCKET_ERROR) { // 에러 처리
+        int error = WSAGetLastError();
+        err_display("send failed");
+        err_display(error);  // 오류 코드 출력
+        return false;
+    }
+    return true;
+}
+
 int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
 {
     char recv_buf[BUFSIZE];
-    char send_buf[BUFSIZE];
+    std::string pid;
 
     // 로그인 처리 단계
     {
@@ -68,24 +152,13 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
 
         // 1-1. 로그인 패킷 처리
         CS_LOGIN_PACKET* p = reinterpret_cast<CS_LOGIN_PACKET*>(recv_buf);
-
         client_info(s, p->id);
+        if (send_login_packet(s, p))
+            pid = p->id;
 
-        // 패킷 만들어서 보내기
-        SC_LOGIN_RESULT_PACKET res;
-        res.size = sizeof(SC_LOGIN_RESULT_PACKET);
-        res.type = SC_LOGIN_RESULT;
-        if (players[p->id].isPlaying()) { // 플레이어가 지금 접속중인가?
-            res.success = false;
-        }
-        else {
-            res.success = true;
-            players[p->id].setPlaying(true);
-        }
-        ZeroMemory(send_buf, sizeof(send_buf));
-        memcpy(send_buf, &res, sizeof(res));
+        // 2. 
 
-        send(s, send_buf, sizeof(SC_LOGIN_RESULT_PACKET), 0);
+
     }
 }
 
