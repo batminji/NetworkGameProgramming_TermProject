@@ -18,6 +18,17 @@ public:
 
     Player() {}
 
+    bool broadcast(char* res, size_t size )
+    {
+        int ret = send(s, reinterpret_cast<char*>(&res), size, 0);
+        if (ret == SOCKET_ERROR) { // 에러 처리
+            int error = WSAGetLastError();
+            err_display("send failed");
+            err_display(error);  // 오류 코드 출력
+            return false;
+        }
+    }
+
     // getter - setter 부류
     bool isPlaying() { return inGame; }
     void setPlaying(bool x) { inGame = x; }
@@ -31,7 +42,7 @@ class Room
 private:
     Player* p1 = nullptr;
     Player* p2 = nullptr;
-    std::string host_id;
+    std::string dealer_id; // 누가 딜러인가.
     bool isPlaying = false;
     unsigned int score;
     unsigned short heart; // 음수가 없..?
@@ -50,6 +61,13 @@ public:
     void setP1(Player* p) { p1 = p; }
     void setP2(Player* p) { p2 = p; }
     void setisPlaying(bool a) { isPlaying = a; }
+    bool getisPlaying() { return isPlaying; }
+    bool getisDealer(std::string myid) { return myid == dealer_id; }
+    bool broadcast(char* res, size_t size)
+    {
+        p1->broadcast(res, size);
+        p2->broadcast(res, size);
+    }
 };
 
 std::unordered_map<std::string, Room> roomInfo;
@@ -80,14 +98,29 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
             else t_room.setP2(nullptr);
         if (p->isPlaying) t_room.setisPlaying(true);
 
-        // todo: 두 플레이어 둘다에게 발송해야 함
-
+        send_room_change_packet(id);
         break;
     }
     default:
         std::cout << "undefined packet" << std::endl;
         exit(-1);
     }
+}
+
+bool send_room_change_packet(std::string& id)
+{
+    auto t_room = roomInfo[id];
+    SC_ROOM_CHANGE_PACKET res;
+    res.size = sizeof(SC_ROOM_CHANGE_PACKET);
+    res.type = SC_ROOM_CHANGE;
+    res.isPlaying = t_room.getisPlaying();
+    res.isDealer = t_room.getisDealer(id);
+    if (t_room.getP1ID() == id)  memcpy(res.other_pl, t_room.getP2ID().c_str(), ID_LEN);
+    else memcpy(res.other_pl, t_room.getP1ID().c_str(), ID_LEN);
+   
+    if (t_room.broadcast(reinterpret_cast<char*>(&res), res.size))
+        return true;
+    return false;
 }
 
 bool send_player_move_packet(SOCKET& s, std::string& id)
