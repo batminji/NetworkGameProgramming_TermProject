@@ -30,6 +30,7 @@ enum PACKET // 패킷 타입 정의.
 	CS_LOGIN,
 	CS_MOVE,
 	CS_KEY_INPUT,
+	CS_JOIN_ROOM,
 	CS_ROOM_STATE,
 
 	// S to C

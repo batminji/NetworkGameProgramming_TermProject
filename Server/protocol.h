@@ -25,6 +25,13 @@ struct CS_KEY_INPUT_PACKET // 스킬 등 키 입력이 있을 떄
 	unsigned char key; // todo: 자료형 뭐로할지 고민
 };
 
+struct CS_JOIN_ROOM_PACKET
+{
+	unsigned short size;
+	PACKET type;
+	char id[ID_LEN];
+};
+
 struct CS_ROOM_STATE_PACKET // 방 설정을 변경하는 패킷
 {
 	unsigned short size;

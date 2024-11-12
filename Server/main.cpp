@@ -35,6 +35,7 @@ public:
     unsigned short getY() { return y; }
     void setY(unsigned short y) { this->y = y; }
     std::string getID() { return id; }
+    void setSocket(SOCKET& s) { this->s = s; }
 };
 
 class Room
@@ -77,6 +78,26 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
 {
     switch (packet[2]) // 여기 정확하게 어디 들어오는지 봐야 할듯
     {
+    case CS_JOIN_ROOM: 
+    {
+        CS_JOIN_ROOM_PACKET* p = reinterpret_cast<CS_JOIN_ROOM_PACKET*>(packet);
+        // 만약 roomInfo에 p.id로 된 room이 있을때 조인
+        // 아닐때 새로 만들어서 초기화
+
+        if (roomInfo.find(p->id) != roomInfo.end()) {  // roomID가 이미 존재하면
+            roomInfo[id] = roomInfo[p->id];
+            roomInfo[id].setP2(&players[id]);       // 플레이어를 해당 방에 추가
+            std::cout << "Player " << id  << " joined existing room " << p->id << std::endl;
+        }
+        else { // roomID가 없다면 새로운 방을 생성하여 초기화
+            Room newRoom;
+            roomInfo[id] = newRoom; // roomInfo에 새로운 방 추가
+            roomInfo[id].setP1(&players[id]);
+            std::cout << "Player " << id << " created and joined new room " << id << std::endl;
+        }
+
+        break;
+    }
     case CS_MOVE: // 플레이어 캐릭터의 이동 -> 나와 동료의 업데이트된 위치 정보 반환.
     {
         CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
@@ -188,14 +209,27 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         client_info(s, p->id);
         if (send_login_packet(s, p))
             pid = p->id;
+        
+        players[pid].setSocket(s);
 
-        // 2. 
+        // 2. 방 관련 send - recv 
+        while (true) {
+            // 2-1. 참여할 방의 플레이어 아이디 recv하기.
+            ZeroMemory(recv_buf, sizeof(recv_buf));
+            int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), 0);
+            if (ret == SOCKET_ERROR) { // 에러처리
+                int error = WSAGetLastError();
+                err_display("recv() failed");
+                err_display(error);  // 오류 코드 출력
+            }
 
+            CS_JOIN_ROOM_PACKET;
+
+
+        }
 
     }
 }
-
-std::atomic_int playerID; // 플래이어 아이디
 
 int main()
 {
