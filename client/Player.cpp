@@ -11,6 +11,23 @@ Player::Player()
 	// kirby_blue_die = &ResourceManager::getInstance().Kirby_blue_die;
 	kirby_blue_hit = &ResourceManager::getInstance().Kirby_blue_hit;
 	kirby_blue_zombie = &ResourceManager::getInstance().Kirby_blue_zombie;
+
+	job = 1;
+}
+
+Player::Player(short job, std::string id)
+{
+	kirby_pink_fly = &ResourceManager::getInstance().Kirby_pink_fly;
+	kirby_pink_die = &ResourceManager::getInstance().Kirby_pink_die;
+	kirby_pink_hit = &ResourceManager::getInstance().Kirby_pink_hit;
+	kirby_pink_zombie = &ResourceManager::getInstance().Kirby_pink_zombie;
+
+	kirby_blue_fly = &ResourceManager::getInstance().Kirby_blue_fly;
+	// kirby_blue_die = &ResourceManager::getInstance().Kirby_blue_die;
+	kirby_blue_hit = &ResourceManager::getInstance().Kirby_blue_hit;
+	kirby_blue_zombie = &ResourceManager::getInstance().Kirby_blue_zombie;
+	job = job;
+	id = id;
 }
 
 void Player::render(HDC mdc)
@@ -33,4 +50,10 @@ void Player::render(HDC mdc)
 	default:
 		break;
 	}
+}
+
+void Player::update()
+{
+	Kirby_frame += 25;
+	if (Kirby_frame == 200)Kirby_frame = 0;
 }

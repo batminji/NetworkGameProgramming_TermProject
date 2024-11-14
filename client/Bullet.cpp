@@ -6,6 +6,7 @@ bullet::bullet(short x, short y, short t)
 	y = type;
 	Basic_bullet = &ResourceManager::getInstance().basic_bullet;
 	Skill_bullet = &ResourceManager::getInstance().skill_bullet;
+	Monster_bullet = &ResourceManager::getInstance().monster_bullet;
 }
 
 void bullet::render(HDC mdc)
@@ -17,6 +18,8 @@ void bullet::render(HDC mdc)
 	case 2: // ½ºÅ³ ÃÑ¾Ë
 		Skill_bullet->TransparentBlt(mdc, xy[0] - 20, xy[1] - 15, 40, 30, skill_bullet_frame, 0, 260, 260, RGB(255, 0, 255));
 		break;
+	case 3: // Àû ÃÑ¾Ë
+		Monster_bullet->TransparentBlt(mdc, xy[0], xy[1], 10, 10, 0, 0, 30, 30, RGB(255, 0, 255));
 	}
 }
 
