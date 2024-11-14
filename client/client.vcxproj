@@ -162,6 +162,7 @@
     <ClInclude Include="Lobby_Scene.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Play_Scene.h" />
+    <ClInclude Include="protocol.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Room_Scene.h" />

@@ -1,0 +1,94 @@
+#pragma once
+#include "stdafx.h"
+#pragma pack(push, 1)
+
+// client to server
+
+struct CS_LOGIN_PACKET
+{
+	unsigned short size;
+	PACKET type;
+	char id[ID_LEN];
+};
+
+struct CS_MOVE_PACKET // 플레이어 마우스 위치 전송
+{
+	unsigned short size;
+	PACKET type;
+	unsigned short y; // x값은 전송하지 않아도 됨
+};
+
+struct CS_KEY_INPUT_PACKET // 스킬 등 키 입력이 있을 떄
+{
+	unsigned short size;
+	PACKET type;
+	unsigned char key; // todo: 자료형 뭐로할지 고민
+};
+
+struct CS_JOIN_ROOM_PACKET
+{
+	unsigned short size;
+	PACKET type;
+	char id[ID_LEN];
+};
+
+struct CS_ROOM_STATE_PACKET // 방 설정을 변경하는 패킷
+{
+	unsigned short size;
+	PACKET type;
+	bool isPlaying;
+	bool isQuit;
+};
+
+// server to client
+
+struct SC_LOGIN_RESULT_PACKET
+{
+	unsigned short size;
+	PACKET type;
+	bool success; // True일 때 로그인 성공
+};
+
+struct SC_ROOM_CHANGE_PACKET // 방 설정이 변경되면
+{
+	unsigned short size;
+	PACKET type;
+	char other_pl[ID_LEN]; // 친구 플레이어 이름
+	bool isPlaying; // 시작했는지
+	bool isDealer; // 내가 딜러인가?
+};
+
+struct SC_PLAYER_MOVE_PACKET // 캐릭터 이동
+{
+	unsigned short size;
+	PACKET type;
+	unsigned short this_y; // 나의위치
+	unsigned short other_y; // 친구 위치
+};
+
+struct SC_PLAYER_STATE_CHANGE_PACKET
+{
+	unsigned short size;
+	PACKET type;
+	unsigned short hp; // 이걸로 죽음까지 판단하도록
+	bool isHit; // 맞았는가?
+	bool skillEnd; // 스킬 끝났을떄 true
+};
+
+struct SC_OBJECT_MOVE_PACKET // 오브젝트 이동
+{
+	unsigned short size;
+	PACKET type;
+	OTYPE obj_type; // 어떤 오브젝트의 이동인가
+	unsigned short number; // 개수
+	unsigned short objs_x[MAX_OBJ_NUM];
+	unsigned short objs_y[MAX_OBJ_NUM];
+};
+
+struct SC_OBJECT_CHANGE_PACKET // 오브젝트 상태변경
+{
+	unsigned short size;
+	PACKET type;
+	OTYPE obj_type;
+	bool isRemove; // 삭제되었는가 혹은 죽었는가?
+};

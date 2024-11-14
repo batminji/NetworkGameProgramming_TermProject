@@ -1,5 +1,9 @@
 #include "Lobby_Scene.h"
 
+Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock)
+{
+}
+
 void Lobby_Scene::render(LPVOID param)
 {
     m_hwnd = (HWND)param;

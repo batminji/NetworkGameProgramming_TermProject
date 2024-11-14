@@ -1,5 +1,9 @@
 #include "Room_Scene.h"
+#include "protocol.h"
+Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock) {
 
+
+}
 void Room_Scene::render(LPVOID param)
 {
     m_hwnd = (HWND)param;

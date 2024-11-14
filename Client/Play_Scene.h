@@ -26,11 +26,11 @@ private :
 
 public:
 
-    Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC) {
+    Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock) {
         m_hwnd = hwnd;
         m_hBufferBitmap = hBufferBitmap;
         m_hBufferDC = hBufferDC;
-
+        m_sock = sock;
         player = new Player();
 
         //ui 이미지 로드
