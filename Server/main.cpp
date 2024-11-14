@@ -102,7 +102,7 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     {
         CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
         players[id].setY(p->y);
-        send_player_move_packet(s, id);
+       // send_player_move_packet(s, id);
         break;
     }
     case CS_KEY_INPUT: // 플레이어의 키 입력(스킬 등)
@@ -119,7 +119,7 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
             else t_room.setP2(nullptr);
         if (p->isPlaying) t_room.setisPlaying(true);
 
-        send_room_change_packet(id);
+      //  send_room_change_packet(id);
         break;
     }
     default:
@@ -223,7 +223,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                 err_display(error);  // 오류 코드 출력
             }
 
-            CS_JOIN_ROOM_PACKET;
+            //CS_JOIN_ROOM_PACKET;
 
 
         }
