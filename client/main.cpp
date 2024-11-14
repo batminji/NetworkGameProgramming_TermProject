@@ -48,12 +48,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
   
 
     ShowWindow(hwnd, nCmdShow);
-    HANDLE hThread = NULL;
+    HANDLE Render_Thread = NULL;
+    HANDLE Update_Thread = NULL;
     // 렌더링 스레드 시작
     if (m_framework) {
-       hThread = CreateThread(NULL, 0, client_render, hwnd, 0, NULL);
+       Render_Thread = CreateThread(NULL, 0, client_render, hwnd, 0, NULL);
     }
-
+    // 업데이트 스레드 시작
+    if (m_framework) {
+        Update_Thread = CreateThread(NULL, 0, client_update, hwnd, 0, NULL);
+    }
     MSG msg = {};
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
@@ -62,8 +66,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
 
     // 스레드 종료 설정
     isRunning = false;
-    WaitForSingleObject(hThread, INFINITE); // 스레드가 종료될 때까지 대기
-    CloseHandle(hThread); // 스레드 핸들 닫기
+    WaitForSingleObject(Render_Thread, INFINITE); // 스레드가 종료될 때까지 대기
+    CloseHandle(Render_Thread); // 스레드 핸들 닫기
+    WaitForSingleObject(Update_Thread, INFINITE); // 스레드가 종료될 때까지 대기
+    CloseHandle(Update_Thread); // 스레드 핸들 닫기
 
     DeleteDC(hBufferDC);
     DeleteObject(hBufferBitmap);
@@ -117,6 +123,14 @@ DWORD WINAPI client_render(LPVOID param) {
 DWORD WINAPI client_update(LPVOID param)
 {
     HWND hwnd = (HWND)param;
-    m_framework->update();
+   
+    while (isRunning)
+    {
+        m_framework->update();
+        // 화면 갱신 요청
+        InvalidateRect(hwnd, NULL, FALSE);
+        // 프레임 속도 조절 (예: 60fps)
+        Sleep(16); // milliseconds
+    }
     return 0;
 }

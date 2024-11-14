@@ -23,7 +23,7 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
     case WM_KEYDOWN:
         switch (wParam) {
-       
+        default:break;
         }
         InvalidateRect(hwnd, NULL, FALSE);
         return 0;

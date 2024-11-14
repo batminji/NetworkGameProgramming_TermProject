@@ -23,6 +23,8 @@ class Player
 	short x = 675;
 	
 	short y;
+
+	short xPos = 0;
 	
 	bool skill;
 
