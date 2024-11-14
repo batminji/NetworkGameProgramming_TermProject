@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <atlImage.h>
 #include <unordered_map>
+#include <fstream>
 #include "..\Kirby\resource.h"
 #pragma comment(lib, "ws2_32") // ws2_32.lib ¸µÅ©
 

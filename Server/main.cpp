@@ -6,14 +6,19 @@
 bool send_player_move_packet(SOCKET& s, std::string& id)
 */
 
+
 class Player
 {
 private:
-    int pid; // 서버에서만 사용함
     SOCKET s;
     std::string id;
     bool inGame = false; // 현재 접속중인 아이디인가?
     unsigned short y;
+    unsigned short high_score;
+    unsigned short coin;
+
+    // 게임을 실행중일 때 
+
 public:
 
     Player() {}
@@ -27,6 +32,14 @@ public:
             err_display(error);  // 오류 코드 출력
             return false;
         }
+    }
+
+    void init(std::string& str, unsigned int high_score, unsigned short gold)
+    {
+        this->high_score = high_score;
+        this->coin = gold;
+        id = str;
+        s = -1; // 접속 전이니까 대충 초기화
     }
 
     // getter - setter 부류
@@ -53,7 +66,7 @@ private:
 public:
     Room() {};
     ~Room() {};
-    
+
     // Getter - Setter
     unsigned short getP1Y() { return p1->getY(); }
     unsigned short getP2Y() { return p2->getY(); }
@@ -73,6 +86,95 @@ public:
 
 std::unordered_map<std::string, Room> roomInfo;
 std::unordered_map<std::string, Player> players;
+
+bool send_login_packet(SOCKET& s, CS_LOGIN_PACKET* p) // 로그인 패킷 보내는 함수 따로 뺌.
+{
+    SC_LOGIN_RESULT_PACKET res;
+    res.size = sizeof(SC_LOGIN_RESULT_PACKET);
+    res.type = SC_LOGIN_RESULT;
+    if (players[p->id].isPlaying()) { // 플레이어가 지금 접속중인가?
+        res.success = false;
+        res.is_new = false;
+    }
+    else {
+        res.success = true;
+        if (players.find(p->id) == players.end()) // 같은 아이디의 플레이어가 존재하는가?
+            res.is_new = true;
+        else
+            res.is_new = false;
+        players[p->id].setPlaying(true);
+    }
+
+    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_LOGIN_RESULT_PACKET), 0);
+    if (ret == SOCKET_ERROR) { // 에러 처리
+        int error = WSAGetLastError();
+        err_display("send failed");
+        err_display(error);  // 오류 코드 출력
+        return false;
+    }
+    return true;
+}
+
+bool send_room_change_packet(std::string& id)
+{
+    auto t_room = roomInfo[id];
+    SC_ROOM_CHANGE_PACKET res;
+    res.size = sizeof(SC_ROOM_CHANGE_PACKET);
+    res.type = SC_ROOM_CHANGE;
+    res.isPlaying = t_room.getisPlaying();
+    res.isDealer = t_room.getisDealer(id);
+    if (t_room.getP1ID() == id)  memcpy(res.other_pl, t_room.getP2ID().c_str(), ID_LEN);
+    else memcpy(res.other_pl, t_room.getP1ID().c_str(), ID_LEN);
+
+    if (t_room.broadcast(reinterpret_cast<char*>(&res), res.size))
+        return true;
+    return false;
+}
+
+bool send_player_move_packet(SOCKET& s, std::string& id)
+{
+    SC_PLAYER_MOVE_PACKET res;
+    res.size = sizeof(SC_PLAYER_MOVE_PACKET);
+    res.type = SC_PLAYER_MOVE;
+    res.this_y = roomInfo[id].getP1Y();
+    res.other_y = roomInfo[id].getP2Y();
+
+    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
+    if (ret == SOCKET_ERROR) { // 에러 처리
+        int error = WSAGetLastError();
+        err_display("send failed");
+        err_display(error);  // 오류 코드 출력
+        return false;
+    }
+    return true;
+}
+
+bool send_player_state_change_packet(SOCKET& s, std::string& id)
+{
+    SC_PLAYER_STATE_CHANGE_PACKET res;
+    res.size = sizeof(SC_PLAYER_STATE_CHANGE_PACKET);
+    res.type = SC_PLAYER_STATE_CHANGE;
+
+    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
+    if (ret == SOCKET_ERROR) { // 에러 처리
+        int error = WSAGetLastError();
+        err_display("send failed");
+        err_display(error);  // 오류 코드 출력
+        return false;
+    }
+    return true;
+}
+
+bool send_object_move_packet()
+{
+    return true;
+}
+
+bool send_object_change_packet()
+{
+    return true;
+}
+
 
 bool process_packet(char* packet, SOCKET& s, std::string& id)
 {
@@ -95,14 +197,13 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
             roomInfo[id].setP1(&players[id]);
             std::cout << "Player " << id << " created and joined new room " << id << std::endl;
         }
-
         break;
     }
     case CS_MOVE: // 플레이어 캐릭터의 이동 -> 나와 동료의 업데이트된 위치 정보 반환.
     {
         CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
         players[id].setY(p->y);
-       // send_player_move_packet(s, id);
+        send_player_move_packet(s, id);
         break;
     }
     case CS_KEY_INPUT: // 플레이어의 키 입력(스킬 등)
@@ -114,76 +215,20 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     {
         CS_ROOM_STATE_PACKET* p = reinterpret_cast<CS_ROOM_STATE_PACKET*>(packet);
         auto t_room = roomInfo[id];
-        if (p->isQuit)
-            if (t_room.getP1ID() == id) t_room.setP1(nullptr);
-            else t_room.setP2(nullptr);
+        if (p->isQuit) { // 나가기
+            if (t_room.getP1ID() == id)
+                t_room.setP1(&players[t_room.getP2ID()]); // 2를 1로 바꾸기.
+            t_room.setP2(nullptr);
+        }
         if (p->isPlaying) t_room.setisPlaying(true);
 
-      //  send_room_change_packet(id);
+        send_room_change_packet(id);
         break;
     }
     default:
         std::cout << "undefined packet" << std::endl;
         exit(-1);
     }
-}
-
-bool send_room_change_packet(std::string& id)
-{
-    auto t_room = roomInfo[id];
-    SC_ROOM_CHANGE_PACKET res;
-    res.size = sizeof(SC_ROOM_CHANGE_PACKET);
-    res.type = SC_ROOM_CHANGE;
-    res.isPlaying = t_room.getisPlaying();
-    res.isDealer = t_room.getisDealer(id);
-    if (t_room.getP1ID() == id)  memcpy(res.other_pl, t_room.getP2ID().c_str(), ID_LEN);
-    else memcpy(res.other_pl, t_room.getP1ID().c_str(), ID_LEN);
-   
-    if (t_room.broadcast(reinterpret_cast<char*>(&res), res.size))
-        return true;
-    return false;
-}
-
-bool send_player_move_packet(SOCKET& s, std::string& id)
-{
-    SC_PLAYER_MOVE_PACKET res;
-    res.size = sizeof(SC_PLAYER_MOVE_PACKET);
-    res.type = SC_PLAYER_MOVE;
-    res.this_y = roomInfo[id].getP1Y();
-    res.other_y = roomInfo[id].getP2Y();
-    
-    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
-    if (ret == SOCKET_ERROR) { // 에러 처리
-        int error = WSAGetLastError();
-        err_display("send failed");
-        err_display(error);  // 오류 코드 출력
-        return false;
-    }
-    return true;
-}
-
-
-bool send_login_packet(SOCKET& s, CS_LOGIN_PACKET* p) // 로그인 패킷 보내는 함수 따로 뺌.
-{
-    SC_LOGIN_RESULT_PACKET res;
-    res.size = sizeof(SC_LOGIN_RESULT_PACKET);
-    res.type = SC_LOGIN_RESULT;
-    if (players[p->id].isPlaying()) { // 플레이어가 지금 접속중인가?
-        res.success = false;
-    }
-    else {
-        res.success = true;
-        players[p->id].setPlaying(true);
-    }
-
-    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_LOGIN_RESULT_PACKET), 0);
-    if (ret == SOCKET_ERROR) { // 에러 처리
-        int error = WSAGetLastError();
-        err_display("send failed");
-        err_display(error);  // 오류 코드 출력
-        return false;
-    }
-    return true;
 }
 
 int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
@@ -231,8 +276,32 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
     }
 }
 
+bool read_player_info() // 데이터 처리
+{
+    std::ifstream in{ "data.txt" }; // data.txt 파일 열기
+
+    if (!in.is_open()) { // 파일이 제대로 열렸는지 확인
+        std::cerr << "Failed to open data.txt" << std::endl;
+        return false;
+    }
+
+    std::string stmp;
+    unsigned short ctmp;
+    unsigned short hstmp;
+    while (in >> stmp >> ctmp >> hstmp) { // ID, coin, highScore 읽기
+        players[stmp].init(stmp, hstmp, ctmp);
+    }
+
+    in.close(); // 파일 닫기
+    return true;
+}
+
 int main()
 {
+    // 서버 로딩될때 파일 읽어서 플레이어 생성해 둬야 할듯
+    read_player_info();
+    // todo: 파일에 다시 쓰는것도 해야 함
+
     int retval;
 
     WSADATA wsa;
