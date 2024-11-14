@@ -12,3 +12,4 @@ void margnet::render(HDC mdc)
 void dual::render(HDC mdc)
 {
 }
+

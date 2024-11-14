@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "Framework.h"
-
+#include "ResourceManager.h"
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 DWORD WINAPI client_render(LPVOID param);
@@ -15,7 +15,7 @@ Framework* m_framework;
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow) {
-    m_framework = new Framework(NULL, hBufferBitmap, hBufferDC);
+ 
     const wchar_t CLASS_NAME[] = L"Sample Window Class";
 
     WNDCLASS wc = {};
@@ -25,21 +25,34 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
 
     RegisterClass(&wc);
 
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+    resourceManager.init(hInstance); // hInstance를 전달하여 초기화
+
+   
+
+   
     HWND hwnd = CreateWindowEx(
-        0,
-        CLASS_NAME,
-        L"Rendering Thread Example",
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL,hInstance, NULL
+        0,                    // dwExStyle: 확장 창 스타일 (없으면 0)
+        CLASS_NAME,            // 클래스 이름
+        L"Kirby_don't_overeating",       // 윈도우 이름
+        WS_OVERLAPPEDWINDOW,  // 윈도우 스타일
+        0, 0,                 // 위치 (x, y)
+        800, 600,             // 크기 (width, height)
+        NULL,                 // 부모 윈도우 (없으면 NULL)
+        (HMENU)NULL,          // 메뉴 (없으면 NULL)
+        hInstance,            // 애플리케이션 인스턴스 핸들
+        NULL                  // 추가적인 데이터 (없으면 NULL)
     );
 
     if (hwnd == NULL) return 0;
-    m_framework->m_hwnd = hwnd;
+  
 
     ShowWindow(hwnd, nCmdShow);
-   
+    HANDLE hThread = NULL;
     // 렌더링 스레드 시작
-    HANDLE hThread = CreateThread(NULL, 0, client_render, hwnd, 0, NULL);
+    if (m_framework) {
+       hThread = CreateThread(NULL, 0, client_render, hwnd, 0, NULL);
+    }
 
     MSG msg = {};
     while (GetMessage(&msg, NULL, 0, 0)) {
@@ -59,8 +72,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    
+    if (uMsg == WM_CREATE) {
+        HDC hdc = GetDC(hwnd);
+        hBufferDC = CreateCompatibleDC(hdc);
+        RECT rect;
+        GetClientRect(hwnd, &rect);
+        hBufferBitmap = CreateCompatibleBitmap(hdc, rect.right, rect.bottom);
+        SelectObject(hBufferDC, hBufferBitmap);
+        ReleaseDC(hwnd, hdc);
 
-    m_framework->windowproc(hwnd, uMsg, wParam, lParam);
+        m_framework = new Framework(NULL, hBufferBitmap, hBufferDC);
+        if (!m_framework) {
+            MessageBox(hwnd, L"Failed to create Framework instance", L"Error", MB_OK);
+            return -1;
+        }
+        m_framework->m_hwnd = hwnd;
+ 
+        return 0;
+    }
+
+    if (m_framework) {
+        return m_framework->windowproc(hwnd, uMsg, wParam, lParam);
+    }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
