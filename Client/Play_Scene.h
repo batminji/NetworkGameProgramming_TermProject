@@ -1,6 +1,8 @@
 #pragma once
 #include "Scene.h"
 #include "Player.h"
+#include "Enemy.h"
+
 class Play_Scene :
     public Scene
 {
@@ -9,8 +11,10 @@ private :
     //더블버퍼링
     HBITMAP hBitmap;
 private:
-    Player* player;
+    Player* player1;
+    Player* player2;
 
+    vector<Enemy> enemys;
 private:
     //ui image
     CImage* game_bg;
@@ -43,8 +47,6 @@ public:
 
     void render(LPVOID param) override;
     void ui_render();
-    void player_render();
-    void bullet_render();
     void enemy_render();
     void item_draw();
     void update() override;

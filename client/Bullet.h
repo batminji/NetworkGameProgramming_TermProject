@@ -9,6 +9,7 @@ class bullet
 {
 	CImage* Basic_bullet;
 	CImage* Skill_bullet;
+	CImage* Monster_bullet;
 
 	short type;
 	short xy[2];

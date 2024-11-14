@@ -9,7 +9,9 @@ void Play_Scene::render(LPVOID param)
     //ui
     ui_render();
     // 캐릭터 그리기 (단순한 사각형으로 표현)
-    player->render(m_hBufferDC);
+    player1->render(m_hBufferDC);
+    player2->render(m_hBufferDC);
+    for (Enemy& e : enemys) e.render(m_hBufferDC);
 }
 
 void Play_Scene::ui_render()
@@ -33,7 +35,7 @@ void Play_Scene::ui_render()
         num = number_text[i] - 48;
         number->TransparentBlt(m_hBufferDC, i * 24 + 10, 12, 24, 28, num * 12, 0, 12, 14, RGB(255, 0, 255));
     }
-  //  // 코인 수
+   // 코인 수
     wsprintf(number_text, L"%d", play_gold);
     if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 10, 12, 24, 28, 0, 0, 12, 14, RGB(255, 0, 255));
     for (int i = 0; i < lstrlen(number_text); i++) {
@@ -44,10 +46,9 @@ void Play_Scene::ui_render()
 
 void Play_Scene::update()
 {
-    //임시
-    player->xPos += 25;
-    if (player->xPos == 200)player->xPos = 0;
-
+    player1->update();
+    player2->update();
+    for (Enemy& e : enemys) e.update();
 
     //배경
     if (bg_xPos == 0) bg_xPos = 1600;

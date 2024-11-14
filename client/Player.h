@@ -42,9 +42,11 @@ class Player
 public:
 
 	Player();
+	Player(short job, string id);
 
 public:
 	
 	void render(HDC mdc);
+	void update();
 };
 
