@@ -54,6 +54,8 @@ void Player::render(HDC mdc)
 
 void Player::update()
 {
-	Kirby_frame += 25;
-	if (Kirby_frame == 200)Kirby_frame = 0;
+	Kirby_frame = (Kirby_frame + 25) % 200;
+
+	//플레이어 좌표받아오기
+	
 }

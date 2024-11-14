@@ -2,6 +2,8 @@
 #include "Scene.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Item.h"
+#include "protocol.h"
 
 class Play_Scene :
     public Scene
@@ -15,6 +17,7 @@ private:
     Player* player2;
 
     vector<Enemy> enemys;
+    vector<Item> Items;
 private:
     //ui image
     CImage* game_bg;
@@ -53,4 +56,9 @@ public:
     void item_draw();
     void update() override;
     LRESULT CALLBACK windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
+
+public:
+    short send_y = 0;
+    int send_player_input(short y);
 };

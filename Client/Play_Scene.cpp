@@ -11,7 +11,7 @@ void Play_Scene::render(LPVOID param)
     // 캐릭터 그리기 (단순한 사각형으로 표현)
     player1->render(m_hBufferDC);
     player2->render(m_hBufferDC);
-    for (Enemy& e : enemys) e.render(m_hBufferDC);
+   
 }
 
 void Play_Scene::ui_render()
@@ -44,6 +44,16 @@ void Play_Scene::ui_render()
     }
 }
 
+void Play_Scene::enemy_render()
+{
+    for (Enemy& e : enemys) e.render(m_hBufferDC);
+}
+
+void Play_Scene::item_draw()
+{
+    for (Item& i : Items) i.render(m_hBufferDC);
+}
+
 void Play_Scene::update()
 {
     player1->update();
@@ -53,6 +63,9 @@ void Play_Scene::update()
     //배경
     if (bg_xPos == 0) bg_xPos = 1600;
     else bg_xPos--;
+
+    //플레이어인풋 전송
+    send_player_input(send_y);
 }
 
 LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -78,6 +91,30 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
+    case WM_MOUSEMOVE:
+        send_y = HIWORD(lParam);
+         return 0;
     }
+    
+
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+int Play_Scene::send_player_input(short y)
+{
+
+    CS_MOVE_PACKET movePacket;
+    movePacket.size = sizeof(CS_MOVE_PACKET);
+    movePacket.type = CS_MOVE;
+    movePacket.y = y;
+
+    if (send(*m_sock, reinterpret_cast<char*>(&movePacket), sizeof(movePacket), 0) == SOCKET_ERROR) {
+        std::cerr << "Send failed." << std::endl;
+        closesocket(*m_sock);
+        WSACleanup();
+        return -1;
+    }
+
+    
+    return 1;
 }
