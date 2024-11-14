@@ -7,7 +7,7 @@ static int Kirby_frame = 0;
 
 class Player
 {
-
+	 
  public :
 	 CImage* kirby_pink_fly;
 	 CImage* kirby_pink_die;

@@ -7,6 +7,8 @@ public:
 	HBITMAP m_hBufferBitmap;
 	HDC m_hBufferDC;
 	SOCKET* m_sock;
+
+	short next_scene=0;
 public:
 
 	Scene() {};

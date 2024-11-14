@@ -8,7 +8,7 @@ void Play_Scene::render(LPVOID param)
 
     //ui
     ui_render();
-    // 캐릭터 그리기 (단순한 사각형으로 표현)
+  
     player->render(m_hBufferDC);
 }
 
@@ -44,9 +44,8 @@ void Play_Scene::ui_render()
 
 void Play_Scene::update()
 {
-    //임시
-    player->xPos += 25;
-    if (player->xPos == 200)player->xPos = 0;
+    //업데이트
+
 
 
     //배경

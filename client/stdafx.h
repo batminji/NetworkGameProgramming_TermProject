@@ -25,6 +25,11 @@
 using namespace std;
 using namespace FMOD;
 
+//씬
+#define TITLE_SCENE 0
+#define LOBBY_SCENE 1
+#define ROOM_SCENE 2
+#define PLAY_SCENE 3
 
 enum PACKET // 패킷 타입 정의.
 {
