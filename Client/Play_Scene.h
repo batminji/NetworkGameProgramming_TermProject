@@ -35,8 +35,10 @@ public:
         m_hBufferBitmap = hBufferBitmap;
         m_hBufferDC = hBufferDC;
         m_sock = sock;
-        player = new Player();
 
+        //player
+        player1 = new Player(1, "1");
+        player2 = new Player(2, "1");
         //ui 이미지 로드
         game_bg = &ResourceManager::getInstance().game_bg;
         game_bg2 = &ResourceManager::getInstance().game_bg2;

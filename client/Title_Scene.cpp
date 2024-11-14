@@ -68,28 +68,29 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
                 WideCharToMultiByte(CP_ACP, 0, ID, -1, loginPacket.id, sizeof(loginPacket.id), NULL, NULL);
 
-                if (send(*m_sock, reinterpret_cast<char*>(&loginPacket), sizeof(loginPacket), 0) == SOCKET_ERROR) {
-                    std::cerr << "Send failed." << std::endl;
-                    closesocket(*m_sock);
-                    WSACleanup();
-                    return -1;
-                }
-
-                // 6. 로그인 결과 받기
-                char recvBuf[BUFSIZE];
-                int recvLen = recv(*m_sock, recvBuf, sizeof(SC_LOGIN_RESULT_PACKET), 0);
-                if (recvLen <= 0) {
-                    std::cerr << "Receive failed or connection closed." << std::endl;
-                }
-                else {
-                    SC_LOGIN_RESULT_PACKET* resPacket = reinterpret_cast<SC_LOGIN_RESULT_PACKET*>(recvBuf);
-                    if (resPacket->success) {
-                        std::cout << "Login successful!" << std::endl;
-                    }
-                    else {
-                        std::cout << "Login failed." << std::endl;
-                    }
-                }
+               //if (send(*m_sock, reinterpret_cast<char*>(&loginPacket), sizeof(loginPacket), 0) == SOCKET_ERROR) {
+               //    std::cerr << "Send failed." << std::endl;
+               //    closesocket(*m_sock);
+               //    WSACleanup();
+               //    return -1;
+               //}
+               //
+               //// 6. 로그인 결과 받기
+               //char recvBuf[BUFSIZE];
+               //int recvLen = recv(*m_sock, recvBuf, sizeof(SC_LOGIN_RESULT_PACKET), 0);
+               //if (recvLen <= 0) {
+               //    std::cerr << "Receive failed or connection closed." << std::endl;
+               //}
+               //else {
+               //    SC_LOGIN_RESULT_PACKET* resPacket = reinterpret_cast<SC_LOGIN_RESULT_PACKET*>(recvBuf);
+               //    if (resPacket->success) {
+               //        std::cout << "Login successful!" << std::endl;
+               //    }
+               //    else {
+               //        std::cout << "Login failed." << std::endl;
+               //    }
+               //}
+                next_scene = LOBBY_SCENE;
             }
             else if (count < 10) ID[count++] = wParam;
         break;

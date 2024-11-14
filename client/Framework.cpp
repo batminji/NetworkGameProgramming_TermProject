@@ -23,7 +23,7 @@ void Framework::update()
 			break;
 		case LOBBY_SCENE:
 			delete m_scene;
-			m_scene = new Title_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
+			m_scene = new Lobby_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
 			m_scene->next_scene = LOBBY_SCENE;
 			break;
 		case ROOM_SCENE:
@@ -45,6 +45,11 @@ void Framework::update()
 
 LRESULT Framework::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (uMsg == WM_CHAR) {
+		cout << wParam-48 << endl;
+		if (wParam-48 >= (char)TITLE_SCENE && wParam-48 <= (char)PLAY_SCENE) 
+			m_scene->next_scene = (short)(wParam-48);
+	}
 	if(m_scene)m_scene->windowproc(hwnd, uMsg, wParam, lParam);
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

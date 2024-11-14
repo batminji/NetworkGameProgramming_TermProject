@@ -38,39 +38,39 @@ void CreateConsole()
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow) {
     CreateConsole(); // 메세지확인용 콘솔 생성
     // 1. 윈속 초기화
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        std::cerr << "WSAStartup failed." << std::endl;
-        return -1;
-    }
-
-    // 2. 소켓 생성
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock == INVALID_SOCKET) {
-        std::cerr << "Socket creation failed." << std::endl;
-        WSACleanup();
-        return -1;
-    }
-
-    // 3. 서버 주소 설정
-    memset(&serverAddr, 0, sizeof(serverAddr));
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(SERVER_PORT);
-
-    // InetPton으로 IP 주소 설정
-    if (InetPton(AF_INET, SERVER_IP, &serverAddr.sin_addr) <= 0) {
-        std::cerr << "Invalid address or address not supported." << std::endl;
-        closesocket(sock);
-        WSACleanup();
-        return -1;
-    }
-
-    // 4. 서버에 연결
-    if (connect(sock, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-        std::cerr << "Connection failed." << std::endl;
-        closesocket(sock);
-        WSACleanup();
-        return -1;
-    }
+   // if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+   //     std::cerr << "WSAStartup failed." << std::endl;
+   //     return -1;
+   // }
+   //
+   // // 2. 소켓 생성
+   // sock = socket(AF_INET, SOCK_STREAM, 0);
+   // if (sock == INVALID_SOCKET) {
+   //     std::cerr << "Socket creation failed." << std::endl;
+   //     WSACleanup();
+   //     return -1;
+   // }
+   //
+   // // 3. 서버 주소 설정
+   // memset(&serverAddr, 0, sizeof(serverAddr));
+   // serverAddr.sin_family = AF_INET;
+   // serverAddr.sin_port = htons(SERVER_PORT);
+   //
+   // // InetPton으로 IP 주소 설정
+   // if (InetPton(AF_INET, SERVER_IP, &serverAddr.sin_addr) <= 0) {
+   //     std::cerr << "Invalid address or address not supported." << std::endl;
+   //     closesocket(sock);
+   //     WSACleanup();
+   //     return -1;
+   // }
+   //
+   // // 4. 서버에 연결
+   // if (connect(sock, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
+   //     std::cerr << "Connection failed." << std::endl;
+   //     closesocket(sock);
+   //     WSACleanup();
+   //     return -1;
+   // }
 
     const wchar_t CLASS_NAME[] = L"Sample Window Class";
 
@@ -91,14 +91,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
         0,                    // dwExStyle: 확장 창 스타일 (없으면 0)
         CLASS_NAME,            // 클래스 이름
         L"Kirby_don't_overeating",       // 윈도우 이름
-        WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,  // 윈도우 스타일
-        0, 0,                 // 위치 (x, y)
-        800, 600,             // 크기 (width, height)
-        NULL,                 // 부모 윈도우 (없으면 NULL)
-        (HMENU)NULL,          // 메뉴 (없으면 NULL)
-        hInstance,            // 애플리케이션 인스턴스 핸들
-        NULL                  // 추가적인 데이터 (없으면 NULL)
-    );
+        WS_OVERLAPPEDWINDOW, 0, 0, 800, 600, NULL, (HMENU)NULL, hInstance, NULL);
 
     if (hwnd == NULL) return 0;
   
