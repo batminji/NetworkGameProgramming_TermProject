@@ -19,6 +19,11 @@ public:
 	ResourceManager& operator=(const ResourceManager&) = delete;
 
 	// 그래픽 리소스들 선언
+	CImage Kirby_blue_fly;
+	CImage Kirby_blue_hit;
+	CImage Kirby_blue_zombie;
+	CImage Kirby_blue_die;
+
 	CImage start_screen;
 	CImage title;
 	CImage cartoon[6];
@@ -28,7 +33,10 @@ public:
 	CImage item_check;
 	CImage click_cursor;
 	CImage game_bg;
-	CImage kirby_fly;
+	CImage Kirby_pink_fly;
+	CImage Kirby_pink_die;
+	CImage Kirby_pink_hit;
+	CImage Kirby_pink_zombie;
 	CImage heart;
 	CImage basic_bullet;
 	CImage game_bg2;
@@ -42,8 +50,6 @@ public:
 	CImage skill_effects;
 	CImage game_over;
 	CImage over_number;
-	CImage kirby_hit;
-	CImage kirby_zombie;
 	CImage warning;
 	CImage missile_explosion;
 	CImage missile_bmp;
@@ -52,7 +58,6 @@ public:
 	CImage monster_die;
 	CImage hit_effect;
 	CImage rezero_bg;
-	CImage kirby_die;
 	CImage item[4];
 
 	// 사운드 리소스들 선언

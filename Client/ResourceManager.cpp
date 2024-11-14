@@ -3,6 +3,10 @@
 void ResourceManager::init(HINSTANCE g_hInst)
 {
     // 그래픽 리소스 로드
+    Kirby_blue_fly.LoadFromResource(g_hInst, MAKEINTRESOURCE(BLUE_FLY_LEFT));
+    Kirby_blue_hit.LoadFromResource(g_hInst, MAKEINTRESOURCE(BLUE_HIT));
+    //Kirby_blue_die.LoadFromResource(g_hInst, MAKEINTRESOURCE(BLUE_DIE));
+    Kirby_blue_zombie.LoadFromResource(g_hInst, MAKEINTRESOURCE(BLUE_ZOMBIE));
 
     title.LoadFromResource(g_hInst, MAKEINTRESOURCE(TITLE));
     start_screen.LoadFromResource(g_hInst, MAKEINTRESOURCE(LOGIN_SCREEN));
@@ -18,7 +22,7 @@ void ResourceManager::init(HINSTANCE g_hInst)
     item_check.LoadFromResource(g_hInst, MAKEINTRESOURCE(ITEM_CHECK));
     click_cursor.LoadFromResource(g_hInst, MAKEINTRESOURCE(CLiCK_CURSOR));
     game_bg.LoadFromResource(g_hInst, MAKEINTRESOURCE(GAME_BACKGROUND));
-    kirby_fly.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_FLY_LEFT));
+    Kirby_pink_fly.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_FLY_LEFT));
     heart.LoadFromResource(g_hInst, MAKEINTRESOURCE(HEART));
     basic_bullet.LoadFromResource(g_hInst, MAKEINTRESOURCE(BASIC_BULLET));
     game_bg2.LoadFromResource(g_hInst, MAKEINTRESOURCE(GAME_BACKGROUND_2));
@@ -41,8 +45,8 @@ void ResourceManager::init(HINSTANCE g_hInst)
     skill_effects.LoadFromResource(g_hInst, MAKEINTRESOURCE(SKILL_EFFECTS));
     game_over.LoadFromResource(g_hInst, MAKEINTRESOURCE(GAME_OVER));
     over_number.LoadFromResource(g_hInst, MAKEINTRESOURCE(OVER_NUMBER));
-    kirby_hit.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_HIT));
-    kirby_zombie.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_ZOMBIE));
+    Kirby_pink_hit.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_HIT));
+    Kirby_pink_zombie.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_ZOMBIE));
     warning.LoadFromResource(g_hInst, MAKEINTRESOURCE(WARNING));
     missile_explosion.LoadFromResource(g_hInst, MAKEINTRESOURCE(MISSILE_EXPLOSION));
     missile_bmp.LoadFromResource(g_hInst, MAKEINTRESOURCE(MISSILE));
@@ -50,6 +54,7 @@ void ResourceManager::init(HINSTANCE g_hInst)
     monster_create.LoadFromResource(g_hInst, MAKEINTRESOURCE(MONSTER_CREATE));
     hit_effect.LoadFromResource(g_hInst, MAKEINTRESOURCE(HIT_EFFECT));
     monster_die.LoadFromResource(g_hInst, MAKEINTRESOURCE(MONSTER_DIE));
+
 
     // 사운드 리소스 로드
     result = System_Create(&ssystem);
