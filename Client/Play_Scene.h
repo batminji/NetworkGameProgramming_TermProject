@@ -50,5 +50,3 @@ public:
     void update() override;
     LRESULT CALLBACK windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 };
-
-
