@@ -5,10 +5,7 @@ void Play_Scene::render(LPVOID param)
 	m_hwnd = (HWND)param;
 	RECT rect;
 	GetClientRect(m_hwnd, &rect);
-    // 배경 그리기
-    HBRUSH hBrush = CreateSolidBrush(RGB(30, 30, 30)); // 배경을 어두운 색으로 채우기
-    FillRect(m_hBufferDC, &rect, hBrush);
-    DeleteObject(hBrush);
+
     //ui
     ui_render();
     // 캐릭터 그리기 (단순한 사각형으로 표현)
@@ -64,12 +61,8 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
-       
         HDC hdc = BeginPaint(hwnd, &ps);
-        hBitmap = CreateCompatibleBitmap(hdc, 800, 600);
-        BitBlt(hdc, 0, 0, ps.rcPaint.right, ps.rcPaint.bottom, m_hBufferDC, 0, 0, SRCCOPY);
-       
-
+        BitBlt(hdc, 0, 0, 800, 600, m_hBufferDC, 0, 0, SRCCOPY);
         EndPaint(hwnd, &ps);
         return 0;
     }

@@ -18,6 +18,8 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     case WM_PAINT:
     {
       
+      
+        
         return 0;
     }
 

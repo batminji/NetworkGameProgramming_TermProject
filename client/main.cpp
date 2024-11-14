@@ -35,7 +35,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
         0,                    // dwExStyle: 확장 창 스타일 (없으면 0)
         CLASS_NAME,            // 클래스 이름
         L"Kirby_don't_overeating",       // 윈도우 이름
-        WS_OVERLAPPEDWINDOW,  // 윈도우 스타일
+        WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,  // 윈도우 스타일
         0, 0,                 // 위치 (x, y)
         800, 600,             // 크기 (width, height)
         NULL,                 // 부모 윈도우 (없으면 NULL)
