@@ -30,6 +30,7 @@ using namespace FMOD;
 #define LOBBY_SCENE 1
 #define ROOM_SCENE 2
 #define PLAY_SCENE 3
+#define CARTOON_SCENE 4
 
 enum PACKET // 패킷 타입 정의.
 {

@@ -85,12 +85,21 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                    SC_LOGIN_RESULT_PACKET* resPacket = reinterpret_cast<SC_LOGIN_RESULT_PACKET*>(recvBuf);
                    if (resPacket->success) {
                        std::cout << "Login successful!" << std::endl;
+                       if (resPacket->is_new) {
+                           std::cout << "기존유저!" << std::endl;
+                           next_scene = LOBBY_SCENE;
+                       }
+                       else {
+                           std::cout << "새유저!" << std::endl;
+                           next_scene = CARTOON_SCENE;
+                       }
                    }
                    else {
                        std::cout << "Login failed." << std::endl;
+                       
                    }
                }
-                next_scene = LOBBY_SCENE;
+              
             }
             else if (count < 10) ID[count++] = wParam;
         break;

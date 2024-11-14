@@ -36,6 +36,11 @@ void Framework::update()
 			m_scene = new Play_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
 			m_scene->next_scene = PLAY_SCENE;
 			break;
+		case CARTOON_SCENE:
+			delete m_scene;
+			m_scene = new Cartoon_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
+			m_scene->next_scene = CARTOON_SCENE;
+			break;
 		default:
 			break;
 		}
@@ -46,8 +51,8 @@ void Framework::update()
 LRESULT Framework::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg == WM_CHAR) {
-		cout << wParam-48 << endl;
-		if (wParam-48 >= (char)TITLE_SCENE && wParam-48 <= (char)PLAY_SCENE) 
+		
+		if (wParam-48 >= (char)TITLE_SCENE && wParam-48 <= (char)CARTOON_SCENE) 
 			m_scene->next_scene = (short)(wParam-48);
 	}
 	if(m_scene)m_scene->windowproc(hwnd, uMsg, wParam, lParam);
