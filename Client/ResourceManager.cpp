@@ -18,7 +18,7 @@ void ResourceManager::init(HINSTANCE g_hInst)
     item_check.LoadFromResource(g_hInst, MAKEINTRESOURCE(ITEM_CHECK));
     click_cursor.LoadFromResource(g_hInst, MAKEINTRESOURCE(CLiCK_CURSOR));
     game_bg.LoadFromResource(g_hInst, MAKEINTRESOURCE(GAME_BACKGROUND));
-    kirby_fly.LoadFromResource(g_hInst, MAKEINTRESOURCE(KIRBY_FLY_LEFT));
+    kirby_fly.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_FLY_LEFT));
     heart.LoadFromResource(g_hInst, MAKEINTRESOURCE(HEART));
     basic_bullet.LoadFromResource(g_hInst, MAKEINTRESOURCE(BASIC_BULLET));
     game_bg2.LoadFromResource(g_hInst, MAKEINTRESOURCE(GAME_BACKGROUND_2));
@@ -41,8 +41,8 @@ void ResourceManager::init(HINSTANCE g_hInst)
     skill_effects.LoadFromResource(g_hInst, MAKEINTRESOURCE(SKILL_EFFECTS));
     game_over.LoadFromResource(g_hInst, MAKEINTRESOURCE(GAME_OVER));
     over_number.LoadFromResource(g_hInst, MAKEINTRESOURCE(OVER_NUMBER));
-    kirby_hit.LoadFromResource(g_hInst, MAKEINTRESOURCE(KIRBY_HIT));
-    kirby_zombie.LoadFromResource(g_hInst, MAKEINTRESOURCE(KIRBY_ZOMBIE));
+    kirby_hit.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_HIT));
+    kirby_zombie.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_ZOMBIE));
     warning.LoadFromResource(g_hInst, MAKEINTRESOURCE(WARNING));
     missile_explosion.LoadFromResource(g_hInst, MAKEINTRESOURCE(MISSILE_EXPLOSION));
     missile_bmp.LoadFromResource(g_hInst, MAKEINTRESOURCE(MISSILE));
