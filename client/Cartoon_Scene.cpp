@@ -41,7 +41,7 @@ LRESULT Cartoon_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
         cartoon_cnt++;
         if (cartoon_cnt == 6) {
      
-            next_scene = PLAY_SCENE;
+            next_scene = LOBBY_SCENE;
         }
         break;
     case WM_KEYDOWN:
