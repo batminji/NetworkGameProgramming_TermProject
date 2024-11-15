@@ -345,5 +345,8 @@
     <Image Include="resource_file\room_screen.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="..\..\..\..\Downloads\room_screen_bg.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>

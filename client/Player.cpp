@@ -15,7 +15,7 @@ Player::Player()
 	job = 1;
 }
 
-Player::Player(short job, std::string id)
+Player::Player(short j, std::string i, bool w)
 {
 	kirby_pink_fly = &ResourceManager::getInstance().Kirby_pink_fly;
 	kirby_pink_die = &ResourceManager::getInstance().Kirby_pink_die;
@@ -26,8 +26,9 @@ Player::Player(short job, std::string id)
 	// kirby_blue_die = &ResourceManager::getInstance().Kirby_blue_die;
 	kirby_blue_hit = &ResourceManager::getInstance().Kirby_blue_hit;
 	kirby_blue_zombie = &ResourceManager::getInstance().Kirby_blue_zombie;
-	job = job;
-	id = id;
+	job = j;
+	id = i;
+	who_is_me = w;
 }
 
 void Player::render(HDC mdc)

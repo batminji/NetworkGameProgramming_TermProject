@@ -20,6 +20,7 @@ class Player
 	 CImage* kirby_blue_zombie;
 	
 	short job;
+	bool room;
 	
 	std::string	id;
 	
@@ -33,7 +34,7 @@ class Player
 	short zombie_cnt;
 
 	bool die;
-
+	bool who_is_me;
 	bool equipments[4];
 
 	vector <bullet> basic_bullets;
@@ -42,7 +43,7 @@ class Player
 public:
 
 	Player();
-	Player(short job, string id);
+	Player(short job, string id, bool who_is_me);
 
 public:
 	

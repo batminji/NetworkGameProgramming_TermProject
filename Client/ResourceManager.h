@@ -22,6 +22,7 @@ public:
 	CImage Room_screen;
 	CImage Dealer_check;
 	CImage Healer_check;
+	CImage Room_screen_bg;
 
 	CImage Kirby_blue_fly;
 	CImage Kirby_blue_hit;
