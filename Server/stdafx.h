@@ -20,6 +20,7 @@
 #include <atlImage.h>
 #include <unordered_map>
 #include <fstream>
+#include <chrono>
 #pragma comment(lib, "ws2_32") // ws2_32.lib ¸µÅ©
 
 // enum
