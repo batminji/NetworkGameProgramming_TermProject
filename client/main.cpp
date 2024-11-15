@@ -158,33 +158,44 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
+
 DWORD WINAPI client_render(LPVOID param) {
     HWND hwnd = (HWND)param;
 
-    // 더블 버퍼링에 사용할 메모리 DC에서 작업
+    auto previousTime = std::chrono::high_resolution_clock::now();
+    const double frameDuration = 1.0 / 30.0; // 30 FPS
+
     while (isRunning) {
-        
-        m_framework->render(hwnd);
-        // 화면 갱신 요청
-        InvalidateRect(hwnd, NULL, FALSE);
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        double elapsedTime = std::chrono::duration<double>(currentTime - previousTime).count();
 
-        // 프레임 속도 조절 (예: 60fps)
-        Sleep(16); // milliseconds
+        if (elapsedTime >= frameDuration) {
+            previousTime = currentTime;
+            m_framework->render(hwnd);
+            InvalidateRect(hwnd, NULL, FALSE);
+        }
     }
+
     return 0;
 }
 
-DWORD WINAPI client_update(LPVOID param)
-{
+DWORD WINAPI client_update(LPVOID param) {
     HWND hwnd = (HWND)param;
-   
-    while (isRunning)
-    {
-        m_framework->update();
-        // 화면 갱신 요청
-        InvalidateRect(hwnd, NULL, FALSE);
-        // 프레임 속도 조절 (예: 60fps)
-        Sleep(16); // milliseconds
+
+    auto previousTime = std::chrono::high_resolution_clock::now();
+    const double frameDuration = 1.0 / 30.0; // 30 FPS
+
+    while (isRunning) {
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        double elapsedTime = std::chrono::duration<double>(currentTime - previousTime).count();
+
+        if (elapsedTime >= frameDuration) {
+            previousTime = currentTime;
+            m_framework->update();
+            InvalidateRect(hwnd, NULL, FALSE);
+        }
     }
+
     return 0;
 }
+

@@ -61,6 +61,7 @@ public:
 	CImage item[4];
 
 	// 사운드 리소스들 선언
+ // &ResourceManager::getinstance().ssystem -> 이런식으로 사용해야함
 	System* ssystem;
 	Sound* title_bgm;
 	Sound* main_bgm;
