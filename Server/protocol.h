@@ -96,3 +96,19 @@ struct SC_OBJECT_CHANGE_PACKET // 오브젝트 상태변경
 	OTYPE obj_type;
 	bool isRemove; // 삭제되었는가 혹은 죽었는가?
 };
+
+struct SC_RANKING_PACKET 
+{
+	unsigned short size;
+	PACKET type;
+	char id1[ID_LEN];
+	unsigned int hs1;
+	char id2[ID_LEN];
+	unsigned int hs2;
+	char id3[ID_LEN];
+	unsigned int hs3;
+	char id4[ID_LEN];
+	unsigned int hs4;
+	char id5[ID_LEN];
+	unsigned int hs5;
+};

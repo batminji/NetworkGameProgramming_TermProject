@@ -15,7 +15,7 @@ private:
     bool inGame = false; // 현재 접속중인 아이디인가?
     unsigned short y = 0; // winsize/2로 할것
     unsigned int high_score = 0;
-    unsigned int coin = 0; // 오버플로우 떠서 int로 수정: 11/15
+    unsigned int coin = 0; // 오버플로우 떠서 int로 수정
 
     // 게임을 실행중일 때 
 
@@ -146,6 +146,55 @@ bool read_player_info() // 데이터 처리
     }
 
     in.close(); // 파일 닫기
+    return true;
+}
+
+// 랭킹
+bool send_top_high_scores(SOCKET& s) {
+    SC_RANKING_PACKET res;
+    res.size = sizeof(SC_RANKING_PACKET);
+    res.type = SC_RANKING;
+
+    std::vector<std::pair<std::string, unsigned int>> playerData;
+    for (auto& p : players) {
+        playerData.emplace_back(p.second.getID(), p.second.getHigh_score());
+    }
+
+    // 점수를 기준으로 내림차순 정렬
+    std::sort(playerData.begin(), playerData.end(),
+        [](const auto& a, const auto& b) {
+            return a.second > b.second; // 점수 비교
+        });
+
+    // 하드... 복붙
+    int cnt = 0;
+
+    strcpy(res.id1, playerData[cnt].first.c_str());
+    res.hs1 = playerData[cnt].second;
+    cnt++;
+
+    strcpy(res.id2, playerData[cnt].first.c_str());
+    res.hs2 = playerData[cnt].second;
+    cnt++;
+
+    strcpy(res.id3, playerData[cnt].first.c_str());
+    res.hs3 = playerData[cnt].second;
+    cnt++;
+    
+    strcpy(res.id4, playerData[cnt].first.c_str());
+    res.hs4 = playerData[cnt].second;
+    cnt++;
+    
+    strcpy(res.id5, playerData[cnt].first.c_str());
+    res.hs5 = playerData[cnt].second;
+    cnt++;
+
+    // 패킷 전송
+    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(res), 0);
+    if (ret == SOCKET_ERROR) {
+        SERVER_err_display("send() failed");
+        return false;
+    }
     return true;
 }
 
@@ -326,8 +375,10 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         // 1-1. 로그인 패킷 처리
         CS_LOGIN_PACKET* p = reinterpret_cast<CS_LOGIN_PACKET*>(recv_buf);
         client_info(s, p->id);
-        if (send_login_packet(s, p))
+        if (send_login_packet(s, p)){
             pid = p->id;
+            send_top_high_scores(s);
+        }
         
         players[pid].setSocket(s);
 

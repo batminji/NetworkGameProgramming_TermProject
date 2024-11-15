@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <fstream>
 #include <chrono>
+#include <array>
 #pragma comment(lib, "ws2_32") // ws2_32.lib 링크
 
 // enum
@@ -39,7 +40,8 @@ enum PACKET // 패킷 타입 정의.
 	SC_PLAYER_MOVE,
 	SC_PLAYER_STATE_CHANGE,
 	SC_OBJECT_MOVE,
-	SC_OBJECT_CHANGE
+	SC_OBJECT_CHANGE,
+	SC_RANKING
 };
 
 enum OTYPE // 오브젝트 타입 정의.
