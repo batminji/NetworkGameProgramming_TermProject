@@ -1,5 +1,5 @@
 #include "Room_Scene.h"
-#include "protocol.h"
+//#include "../Server/protocol.h"
 Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock) {
 
 

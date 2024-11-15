@@ -48,6 +48,9 @@ struct SC_LOGIN_RESULT_PACKET
 	PACKET type;
 	bool success; // True일 때 로그인 성공
 	bool is_new; // 이게 true일때 컷씬 실행해주세요
+	// 플레이어 기존 데이터 전송
+	unsigned int high_score; 
+	unsigned int coin;
 };
 
 struct SC_ROOM_CHANGE_PACKET // 방 설정이 변경되면

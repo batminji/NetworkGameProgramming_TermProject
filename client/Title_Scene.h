@@ -1,7 +1,7 @@
 #pragma once
 #include "Scene.h"
 #include "ResourceManager.h"
-#include "protocol.h"
+//#include "../Server/protocol.h"
 class Title_Scene :
     public Scene
 {

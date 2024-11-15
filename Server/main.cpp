@@ -10,12 +10,12 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
 class Player
 {
 private:
-    SOCKET s;
-    std::string id;
+    SOCKET s = -1;
+    std::string id = "";
     bool inGame = false; // 현재 접속중인 아이디인가?
-    unsigned short y;
-    unsigned short high_score;
-    unsigned short coin;
+    unsigned short y = 0; // winsize/2로 할것
+    unsigned int high_score = 0;
+    unsigned int coin = 0; // 오버플로우 떠서 int로 수정: 11/15
 
     // 게임을 실행중일 때 
 
@@ -28,10 +28,11 @@ public:
         int ret = send(s, reinterpret_cast<char*>(&res), size, 0);
         if (ret == SOCKET_ERROR) { // 에러 처리
             int error = WSAGetLastError();
-            err_display("send failed");
-            err_display(error);  // 오류 코드 출력
+            SERVER_err_display("send failed");
+            SERVER_err_display(error);  // 오류 코드 출력
             return false;
         }
+        return true;
     }
 
     void init(std::string& str, unsigned int high_score, unsigned short gold)
@@ -49,6 +50,8 @@ public:
     void setY(unsigned short y) { this->y = y; }
     std::string getID() { return id; }
     void setSocket(SOCKET& s) { this->s = s; }
+    unsigned short getCoin() { return coin; }
+    unsigned int getHigh_score() { return high_score; }
 };
 
 class Room
@@ -79,37 +82,108 @@ public:
     bool getisDealer(std::string myid) { return myid == dealer_id; }
     bool broadcast(char* res, size_t size)
     {
-        p1->broadcast(res, size);
-        p2->broadcast(res, size);
+        return (p1->broadcast(res, size) && p2->broadcast(res, size));
     }
 };
 
 std::unordered_map<std::string, Room> roomInfo;
 std::unordered_map<std::string, Player> players;
 
+// 유저데이터 관리용 : 전체 데이터 덮어쓰기
+bool save_all_player_info()
+{
+    // 덮어쓰기 모드로 파일 열기 (기본 설정)
+    std::ofstream out{ "data.txt", std::ios::out | std::ios::trunc };
+
+    if (!out.is_open()) { // 파일이 제대로 열렸는지 확인
+        std::cerr << "Failed to open data.txt for writing" << std::endl;
+        return false;
+    }
+
+    for (auto& pair : players) { // players 맵의 모든 항목 순회
+        auto& player = pair.second;
+        out << player.getID() << " "   // ID
+            << player.getCoin() << " " // Coin
+            << player.getHigh_score()   // High Score
+            << std::endl;              // 각 플레이어 정보를 한 줄로 저장
+    }
+
+    return true; // 파일 자동으로 닫힘 (RAII)
+}
+
+// 새 유저 추가하기
+bool add_new_player(const std::string& id, unsigned int coin, unsigned int highScore)
+{
+    // 추가 모드로 파일 열기
+    std::ofstream out{ "data.txt", std::ios::out | std::ios::app };
+
+    if (!out.is_open()) { // 파일이 제대로 열렸는지 확인
+        std::cerr << "Failed to open data.txt for appending" << std::endl;
+        return false;
+    }
+
+    // 새 유저 데이터를 추가
+    out << id << " " << coin << " " << highScore << std::endl;
+
+    return true; // 파일 자동으로 닫힘 (RAII)
+}
+
+// 기존 유저 추가하기(서버 실행시에 로드)
+bool read_player_info() // 데이터 처리
+{
+    std::ifstream in{ "data.txt" }; // data.txt 파일 열기
+
+    if (!in.is_open()) { // 파일이 제대로 열렸는지 확인
+        std::cerr << "Failed to open data.txt" << std::endl;
+        return false;
+    }
+
+    std::string stmp;
+    unsigned int ctmp;
+    unsigned int hstmp;
+    while (in >> stmp >> ctmp >> hstmp) { // ID, coin, highScore 읽기
+        players[stmp].init(stmp, hstmp, ctmp);
+    }
+
+    in.close(); // 파일 닫기
+    return true;
+}
+
 bool send_login_packet(SOCKET& s, CS_LOGIN_PACKET* p) // 로그인 패킷 보내는 함수 따로 뺌.
 {
     SC_LOGIN_RESULT_PACKET res;
     res.size = sizeof(SC_LOGIN_RESULT_PACKET);
     res.type = SC_LOGIN_RESULT;
-    if (players[p->id].isPlaying()) { // 플레이어가 지금 접속중인가?
+
+    int k = players.count(p->id);
+    auto& pl = players[p->id];
+    if (pl.isPlaying()) { // 플레이어가 지금 접속중인가?
         res.success = false;
         res.is_new = false;
     }
     else {
         res.success = true;
-        if (players.find(p->id) == players.end()) // 같은 아이디의 플레이어가 존재하는가?
+        if (k == 0) // 같은 아이디의 플레이어가 존재하는가?
+        {
             res.is_new = true;
-        else
+            std::cout << "새로운 유저 " << p->id << "등장!" << std::endl;
+            add_new_player(p->id, pl.getCoin(), pl.getHigh_score());
+        }
+        else {
             res.is_new = false;
-        players[p->id].setPlaying(true);
+            std::cout << "기존 유저 " << p->id << "등장!" << std::endl;
+        }
+
+        pl.setPlaying(true);
+        res.coin = pl.getCoin();
+        res.high_score = pl.getHigh_score();
     }
 
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_LOGIN_RESULT_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
         int error = WSAGetLastError();
-        err_display("send failed");
-        err_display(error);  // 오류 코드 출력
+        SERVER_err_display("send failed");
+        SERVER_err_display(error);  // 오류 코드 출력
         return false;
     }
     return true;
@@ -142,8 +216,8 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
         int error = WSAGetLastError();
-        err_display("send failed");
-        err_display(error);  // 오류 코드 출력
+        SERVER_err_display("send failed");
+        SERVER_err_display(error);  // 오류 코드 출력
         return false;
     }
     return true;
@@ -158,8 +232,8 @@ bool send_player_state_change_packet(SOCKET& s, std::string& id)
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
         int error = WSAGetLastError();
-        err_display("send failed");
-        err_display(error);  // 오류 코드 출력
+        SERVER_err_display("send failed");
+        SERVER_err_display(error);  // 오류 코드 출력
         return false;
     }
     return true;
@@ -243,8 +317,8 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         int ret = recv(s, recv_buf, sizeof(CS_LOGIN_PACKET), 0);
         if (ret == SOCKET_ERROR) { // 에러처리
             int error = WSAGetLastError();
-            err_display("recv() failed");
-            err_display(error);  // 오류 코드 출력
+            SERVER_err_display("recv() failed");
+            SERVER_err_display(error);  // 오류 코드 출력
             closesocket(s);
             return -1;
         }
@@ -264,8 +338,8 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), 0);
             if (ret == SOCKET_ERROR) { // 에러처리
                 int error = WSAGetLastError();
-                err_display("recv() failed");
-                err_display(error);  // 오류 코드 출력
+                SERVER_err_display("recv() failed");
+                SERVER_err_display(error);  // 오류 코드 출력
             }
 
             //CS_JOIN_ROOM_PACKET;
@@ -276,25 +350,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
     }
 }
 
-bool read_player_info() // 데이터 처리
-{
-    std::ifstream in{ "data.txt" }; // data.txt 파일 열기
 
-    if (!in.is_open()) { // 파일이 제대로 열렸는지 확인
-        std::cerr << "Failed to open data.txt" << std::endl;
-        return false;
-    }
-
-    std::string stmp;
-    unsigned short ctmp;
-    unsigned short hstmp;
-    while (in >> stmp >> ctmp >> hstmp) { // ID, coin, highScore 읽기
-        players[stmp].init(stmp, hstmp, ctmp);
-    }
-
-    in.close(); // 파일 닫기
-    return true;
-}
 
 int main()
 {
@@ -309,7 +365,7 @@ int main()
         return 1;
 
     SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (listen_sock == INVALID_SOCKET) err_quit("socket()");
+    if (listen_sock == INVALID_SOCKET) SERVER_err_quit("socket()");
 
     struct sockaddr_in serveraddr;
     memset(&serveraddr, 0, sizeof(serveraddr));
@@ -317,10 +373,10 @@ int main()
     serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serveraddr.sin_port = htons(SERVERPORT);
     retval = bind(listen_sock, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
-    if (retval == SOCKET_ERROR) err_quit("bind()");
+    if (retval == SOCKET_ERROR) SERVER_err_quit("bind()");
 
     retval = listen(listen_sock, SOMAXCONN);
-    if (retval == SOCKET_ERROR) err_quit("listen()");
+    if (retval == SOCKET_ERROR) SERVER_err_quit("listen()");
 
     SOCKET client_sock;
     struct sockaddr_in clientaddr;

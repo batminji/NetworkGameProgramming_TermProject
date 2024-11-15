@@ -86,12 +86,12 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                    if (resPacket->success) {
                        std::cout << "Login successful!" << std::endl;
                        if (resPacket->is_new) {
-                           std::cout << "기존유저!" << std::endl;
-                           next_scene = LOBBY_SCENE;
-                       }
-                       else {
                            std::cout << "새유저!" << std::endl;
                            next_scene = CARTOON_SCENE;
+                       }
+                       else {
+                           std::cout << "기존유저!" << std::endl;
+                           next_scene = LOBBY_SCENE;
                        }
                    }
                    else {

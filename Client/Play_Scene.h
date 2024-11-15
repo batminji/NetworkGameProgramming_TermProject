@@ -3,7 +3,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Item.h"
-#include "protocol.h"
+//#include "../Server/protocol.h"
 
 class Play_Scene :
     public Scene
