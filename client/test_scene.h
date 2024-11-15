@@ -14,7 +14,7 @@ public:
 
 public :
 
-    test_scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC):Scene(hwnd,hBufferBitmap,hBufferDC) {
+    test_scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock) {
        
     };
 public:

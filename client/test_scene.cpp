@@ -22,41 +22,32 @@ void test_scene::update()
 {
 }
 
-LRESULT test_scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
+
+LRESULT test_scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
-    case WM_CREATE:
-    {
-        // 버퍼 초기화
-        HDC hdc = GetDC(hwnd);
-        m_hBufferDC = CreateCompatibleDC(hdc);
-        RECT rect;
-        GetClientRect(hwnd, &rect);
-        m_hBufferBitmap = CreateCompatibleBitmap(hdc, rect.right, rect.bottom);
-        SelectObject(m_hBufferDC, m_hBufferBitmap);
-        ReleaseDC(hwnd, hdc);
-    }
-    return 0;
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
         BitBlt(hdc, 0, 0, ps.rcPaint.right, ps.rcPaint.bottom, m_hBufferDC, 0, 0, SRCCOPY);
         EndPaint(hwnd, &ps);
-    }
-    return 0;
-    case WM_KEYDOWN: // 키 입력 처리
-        switch (wParam) {
-        case 'W': characterY -= moveStep; break; // 위로 이동
-        case 'S': characterY += moveStep; break; // 아래로 이동
-        case 'A': characterX -= moveStep; break; // 왼쪽으로 이동
-        case 'D': characterX += moveStep; break; // 오른쪽으로 이동
-        }
-        InvalidateRect(hwnd, NULL, FALSE); // 화면 갱신 요청
         return 0;
+    }
+
+    case WM_KEYDOWN:
+        switch (wParam) {
+        case 'W': characterY -= moveStep; break;
+        case 'S': characterY += moveStep; break;
+        case 'A': characterX -= moveStep; break;
+        case 'D': characterX += moveStep; break;
+        }
+        InvalidateRect(hwnd, NULL, FALSE);
+        return 0;
+
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
+

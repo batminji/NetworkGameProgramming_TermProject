@@ -6,12 +6,17 @@ public:
 	HWND m_hwnd;
 	HBITMAP m_hBufferBitmap;
 	HDC m_hBufferDC;
+	SOCKET* m_sock;
+
+	short next_scene=0;
 public:
 
-	Scene(HWND hwnd,HBITMAP hBufferBitmap, HDC hBufferDC) {
+	Scene() {};
+	Scene(HWND hwnd,HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock) {
 		m_hwnd = hwnd;
 		m_hBufferBitmap = hBufferBitmap;
 		m_hBufferDC = hBufferDC;
+		m_sock = sock;
 	};
 public:
 	bool running = 0;

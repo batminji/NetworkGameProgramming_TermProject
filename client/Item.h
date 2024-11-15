@@ -1,12 +1,18 @@
 #pragma once
 #include "stdafx.h"
-
+#include "ResourceManager.h"
 class Item
 {
-
 public:
-	short xy[2];
-
+	CImage* coin_bmp;
+	CImage* dual_bmp;
+	CImage* magnet_bmp;
+public:
+	short x;
+	short y;
+public :
+	Item(short ax, short ay);
+	Item();
 public:
 	virtual void render(HDC mdc) = 0 ;
 
