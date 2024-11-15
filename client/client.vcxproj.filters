@@ -336,5 +336,14 @@
     <Image Include="resource_file\warning.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="resource_file\dealer_check.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="resource_file\healer_check.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="resource_file\room_screen.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>

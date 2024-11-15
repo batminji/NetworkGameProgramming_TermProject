@@ -200,11 +200,13 @@
     <Image Include="resource_file\click_cursor.bmp" />
     <Image Include="resource_file\coin.bmp" />
     <Image Include="resource_file\cursor.bmp" />
+    <Image Include="resource_file\dealer_check.bmp" />
     <Image Include="resource_file\effects.bmp" />
     <Image Include="resource_file\GAMEOVER.bmp" />
     <Image Include="resource_file\gameplay_background.bmp" />
     <Image Include="resource_file\gameplay_background2.bmp" />
     <Image Include="resource_file\gameplay_background2.png" />
+    <Image Include="resource_file\healer_check.bmp" />
     <Image Include="resource_file\heart.bmp" />
     <Image Include="resource_file\HP_bar1.bmp" />
     <Image Include="resource_file\HP_bar2.bmp" />
@@ -245,6 +247,7 @@
     <Image Include="resource_file\number.bmp" />
     <Image Include="resource_file\over_number.bmp" />
     <Image Include="resource_file\rezero_bg.bmp" />
+    <Image Include="resource_file\room_screen.bmp" />
     <Image Include="resource_file\skill_bullet.bmp" />
     <Image Include="resource_file\skill_color.bmp" />
     <Image Include="resource_file\skill_dark.bmp" />

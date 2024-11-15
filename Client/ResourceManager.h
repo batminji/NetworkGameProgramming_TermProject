@@ -19,6 +19,10 @@ public:
 	ResourceManager& operator=(const ResourceManager&) = delete;
 
 	// 그래픽 리소스들 선언
+	CImage Room_screen;
+	CImage Dealer_check;
+	CImage Healer_check;
+
 	CImage Kirby_blue_fly;
 	CImage Kirby_blue_hit;
 	CImage Kirby_blue_zombie;

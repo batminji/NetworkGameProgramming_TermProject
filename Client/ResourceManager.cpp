@@ -3,6 +3,10 @@
 void ResourceManager::init(HINSTANCE g_hInst)
 {
     // 그래픽 리소스 로드
+    Room_screen.LoadFromResource(g_hInst, MAKEINTRESOURCE(ROOM_SCREEN));
+    Dealer_check.LoadFromResource(g_hInst, MAKEINTRESOURCE(DEALER_CHECK));
+    Healer_check.LoadFromResource(g_hInst, MAKEINTRESOURCE(HEALER_CHECK));
+
     Kirby_blue_fly.LoadFromResource(g_hInst, MAKEINTRESOURCE(BLUE_FLY_LEFT));
     Kirby_blue_hit.LoadFromResource(g_hInst, MAKEINTRESOURCE(BLUE_HIT));
     //Kirby_blue_die.LoadFromResource(g_hInst, MAKEINTRESOURCE(BLUE_DIE));
