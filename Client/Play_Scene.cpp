@@ -66,6 +66,8 @@ void Play_Scene::update()
 
     //플레이어인풋 전송
     send_player_input(send_y);
+    //플레이어 데이터 수신
+    recv_player_data();
 }
 
 LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -118,3 +120,4 @@ int Play_Scene::send_player_input(short y)
     
     return 1;
 }
+

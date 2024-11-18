@@ -9,9 +9,6 @@ class Play_Scene :
     public Scene
 {
 
-private :
-    //더블버퍼링
-    HBITMAP hBitmap;
 private:
     Player* player1;
     Player* player2;
@@ -42,6 +39,7 @@ public:
         //player
         player1 = new Player(1, "1",1);
         player2 = new Player(2, "1",0);
+
         //ui 이미지 로드
         game_bg = &ResourceManager::getInstance().game_bg;
         game_bg2 = &ResourceManager::getInstance().game_bg2;
@@ -61,4 +59,8 @@ public:
 public:
     short send_y = 0;
     int send_player_input(short y);
+
+
+   
+
 };
