@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 class DataManager
 {
 public:
@@ -16,20 +17,12 @@ public:
 	};
 	struct ranking_des
 	{
-		char id1[20];
-		unsigned int hs1;
-		char id2[20];
-		unsigned int hs2;
-		char id3[20];
-		unsigned int hs3;
-		char id4[20];
-		unsigned int hs4;
-		char id5[20];
-		unsigned int hs5;
+		char id[20];
+		unsigned int hs;
 	};
 	public:
 	my_data_des my_data;
-	ranking_des rank_data;
+	std::vector<ranking_des> rank_data;
 
 
 

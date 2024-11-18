@@ -10,6 +10,36 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 	main_screen = &ResourceManager::getInstance().main_screen;
 	start_button = &ResourceManager::getInstance().start_button;
 
+	// 6. ·©Å· ¹Þ±â
+	char recvBuf[BUFSIZE];
+	int recvLen = recv(*m_sock, recvBuf, sizeof(SC_RANKING_PACKET), 0);
+	if (recvLen <= 0) {
+		std::cerr << "·©Å· ¹Þ±â ½ÇÆÐ" << std::endl;
+	}
+	else {
+		DataManager::getInstance().rank_data.clear();
+
+		SC_RANKING_PACKET* resPacket = reinterpret_cast<SC_RANKING_PACKET*>(recvBuf);
+		DataManager::getInstance().rank_data.push_back({});
+		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id1);
+		DataManager::getInstance().rank_data.back().hs = resPacket->hs1;
+
+		DataManager::getInstance().rank_data.push_back({});
+		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id2);
+		DataManager::getInstance().rank_data.back().hs = resPacket->hs2;
+
+		DataManager::getInstance().rank_data.push_back({});
+		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id3);
+		DataManager::getInstance().rank_data.back().hs = resPacket->hs3;
+
+		DataManager::getInstance().rank_data.push_back({});
+		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id4);
+		DataManager::getInstance().rank_data.back().hs = resPacket->hs4;
+
+		DataManager::getInstance().rank_data.push_back({});
+		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id5);
+		DataManager::getInstance().rank_data.back().hs = resPacket->hs5;
+	}
 
 }
 
@@ -27,32 +57,53 @@ void Lobby_Scene::render(LPVOID param)
 	//	if (item[i].buy) item_check.TransparentBlt(m_hBufferDC, item[i].rt.left, item[i].rt.top - 10, item[i].rt.right - item[i].rt.left, item[i].rt.bottom - item[i].rt.top, 0, 0, 24, 24, RGB(255, 0, 255));
 	
 	//³»Á¤º¸
-	//SetBkMode(m_hBufferDC, TRANSPARENT);
-	//TextOut(m_hBufferDC, 155, 75, My.name, lstrlen(My.name));
-	//wsprintf(number_text, L"%d", My.score);
-	//SetBkMode(m_hBufferDC, TRANSPARENT);
-	//TextOut(m_hBufferDC, 270, 100, number_text, lstrlen(number_text));
-	//wsprintf(number_text, L"%d G", My.money);
-	//SetBkMode(m_hBufferDC, TRANSPARENT);
-	//TextOut(m_hBufferDC, 555, 110, number_text, lstrlen(number_text));
+
+
+	WCHAR* text_out_id = new WCHAR[20];
+	WCHAR* text_out_score = new WCHAR[20];
+	WCHAR* text_out_coin= new WCHAR[20];
+	MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, text_out_id, sizeof(DataManager::getInstance().my_data.ID));
+
+
+	SetBkMode(m_hBufferDC, TRANSPARENT);
+	TextOut(m_hBufferDC, 155, 90, text_out_id, lstrlen(text_out_id));
+	wsprintf(text_out_score, L"%d", DataManager::getInstance().my_data.high_score);
+	SetBkMode(m_hBufferDC, TRANSPARENT);
+	TextOut(m_hBufferDC, 270, 115, text_out_score, lstrlen(text_out_score));
+	wsprintf(text_out_coin, L"%d G", DataManager::getInstance().my_data.coin);
+	SetBkMode(m_hBufferDC, TRANSPARENT);
+	TextOut(m_hBufferDC, 555, 125, text_out_coin, lstrlen(text_out_coin));
 	
+
+
 	//·©Å·
-	//for (int i = 0; (i < 5) && (i < all_data.size()); i++) {
-	//	if (i < 3) {
-	//		SetBkMode(m_hBufferDC, TRANSPARENT);
-	//		TextOut(m_hBufferDC, 158, (60 * i) + 210, all_data[i].name, lstrlen(all_data[i].name));
-	//		wsprintf(number_text, L"%d", all_data[i].score);
-	//		SetBkMode(m_hBufferDC, TRANSPARENT);
-	//		TextOut(m_hBufferDC, 158, (60 * i) + 230, number_text, lstrlen(number_text));
-	//	}
-	//	else {
-	//		SetBkMode(m_hBufferDC, TRANSPARENT);
-	//		TextOut(m_hBufferDC, 158, (60 * i) + 200, all_data[i].name, lstrlen(all_data[i].name));
-	//		wsprintf(number_text, L"%d", all_data[i].score);
-	//		SetBkMode(m_hBufferDC, TRANSPARENT);
-	//		TextOut(m_hBufferDC, 158, (60 * i) + 220, number_text, lstrlen(number_text));
-	//	}
-	//}
+	WCHAR* number_text= new WCHAR[20];
+	
+	for (int i = 0; (i < 5) && (i < DataManager::getInstance().rank_data.size()); i++) {
+		if (i < 3) {
+			WCHAR* user_name= new WCHAR[20];
+			MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().rank_data[i].id, -1, user_name, sizeof(DataManager::getInstance().rank_data[i].id));
+
+			SetBkMode(m_hBufferDC, TRANSPARENT);
+			TextOut(m_hBufferDC, 158, (60 * i) + 225, user_name, lstrlen(user_name));
+
+
+			wsprintf(number_text, L"%d", DataManager::getInstance().rank_data[i].hs);
+			SetBkMode(m_hBufferDC, TRANSPARENT);
+			TextOut(m_hBufferDC, 158, (60 * i) + 245, number_text, lstrlen(number_text));
+		}
+		else {
+			WCHAR* user_name= new WCHAR[20];
+			MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().rank_data[i].id, -1, user_name, sizeof(DataManager::getInstance().rank_data[i].id));
+
+			SetBkMode(m_hBufferDC, TRANSPARENT);
+			TextOut(m_hBufferDC, 158, (60 * i) + 225, user_name, lstrlen(user_name));
+
+			wsprintf(number_text, L"%d", DataManager::getInstance().rank_data[i].hs);
+			SetBkMode(m_hBufferDC, TRANSPARENT);
+			TextOut(m_hBufferDC, 158, (60 * i) + 235, number_text, lstrlen(number_text));
+		}
+	}
 }
 
 void Lobby_Scene::update()
@@ -88,13 +139,13 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		}
 	}
 		break;
-    case WM_KEYDOWN:
-        switch (wParam) {
-        default:break;
-        }
-        InvalidateRect(hwnd, NULL, FALSE);
-        return 0;
-
+  // case WM_KEYDOWN:
+  //     switch (wParam) {
+  //     default:break;
+  //     }
+  //     InvalidateRect(hwnd, NULL, FALSE);
+  //     return 0;
+  //
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
