@@ -9,6 +9,8 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 
 	main_screen = &ResourceManager::getInstance().main_screen;
 	start_button = &ResourceManager::getInstance().start_button;
+
+
 }
 
 void Lobby_Scene::render(LPVOID param)

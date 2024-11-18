@@ -28,7 +28,7 @@ void Framework::update()
 			break;
 		case ROOM_SCENE:
 			delete m_scene;
-			m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
+			m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock,1);
 			m_scene->next_scene = ROOM_SCENE;
 			break;
 		case PLAY_SCENE:
