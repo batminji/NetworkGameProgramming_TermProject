@@ -1,6 +1,11 @@
 #include "Framework.h"
 
 
+Framework::~Framework()
+{
+	if (m_scene) delete m_scene;
+}
+
 void Framework::render(LPVOID param)
 {
 	if(m_scene)m_scene->render(param);
@@ -28,13 +33,21 @@ void Framework::update()
 			break;
 		case ROOM_SCENE:
 			delete m_scene;
-			m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock,1);
+			// 내가 방장일 경우
+			m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, TRUE);
+			// 내가 조인일 경우
+			// m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, FALSE);
 			m_scene->next_scene = ROOM_SCENE;
 			break;
 		case PLAY_SCENE:
+		{
+			// Room_Scene에서 플레이어 데이터를 가져옴
+			Player master_player = *dynamic_cast<Room_Scene*>(m_scene)->getMasterPlayer();
+			Player join_player = *dynamic_cast<Room_Scene*>(m_scene)->getJoinPlayer();
 			delete m_scene;
-			m_scene = new Play_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
+			m_scene = new Play_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, &master_player, &join_player);
 			m_scene->next_scene = PLAY_SCENE;
+		}
 			break;
 		case CARTOON_SCENE:
 			delete m_scene;

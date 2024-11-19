@@ -45,66 +45,60 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 
 void Lobby_Scene::render(LPVOID param)
 {
-    m_hwnd = (HWND)param;
-    RECT rect;
-    GetClientRect(m_hwnd, &rect);
+	m_hwnd = (HWND)param;
+	RECT rect;
+	GetClientRect(m_hwnd, &rect);
 
 	main_screen->StretchBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, SRCCOPY);
 	start_button->TransparentBlt(m_hBufferDC, 10 - stbt_x, 10 - stbt_y, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
-	
+
 	//아이템구매
 	//for (int i = 0; i < 4; ++i)
-	//	if (item[i].buy) item_check.TransparentBlt(m_hBufferDC, item[i].rt.left, item[i].rt.top - 10, item[i].rt.right - item[i].rt.left, item[i].rt.bottom - item[i].rt.top, 0, 0, 24, 24, RGB(255, 0, 255));
-	
-	//내정보
+	//    if (item[i].buy) item_check.TransparentBlt(m_hBufferDC, item[i].rt.left, item[i].rt.top - 10, item[i].rt.right - item[i].rt.left, item[i].rt.bottom - item[i].rt.top, 0, 0, 24, 24, RGB(255, 0, 255));
 
+	//내정보
 
 	WCHAR* text_out_id = new WCHAR[20];
 	WCHAR* text_out_score = new WCHAR[20];
-	WCHAR* text_out_coin= new WCHAR[20];
+	WCHAR* text_out_coin = new WCHAR[20];
 	MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, text_out_id, sizeof(DataManager::getInstance().my_data.ID));
 
-
 	SetBkMode(m_hBufferDC, TRANSPARENT);
-	TextOut(m_hBufferDC, 155,85, text_out_id, lstrlen(text_out_id));
+	TextOut(m_hBufferDC, 155, 85, text_out_id, lstrlen(text_out_id));
 	wsprintf(text_out_score, L"%d", DataManager::getInstance().my_data.high_score);
 	SetBkMode(m_hBufferDC, TRANSPARENT);
 	TextOut(m_hBufferDC, 270, 110, text_out_score, lstrlen(text_out_score));
 	wsprintf(text_out_coin, L"%d G", DataManager::getInstance().my_data.coin);
 	SetBkMode(m_hBufferDC, TRANSPARENT);
 	TextOut(m_hBufferDC, 555, 120, text_out_coin, lstrlen(text_out_coin));
-	
 
+	// 메모리 해제
+	delete[] text_out_id;
+	delete[] text_out_score;
+	delete[] text_out_coin;
 
 	//랭킹
-	WCHAR* number_text= new WCHAR[20];
-	
+	WCHAR* number_text = new WCHAR[20];
+
 	for (int i = 0; (i < 5) && (i < DataManager::getInstance().rank_data.size()); i++) {
-		if (i < 3) {
-			WCHAR* user_name= new WCHAR[20];
-			MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().rank_data[i].id, -1, user_name, sizeof(DataManager::getInstance().rank_data[i].id));
+		WCHAR* user_name = new WCHAR[20];
+		MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().rank_data[i].id, -1, user_name, sizeof(DataManager::getInstance().rank_data[i].id));
 
-			SetBkMode(m_hBufferDC, TRANSPARENT);
-			TextOut(m_hBufferDC, 158, (60 * i) + 225, user_name, lstrlen(user_name));
+		SetBkMode(m_hBufferDC, TRANSPARENT);
+		TextOut(m_hBufferDC, 158, (60 * i) + 225, user_name, lstrlen(user_name));
 
+		wsprintf(number_text, L"%d", DataManager::getInstance().rank_data[i].hs);
+		SetBkMode(m_hBufferDC, TRANSPARENT);
+		TextOut(m_hBufferDC, 158, (60 * i) + 245, number_text, lstrlen(number_text));
 
-			wsprintf(number_text, L"%d", DataManager::getInstance().rank_data[i].hs);
-			SetBkMode(m_hBufferDC, TRANSPARENT);
-			TextOut(m_hBufferDC, 158, (60 * i) + 245, number_text, lstrlen(number_text));
-		}
-		else {
-			WCHAR* user_name= new WCHAR[20];
-			MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().rank_data[i].id, -1, user_name, sizeof(DataManager::getInstance().rank_data[i].id));
-
-			SetBkMode(m_hBufferDC, TRANSPARENT);
-			TextOut(m_hBufferDC, 158, (60 * i) + 235, user_name, lstrlen(user_name));
-
-			wsprintf(number_text, L"%d", DataManager::getInstance().rank_data[i].hs);
-			SetBkMode(m_hBufferDC, TRANSPARENT);
-			TextOut(m_hBufferDC, 158, (60 * i) + 255, number_text, lstrlen(number_text));
-		}
+		// 메모리 해제
+		delete[] user_name;
 	}
+
+	// 메모리 해제
+	delete[] number_text;
 }
+
 
 void Lobby_Scene::update()
 {

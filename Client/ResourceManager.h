@@ -13,6 +13,7 @@ public:
 
 
 	void init(HINSTANCE g_hInst);
+	void destroy();
 
 
 	ResourceManager(const ResourceManager&) = delete;
