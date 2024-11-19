@@ -10,6 +10,11 @@ private:
     CImage* dealer_check;
     CImage* healer_check;
     CImage* room_screen_bg;
+    CImage* pink_idle_left;
+    CImage* pink_idle_right;
+    CImage* blue_idle_left;
+    CImage* blue_idle_right;
+    short frame;
 
 private:
     Player* master_player;

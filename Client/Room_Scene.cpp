@@ -5,6 +5,7 @@ Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     m_hBufferBitmap = hBufferBitmap;
     m_hBufferDC = hBufferDC;
     m_sock = sock;
+    frame = 0;
     if (is_master) { // 내가 방장일 경우
         master_player = new Player(1, "1", TRUE);
         join_player = new Player(2, "1", FALSE);
@@ -23,6 +24,10 @@ Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     room_screen_bg = &ResourceManager::getInstance().Room_screen_bg;
     dealer_check = &ResourceManager::getInstance().Dealer_check;
     healer_check = &ResourceManager::getInstance().Healer_check;
+    pink_idle_left = &ResourceManager::getInstance().Kirby_pink_idle_left;
+    pink_idle_right = &ResourceManager::getInstance().Kirby_pink_idle_right;
+    blue_idle_left = &ResourceManager::getInstance().Kirby_blue_idle_left;
+    blue_idle_right = &ResourceManager::getInstance().Kirby_blue_idle_right;
 
 }
 void Room_Scene::render(LPVOID param)
@@ -35,6 +40,13 @@ void Room_Scene::render(LPVOID param)
     room_screen->TransparentBlt(m_hBufferDC, -20, -20, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
 
     // 플레이어 그리기
+    switch (master_player->job) {
+    case 1:
+        pink_idle_left->TransparentBlt(m_hBufferDC, 25, 25, 50, 50, frame * 25, 0, 25, 25, RGB(0, 255, 0));
+        break;
+    case 2:
+        break;
+    }
 
     // 역할 체크
     if (master_player->who_is_me) { // 내가 방장이면
@@ -61,6 +73,8 @@ void Room_Scene::render(LPVOID param)
 
 void Room_Scene::update()
 {
+    frame++;
+    if (frame == 6) frame = 0;
 }
 
 LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -79,6 +93,7 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         int mx = LOWORD(lParam);
         int my = HIWORD(lParam);
         POINT mypt = { mx,my };
+        printf("x : %d y : %d\n", mx, my);
         if (master_player->who_is_me) {
             if (PtInRect(&dealer_rt, mypt)) { // 딜러 누르기
                 master_player->job = 1;

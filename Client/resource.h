@@ -59,12 +59,16 @@
 #define HEALER_CHECK                    173
 #define ROOM_SCREEN                     174
 #define ROOM_SCREEN_BG                  175
+#define BLUE_IDLE_LEFT                  176
+#define BLUE_IDLE_RIGHT                 177
+#define PINK_IDLE_LEFT                  178
+#define PINK_IDLE_RIGHT                 179
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        176
+#define _APS_NEXT_RESOURCE_VALUE        180
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101

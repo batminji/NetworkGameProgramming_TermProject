@@ -22,22 +22,28 @@ void Framework::update()
 		switch (m_scene->next_scene)
 		{
 		case TITLE_SCENE:
+		{
 			delete m_scene;
 			m_scene = new Title_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
 			m_scene->next_scene = TITLE_SCENE;
+		}
 			break;
 		case LOBBY_SCENE:
+		{
 			delete m_scene;
 			m_scene = new Lobby_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
 			m_scene->next_scene = LOBBY_SCENE;
+		}
 			break;
 		case ROOM_SCENE:
+		{
 			delete m_scene;
 			// 내가 방장일 경우
 			m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, TRUE);
 			// 내가 조인일 경우
 			// m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, FALSE);
 			m_scene->next_scene = ROOM_SCENE;
+		}
 			break;
 		case PLAY_SCENE:
 		{
@@ -50,9 +56,11 @@ void Framework::update()
 		}
 			break;
 		case CARTOON_SCENE:
+		{
 			delete m_scene;
 			m_scene = new Cartoon_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
 			m_scene->next_scene = CARTOON_SCENE;
+		}
 			break;
 		default:
 			break;

@@ -190,6 +190,8 @@
     <Image Include="resource_file\big.bmp" />
     <Image Include="resource_file\Blue_fly_left.bmp" />
     <Image Include="resource_file\Blue_heart.bmp" />
+    <Image Include="resource_file\Blue_Idle_left.bmp" />
+    <Image Include="resource_file\Blue_Idle_right.bmp" />
     <Image Include="resource_file\Blue_round.bmp" />
     <Image Include="resource_file\cartoon1.bmp" />
     <Image Include="resource_file\cartoon2.bmp" />
@@ -247,8 +249,11 @@
     <Image Include="resource_file\Monster_die.bmp" />
     <Image Include="resource_file\number.bmp" />
     <Image Include="resource_file\over_number.bmp" />
+    <Image Include="resource_file\Pink_Idle_left.bmp" />
+    <Image Include="resource_file\Pink_Idle_right.bmp" />
     <Image Include="resource_file\rezero_bg.bmp" />
     <Image Include="resource_file\room_screen.bmp" />
+    <Image Include="resource_file\room_screen_bg.bmp" />
     <Image Include="resource_file\skill_bullet.bmp" />
     <Image Include="resource_file\skill_color.bmp" />
     <Image Include="resource_file\skill_dark.bmp" />
