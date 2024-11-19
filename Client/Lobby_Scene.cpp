@@ -40,7 +40,6 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id5);
 		DataManager::getInstance().rank_data.back().hs = resPacket->hs5;
 	}
-
 }
 
 void Lobby_Scene::render(LPVOID param)
