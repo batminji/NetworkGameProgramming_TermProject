@@ -1,5 +1,12 @@
 #include "Play_Scene.h"
 
+Play_Scene::~Play_Scene()
+{
+    if (player1) delete player1;
+    if (player2) delete player2;
+
+}
+
 void Play_Scene::render(LPVOID param)
 {
 	m_hwnd = (HWND)param;
@@ -66,8 +73,7 @@ void Play_Scene::update()
 
     //플레이어인풋 전송
     send_player_input(send_y);
-    //플레이어 데이터 수신
-    recv_player_data();
+    
 }
 
 LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

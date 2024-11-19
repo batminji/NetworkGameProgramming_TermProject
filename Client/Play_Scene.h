@@ -45,7 +45,7 @@ public:
         game_bg2 = &ResourceManager::getInstance().game_bg2;
         number = &ResourceManager::getInstance().number;
     };
-
+    ~Play_Scene();
 public:
 
     void render(LPVOID param) override;
