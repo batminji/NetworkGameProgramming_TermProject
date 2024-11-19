@@ -9,8 +9,8 @@ void Play_Scene::render(LPVOID param)
     //ui
     ui_render();
     // 캐릭터 그리기 (단순한 사각형으로 표현)
-    player1->render(m_hBufferDC);
-    player2->render(m_hBufferDC);
+    /*player1->render(m_hBufferDC);
+    player2->render(m_hBufferDC);*/
    
 }
 
@@ -67,7 +67,7 @@ void Play_Scene::update()
     //플레이어인풋 전송
     send_player_input(send_y);
     //플레이어 데이터 수신
-    recv_player_data();
+    //recv_player_data();
 }
 
 LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

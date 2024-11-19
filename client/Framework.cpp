@@ -35,9 +35,14 @@ void Framework::update()
 			m_scene->next_scene = ROOM_SCENE;
 			break;
 		case PLAY_SCENE:
+		{
+			// Room_Scene에서 플레이어 데이터를 가져옴
+			Player master_player = *dynamic_cast<Room_Scene*>(m_scene)->getMasterPlayer();
+			Player join_player = *dynamic_cast<Room_Scene*>(m_scene)->getJoinPlayer();
 			delete m_scene;
-			m_scene = new Play_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
+			m_scene = new Play_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, &master_player, &join_player);
 			m_scene->next_scene = PLAY_SCENE;
+		}
 			break;
 		case CARTOON_SCENE:
 			delete m_scene;

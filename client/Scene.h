@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+
 class Scene
 {
 public:
@@ -8,7 +9,7 @@ public:
 	HDC m_hBufferDC;
 	SOCKET* m_sock;
 
-	short next_scene=0;
+	short next_scene;
 public:
 
 	Scene() {};
@@ -18,6 +19,7 @@ public:
 		m_hBufferDC = hBufferDC;
 		m_sock = sock;
 	};
+
 public:
 	bool running = 0;
 
