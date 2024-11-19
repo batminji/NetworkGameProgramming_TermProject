@@ -23,7 +23,7 @@ public:
 
     Player() {}
 
-    bool broadcast(char* res, size_t size )
+    bool broadcast(char* res, size_t size)
     {
         int ret = send(s, reinterpret_cast<char*>(&res), size, 0);
         if (ret == SOCKET_ERROR) { // 에러 처리
@@ -74,7 +74,11 @@ public:
     unsigned short getP1Y() { return p1->getY(); }
     unsigned short getP2Y() { return p2->getY(); }
     std::string getP1ID() { return p1->getID(); }
-    std::string getP2ID() { return p2->getID(); }
+    std::string getP2ID() 
+    { 
+        if (p2 == nullptr) return "";
+        return p2->getID(); 
+    }
     void setP1(Player* p) { p1 = p; }
     void setP2(Player* p) { p2 = p; }
     void setisPlaying(bool a) { isPlaying = a; }
@@ -86,9 +90,35 @@ public:
     }
 };
 
+enum TASK_TYPE { FIRE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE }; // 뭐가 있을까?
+class EVENT
+{
+public:
+    TASK_TYPE evt_type;
+    std::string room_id; 
+    std::chrono::system_clock::time_point do_time;
+
+    EVENT() {}
+
+    void setup(TASK_TYPE evt, int s_time, std::string& rid) // time -> ms
+    {
+        evt_type = evt;
+        room_id = rid;
+        do_time = std::chrono::system_clock::now() + std::chrono::milliseconds(s_time);
+    }
+
+    std::chrono::system_clock::time_point& getTime() { return do_time; }
+
+    bool operator<(const EVENT& other) const
+    {
+        return do_time > other.do_time;
+    }
+};
+
 std::unordered_map<std::string, Room> roomInfo;
 std::unordered_map<std::string, Player> players;
-//concurrency::concurrent_priority_queue<EVENT> g_evt_queue;
+concurrency::concurrent_priority_queue<EVENT> evt_queue;
+concurrency::concurrent_queue<EVENT> task_queue;
 
 // 유저데이터 관리용 : 전체 데이터 덮어쓰기
 bool save_all_player_info()
@@ -260,8 +290,14 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     SC_PLAYER_MOVE_PACKET res;
     res.size = sizeof(SC_PLAYER_MOVE_PACKET);
     res.type = SC_PLAYER_MOVE;
-    res.this_y = roomInfo[id].getP1Y();
-    res.other_y = roomInfo[id].getP2Y();
+    if (roomInfo[id].getP1ID() == id) {// 내가 p1이군
+        res.this_y = roomInfo[id].getP1Y();
+        res.other_y = roomInfo[id].getP2Y();
+    }
+    else {
+        res.this_y = roomInfo[id].getP2Y();
+        res.other_y = roomInfo[id].getP1Y();
+    }
 
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
@@ -321,6 +357,9 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
             roomInfo[id].setP1(&players[id]);
             std::cout << "Player " << id << " created and joined new room " << id << std::endl;
         }
+
+        if (false == send_room_change_packet(id)) return false; // 전송 실패.
+
         break;
     }
     case CS_MOVE: // 플레이어 캐릭터의 이동 -> 나와 동료의 업데이트된 위치 정보 반환.
@@ -347,13 +386,14 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
         }
         if (p->isPlaying) t_room.setisPlaying(true);
 
-        send_room_change_packet(id);
+        if (false == send_room_change_packet(id)) return false; // 전송 실패.
         break;
     }
     default:
         std::cout << "undefined packet" << std::endl;
         exit(-1);
     }
+    return true;
 }
 
 int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
@@ -385,7 +425,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         client_info(s, p->id);
         if (send_login_packet(s, p)){
             pid = p->id;
-            send_top_high_scores(s);
+            //send_top_high_scores(s);
         }
         
         players[pid].setSocket(s);
@@ -400,10 +440,17 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                 SERVER_err_display("recv() failed");
                 SERVER_err_display(error);  // 오류 코드 출력
             }
+            process_packet(recv_buf, s, pid);
 
-            //CS_JOIN_ROOM_PACKET;
+            if (true == roomInfo[pid].getisPlaying()) break; // 게임 시작
+        }
+
+        while (true) {
+            // send 먼저 player state랑 뭐지.. 뭐지.. 아무튼 보내야 함
+            send_player_move_packet(s, pid);
 
 
+            // recv.
         }
 
     }
@@ -412,13 +459,58 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
 // timer thread: ai 동작
 void timer_thread()
 {
+    while (true)
+    {
+        EVENT ev;
+        bool event_processed = false;
 
+        if (evt_queue.try_pop(ev))
+        {
+            if (ev.getTime() <= std::chrono::system_clock::now())
+                task_queue.push(ev);
+            else
+                evt_queue.push(ev);
+        }
+    }
 }
 
-// task 받는 스레드
+void push_evt_queue(TASK_TYPE ev, int time, std::string& rid) // time: milisecond 단위.
+{
+    // todo
+    EVENT evt;
+    evt.setup(ev, time, rid);
+    evt_queue.push(evt);
+}
+
+// task 처리하는 스레드 -> 룸 당 하나였으면 좋겠는데 어떻게 하면 좋을지 모르겠음.
 void ai_thread()
 {
+    while (true) {
+        EVENT ev;
+        if (evt_queue.empty()) std::this_thread::yield();
+        evt_queue.try_pop(ev);
+        switch (ev.evt_type) {
+        case FIRE_PLAYER_BULLET:
+            // todo: 여기 플레이어 위치에서 bullet 생성해줘야 함
 
+            push_evt_queue(FIRE_PLAYER_BULLET, 1000, ev.room_id); // 1초에 한개씩 발사
+            break;
+
+        case FIRE_ENEMY_BULLET:
+            // todo: 여기 적 위치에서 bullet 생성해줘야 함
+
+            break;
+
+        case AI_MOVE:
+            // todo: ai 로직 여기로 옮기기
+
+            break;
+
+        default:
+            std::cout << "unknown event" << std::endl;
+            exit(-1);
+        }
+    }
 }
 
 

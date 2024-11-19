@@ -22,7 +22,7 @@ struct CS_KEY_INPUT_PACKET // 스킬 등 키 입력이 있을 떄
 {
 	unsigned short size;
 	PACKET type;
-	unsigned char key; // todo: 자료형 뭐로할지 고민 ->wParam 가능한지?
+	unsigned int key; // todo: 자료형 뭐로할지 고민 ->wParam 가능한지?
 };
 
 struct CS_JOIN_ROOM_PACKET

@@ -23,6 +23,7 @@
 #include <chrono>
 #include <array>
 #include <concurrent_priority_queue.h>
+#include <concurrent_queue.h>
 #pragma comment(lib, "ws2_32") // ws2_32.lib ¸µÅ©
 
 // enum

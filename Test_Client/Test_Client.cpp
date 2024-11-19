@@ -81,6 +81,71 @@ int main()
         }
     }
 
+    CS_JOIN_ROOM_PACKET jrp;
+    strcpy_s(jrp.id, s.c_str()); // 예제 ID
+    jrp.size = sizeof(CS_JOIN_ROOM_PACKET);
+    jrp.type = CS_JOIN_ROOM;
+
+    if (send(sock, reinterpret_cast<char*>(&jrp), sizeof(jrp), 0) == SOCKET_ERROR) {
+        std::cerr << "Send failed." << std::endl;
+        closesocket(sock);
+        WSACleanup();
+        return -1;
+    }
+
+    recvLen = recv(sock, recvBuf, sizeof(SC_ROOM_CHANGE_PACKET), 0);
+    if (recvLen <= 0) {
+        std::cerr << "Receive failed or connection closed." << std::endl;
+    }
+    else {
+        SC_ROOM_CHANGE_PACKET* resPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
+        std::cout << "접속성공!" << std::endl;
+        /*if (resPacket->isPlaying) {
+            std::cout << "successful!" << std::endl;
+            recvLen = recv(sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), 0);
+            SC_PLAYER_MOVE_PACKET* qwer = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuf);
+            std::cout << "p1: " << qwer->this_y << ", p2: " << qwer->other_y << std::endl;
+        }
+        else {
+            std::cout << "failed." << std::endl;
+            exit(-1);
+        }*/
+    }
+
+
+
+    CS_ROOM_STATE_PACKET rsp;
+    rsp.isPlaying = true;
+    rsp.size = sizeof(CS_ROOM_STATE_PACKET);
+    rsp.isQuit = false;
+    rsp.type = CS_ROOM_STATE;
+
+    if (send(sock, reinterpret_cast<char*>(&rsp), sizeof(rsp), 0) == SOCKET_ERROR) {
+        std::cerr << "Send failed." << std::endl;
+        closesocket(sock);
+        WSACleanup();
+        return -1;
+    }
+
+    recvLen = recv(sock, recvBuf, sizeof(SC_ROOM_CHANGE_PACKET), 0);
+    if (recvLen <= 0) {
+        std::cerr << "Receive failed or connection closed." << std::endl;
+    }
+    else {
+        SC_ROOM_CHANGE_PACKET* resPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
+        if (resPacket->isPlaying) {
+            std::cout << "successful!" << std::endl;
+            recvLen = recv(sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), 0);
+            SC_PLAYER_MOVE_PACKET* qwer = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuf);
+            std::cout << "p1: " << qwer->this_y << ", p2: " << qwer->other_y << std::endl;
+        }
+        else {
+            std::cout << "failed." << std::endl;
+            exit(-1);
+        }
+    }
+
+
     // 7. 소켓 종료
     closesocket(sock);
     WSACleanup();
