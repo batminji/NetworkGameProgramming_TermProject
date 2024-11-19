@@ -16,8 +16,8 @@ void Play_Scene::render(LPVOID param)
     //ui
     ui_render();
     // 캐릭터 그리기 (단순한 사각형으로 표현)
-    /*player1->render(m_hBufferDC);
-    player2->render(m_hBufferDC);*/
+    player1->render(m_hBufferDC);
+    player2->render(m_hBufferDC);
    
 }
 
