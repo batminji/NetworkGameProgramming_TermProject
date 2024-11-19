@@ -82,8 +82,11 @@ void Room_Scene::render(LPVOID param)
 
 void Room_Scene::update()
 {
-    frame++;
-    if (frame == 6) frame = 0;
+    //애니메이션 프레임 갱신
+    frame = (frame + 1) % 6;
+
+    
+
 }
 
 LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -108,11 +111,11 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 master_player->job = 1;
                 join_player->job = 2;
             }
-            else if (PtInRect(&healer_rt, mypt)) { // 딜러 누르기
+            else if (PtInRect(&healer_rt, mypt)) { // 힐러 누르기
                 master_player->job = 2;
                 join_player->job = 1;
             }
-            else if (PtInRect(&start_rt, mypt)) { // 딜러 누르기
+            else if (PtInRect(&start_rt, mypt)) { //시작 누르기
                 next_scene = PLAY_SCENE;
             }
         }
@@ -130,4 +133,46 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         return 0;
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+int Room_Scene::room_data_update()
+{
+    //송신
+    CS_ROOM_STATE_PACKET roomPacket;
+    roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
+    roomPacket.type = CS_ROOM_STATE;
+    (master_player->job==1)? roomPacket.isDealer = true: roomPacket.isDealer = false;
+    roomPacket.isPlaying =false;
+    roomPacket.isQuit = false ;
+
+    if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
+        std::cerr << "방상태 전송실패 ㅠㅠㅠㅠ" << std::endl;
+        closesocket(*m_sock);
+        WSACleanup();
+    }
+
+
+    //수신
+    char recvBuf[BUFSIZE];
+    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_ROOM_CHANGE_PACKET), 0);
+    if (recvLen <= 0) {
+        std::cerr << "Receive failed or connection closed." << std::endl;
+    }
+    else {
+        SC_ROOM_CHANGE_PACKET* resPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
+        if (resPacket->isPlaying) {
+            std::cout << "이 방은 게임중..." << std::endl;
+        }
+        else {
+            std::cout << "이 방은 이런게임 안게임..." << std::endl;
+
+            //TODO: 이제 이걸 잘써야함 넘졸령
+            resPacket->other_pl[ID_LEN]; // 친구 플레이어 이름
+            resPacket->isPlaying; // 시작했는지
+            resPacket->isDealer; // 내가 딜러인가?
+
+        }
+    }
+
+    return 1;
 }

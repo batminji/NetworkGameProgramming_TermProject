@@ -160,13 +160,6 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		}
 	}
 		break;
-  // case WM_KEYDOWN:
-  //     switch (wParam) {
-  //     default:break;
-  //     }
-  //     InvalidateRect(hwnd, NULL, FALSE);
-  //     return 0;
-  //
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
