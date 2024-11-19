@@ -32,7 +32,7 @@ void Room_Scene::render(LPVOID param)
     GetClientRect(m_hwnd, &rect);
 
     room_screen_bg->StretchBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, SRCCOPY);
-    room_screen->TransparentBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
+    room_screen->TransparentBlt(m_hBufferDC, -20, -20, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
 
     // 플레이어 그리기
 
@@ -74,7 +74,26 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         EndPaint(hwnd, &ps);
         return 0;
     }
-
+    case WM_LBUTTONDOWN:
+    {
+        int mx = LOWORD(lParam);
+        int my = HIWORD(lParam);
+        POINT mypt = { mx,my };
+        if (master_player->who_is_me) {
+            if (PtInRect(&dealer_rt, mypt)) { // 딜러 누르기
+                master_player->job = 1;
+                join_player->job = 2;
+            }
+            else if (PtInRect(&healer_rt, mypt)) { // 딜러 누르기
+                master_player->job = 2;
+                join_player->job = 1;
+            }
+            else if (PtInRect(&start_rt, mypt)) { // 딜러 누르기
+                next_scene = PLAY_SCENE;
+            }
+        }
+    }
+        break;
     case WM_KEYDOWN:
         switch (wParam) {
         default:break;

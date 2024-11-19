@@ -13,6 +13,7 @@ public:
     BOOL stbt_direction = TRUE;
     RECT stbt_rt = { 460,440,760,560 };
     short stbt_x = 0; short stbt_y = 0;
+
 public:
     Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock);
     void render(LPVOID param) override;
