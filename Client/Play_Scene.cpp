@@ -30,10 +30,9 @@ void Play_Scene::ui_render()
   //  for (int i = 0; i < 4; ++i)
   //      if (item[i].buy)item[i].img.TransparentBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, RGB(255, 0, 255));
   //  // 하트
-  //  for (int i = 0; i < heart_cnt; ++i)
-  //      heart.TransparentBlt(m_hBufferDC, heart_pt[i].x - 15, heart_pt[i].y - 15, 30, 30, 0, 0, 18, 16, RGB(0, 255, 0));
-  //  skill.StretchBlt(m_hBufferDC, rt.right - 75, 470, 70, 85, 0, 0, 70, 85, SRCCOPY);
-  //  skill_color.StretchBlt(mdc, rt.right - 75, 555 - skill_dy, 70, skill_dy, 0, 85 - skill_dy, 70, skill_dy, SRCCOPY);
+    for (int i = 0; i < heart_cnt; ++i)
+        heart->TransparentBlt(m_hBufferDC, heart_pt[i].x - 15, heart_pt[i].y - 15, 30, 30, 0, 0, 18, 16, RGB(0, 255, 0));
+   
   //  //점수
     int num;
     wsprintf(number_text, L"%d", play_score);
