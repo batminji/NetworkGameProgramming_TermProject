@@ -425,7 +425,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         client_info(s, p->id);
         if (send_login_packet(s, p)){
             pid = p->id;
-            //send_top_high_scores(s);
+            send_top_high_scores(s);
         }
         
         players[pid].setSocket(s);
