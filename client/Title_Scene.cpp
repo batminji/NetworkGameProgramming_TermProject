@@ -88,10 +88,16 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                        if (resPacket->is_new) {
                            std::cout << "새유저!" << std::endl;
                            next_scene = CARTOON_SCENE;
+                           strcpy(DataManager::getInstance().my_data.ID, loginPacket.id);
+                           DataManager::getInstance().my_data.high_score = 0;
+                           DataManager::getInstance().my_data.coin = 0;
                        }
                        else {
                            std::cout << "기존유저!" << std::endl;
                            next_scene = LOBBY_SCENE;
+                           strcpy(DataManager::getInstance().my_data.ID, loginPacket.id);
+                           DataManager::getInstance().my_data.high_score = resPacket->high_score;
+                           DataManager::getInstance().my_data.coin = resPacket->coin;
                        }
                    }
                    else {

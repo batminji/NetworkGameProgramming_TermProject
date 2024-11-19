@@ -40,6 +40,9 @@ class Player
 	vector <bullet> basic_bullets;
 	vector <bullet> skill_bullets;
 
+public: 
+	SOCKET* p_sock;
+
 public:
 
 	Player();

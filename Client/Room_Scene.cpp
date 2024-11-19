@@ -68,7 +68,10 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     switch (uMsg) {
     case WM_PAINT:
     {
-
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hwnd, &ps);
+        BitBlt(hdc, 0, 0, 800, 600, m_hBufferDC, 0, 0, SRCCOPY);
+        EndPaint(hwnd, &ps);
         return 0;
     }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene.h"
 #include "ResourceManager.h"
+#include "DataManager.h"
 
 class Lobby_Scene :
     public Scene

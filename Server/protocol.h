@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "stdafx.h"
 #pragma pack(push, 1)
 
@@ -11,18 +11,18 @@ struct CS_LOGIN_PACKET
 	char id[ID_LEN];
 };
 
-struct CS_MOVE_PACKET // ÇÃ·¹ÀÌ¾î ¸¶¿ì½º À§Ä¡ Àü¼Û
+struct CS_MOVE_PACKET // í”Œë ˆì´ì–´ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ ì „ì†¡
 {
 	unsigned short size;
 	PACKET type;
-	unsigned short y; // x°ªÀº Àü¼ÛÇÏÁö ¾Ê¾Æµµ µÊ
+	unsigned short y; // xê°’ì€ ì „ì†¡í•˜ì§€ ì•Šì•„ë„ ë¨
 };
 
-struct CS_KEY_INPUT_PACKET // ½ºÅ³ µî Å° ÀÔ·ÂÀÌ ÀÖÀ» ‹š
+struct CS_KEY_INPUT_PACKET // ìŠ¤í‚¬ ë“± í‚¤ ì…ë ¥ì´ ìˆì„ ë–„
 {
 	unsigned short size;
 	PACKET type;
-	unsigned char key; // todo: ÀÚ·áÇü ¹¹·ÎÇÒÁö °í¹Î
+	unsigned char key; // todo: ìë£Œí˜• ë­ë¡œí• ì§€ ê³ ë¯¼ ->wParam ê°€ëŠ¥í•œì§€?
 };
 
 struct CS_JOIN_ROOM_PACKET
@@ -32,7 +32,7 @@ struct CS_JOIN_ROOM_PACKET
 	char id[ID_LEN];
 };
 
-struct CS_ROOM_STATE_PACKET // ¹æ ¼³Á¤À» º¯°æÇÏ´Â ÆĞÅ¶
+struct CS_ROOM_STATE_PACKET // ë°© ì„¤ì •ì„ ë³€ê²½í•˜ëŠ” íŒ¨í‚·
 {
 	unsigned short size;
 	PACKET type;
@@ -46,55 +46,55 @@ struct SC_LOGIN_RESULT_PACKET
 {
 	unsigned short size;
 	PACKET type;
-	bool success; // TrueÀÏ ¶§ ·Î±×ÀÎ ¼º°ø
-	bool is_new; // ÀÌ°Ô trueÀÏ¶§ ÄÆ¾À ½ÇÇàÇØÁÖ¼¼¿ä
-	// ÇÃ·¹ÀÌ¾î ±âÁ¸ µ¥ÀÌÅÍ Àü¼Û
+	bool success; // Trueì¼ ë•Œ ë¡œê·¸ì¸ ì„±ê³µ
+	bool is_new; // ì´ê²Œ trueì¼ë•Œ ì»·ì”¬ ì‹¤í–‰í•´ì£¼ì„¸ìš”
+	// í”Œë ˆì´ì–´ ê¸°ì¡´ ë°ì´í„° ì „ì†¡
 	unsigned int high_score; 
 	unsigned int coin;
 };
 
-struct SC_ROOM_CHANGE_PACKET // ¹æ ¼³Á¤ÀÌ º¯°æµÇ¸é
+struct SC_ROOM_CHANGE_PACKET // ë°© ì„¤ì •ì´ ë³€ê²½ë˜ë©´
 {
 	unsigned short size;
 	PACKET type;
-	char other_pl[ID_LEN]; // Ä£±¸ ÇÃ·¹ÀÌ¾î ÀÌ¸§
-	bool isPlaying; // ½ÃÀÛÇß´ÂÁö
-	bool isDealer; // ³»°¡ µô·¯ÀÎ°¡?
+	char other_pl[ID_LEN]; // ì¹œêµ¬ í”Œë ˆì´ì–´ ì´ë¦„
+	bool isPlaying; // ì‹œì‘í–ˆëŠ”ì§€
+	bool isDealer; // ë‚´ê°€ ë”œëŸ¬ì¸ê°€?
 };
 
-struct SC_PLAYER_MOVE_PACKET // Ä³¸¯ÅÍ ÀÌµ¿
+struct SC_PLAYER_MOVE_PACKET // ìºë¦­í„° ì´ë™
 {
 	unsigned short size;
 	PACKET type;
-	unsigned short this_y; // ³ªÀÇÀ§Ä¡
-	unsigned short other_y; // Ä£±¸ À§Ä¡
+	unsigned short this_y; // ë‚˜ì˜ìœ„ì¹˜
+	unsigned short other_y; // ì¹œêµ¬ ìœ„ì¹˜
 };
 
 struct SC_PLAYER_STATE_CHANGE_PACKET
 {
 	unsigned short size;
 	PACKET type;
-	unsigned short hp; // ÀÌ°É·Î Á×À½±îÁö ÆÇ´ÜÇÏµµ·Ï
-	bool isHit; // ¸Â¾Ò´Â°¡?
-	bool skillEnd; // ½ºÅ³ ³¡³µÀ»‹š true
+	unsigned short hp; // ì´ê±¸ë¡œ ì£½ìŒê¹Œì§€ íŒë‹¨í•˜ë„ë¡
+	bool isHit; // ë§ì•˜ëŠ”ê°€?
+	bool skillEnd; // ìŠ¤í‚¬ ëë‚¬ì„ë–„ true
 };
 
-struct SC_OBJECT_MOVE_PACKET // ¿ÀºêÁ§Æ® ÀÌµ¿
+struct SC_OBJECT_MOVE_PACKET // ì˜¤ë¸Œì íŠ¸ ì´ë™
 {
 	unsigned short size;
 	PACKET type;
-	OTYPE obj_type; // ¾î¶² ¿ÀºêÁ§Æ®ÀÇ ÀÌµ¿ÀÎ°¡
-	unsigned short number; // °³¼ö
+	OTYPE obj_type; // ì–´ë–¤ ì˜¤ë¸Œì íŠ¸ì˜ ì´ë™ì¸ê°€
+	unsigned short number; // ê°œìˆ˜
 	unsigned short objs_x[MAX_OBJ_NUM];
 	unsigned short objs_y[MAX_OBJ_NUM];
 };
 
-struct SC_OBJECT_CHANGE_PACKET // ¿ÀºêÁ§Æ® »óÅÂº¯°æ
+struct SC_OBJECT_CHANGE_PACKET // ì˜¤ë¸Œì íŠ¸ ìƒíƒœë³€ê²½
 {
 	unsigned short size;
 	PACKET type;
 	OTYPE obj_type;
-	bool isRemove; // »èÁ¦µÇ¾ú´Â°¡ È¤Àº Á×¾ú´Â°¡?
+	bool isRemove; // ì‚­ì œë˜ì—ˆëŠ”ê°€ í˜¹ì€ ì£½ì—ˆëŠ”ê°€?
 };
 
 struct SC_RANKING_PACKET 
