@@ -29,6 +29,7 @@ public:
 		m_scene->next_scene = TITLE_SCENE;
 		m_sock = sock;
 	}
+	~Framework();
 public:
 	void render(LPVOID param);
 

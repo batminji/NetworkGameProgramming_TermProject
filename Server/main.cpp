@@ -88,6 +88,7 @@ public:
 
 std::unordered_map<std::string, Room> roomInfo;
 std::unordered_map<std::string, Player> players;
+//concurrency::concurrent_priority_queue<EVENT> g_evt_queue;
 
 // 유저데이터 관리용 : 전체 데이터 덮어쓰기
 bool save_all_player_info()
@@ -326,7 +327,8 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     {
         CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
         players[id].setY(p->y);
-        send_player_move_packet(s, id);
+        if (false == send_player_move_packet(s, id)) return false;
+
         break;
     }
     case CS_KEY_INPUT: // 플레이어의 키 입력(스킬 등)
@@ -371,6 +373,12 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             closesocket(s);
             return -1;
         }
+        else if (ret == 0) {
+            std::cout << "클라이언트가 접속을 종료하다." << std::endl;
+            closesocket(s);
+            return 0;
+        }
+        
 
         // 1-1. 로그인 패킷 처리
         CS_LOGIN_PACKET* p = reinterpret_cast<CS_LOGIN_PACKET*>(recv_buf);
@@ -401,13 +409,22 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
     }
 }
 
+// timer thread: ai 동작
+void timer_thread()
+{
+
+}
+
+// task 받는 스레드
+void ai_thread()
+{
+
+}
 
 
 int main()
 {
-    // 서버 로딩될때 파일 읽어서 플레이어 생성해 둬야 할듯
     read_player_info();
-    // todo: 파일에 다시 쓰는것도 해야 함
 
     int retval;
 

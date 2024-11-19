@@ -79,3 +79,57 @@ void ResourceManager::init(HINSTANCE g_hInst)
     ssystem->createSound("warning.OGG", FMOD_DEFAULT, 0, &warning_sound);
     ssystem->createSound("coin.OGG", FMOD_DEFAULT, 0, &coin_sound);
 }
+
+void ResourceManager::destroy()
+{
+    //捞固瘤 府家胶 秦力
+    Room_screen.Destroy();
+    Dealer_check.Destroy();
+    Healer_check.Destroy();
+    Room_screen_bg.Destroy();
+
+    Kirby_blue_fly.Destroy();
+    Kirby_blue_hit.Destroy();
+    Kirby_blue_zombie.Destroy();
+    Kirby_blue_die.Destroy();
+
+    start_screen.Destroy();
+    title.Destroy();
+    for (int i = 0; i < 6; ++i) cartoon[i].Destroy();
+    cartoon_bg.Destroy();
+    main_screen.Destroy();
+    start_button.Destroy();
+    item_check.Destroy();
+    click_cursor.Destroy();
+    game_bg.Destroy();
+    Kirby_pink_fly.Destroy();
+    Kirby_pink_die.Destroy();
+    Kirby_pink_hit.Destroy();
+    Kirby_pink_zombie.Destroy();
+    heart.Destroy();
+    basic_bullet.Destroy();
+    game_bg2.Destroy();
+    skill.Destroy();
+    skill_color.Destroy();
+    skill_bullet.Destroy();
+    m[5].Destroy();
+    monster_bullet.Destroy();
+    number.Destroy();
+    hp_bar, hp_empty.Destroy();
+    skill_effects.Destroy();
+    game_over.Destroy();
+    over_number.Destroy();
+    warning.Destroy();
+    missile_explosion.Destroy();
+    missile_bmp.Destroy();
+    coin_bmp.Destroy();
+    monster_create.Destroy();
+    monster_die.Destroy();
+    hit_effect.Destroy();
+    rezero_bg.Destroy();
+    for (int i = 0; i < 4; ++i) item[i].Destroy();
+
+    //家府府家胶 秦力
+    ssystem->close();
+    ssystem->release();
+}

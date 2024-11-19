@@ -147,12 +147,23 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
  
         return 0;
     }
+    if (uMsg == WM_DESTROY) {
+        //윈도우파괴
+        ResourceManager::getInstance().destroy();
+
+    }
     if (uMsg == WM_QUIT) {
         // 7. 소켓 종료
-        closesocket(sock);
+        if (sock != INVALID_SOCKET) {
+            shutdown(sock, SD_BOTH); // 양방향 종료 알림
+            closesocket(sock);      // 소켓 닫기
+        }
+
+        // Winsock 정리
         WSACleanup();
 
     }
+
     if (m_framework) {
         return m_framework->windowproc(hwnd, uMsg, wParam, lParam);
     }

@@ -20,11 +20,15 @@ private:
     CImage* game_bg;
     CImage* game_bg2;
     CImage* number;
+    CImage* heart;
 private :
     //play inform
     int bg_xPos = 800; // 배경 사진 xPos
     TCHAR number_text[99] = { '\0' };//점수, 골드 출력용
+
+    POINT heart_pt[4] = { {765,25},{730,25},{695,25},{660,25} }; // 하트 찍는 위치
     int heart_cnt = 3; // 하트 갯수
+
     int play_score = 0;//이번판의 점수
     int play_gold = 0;//이번판의 돈
 
@@ -44,8 +48,9 @@ public:
         game_bg = &ResourceManager::getInstance().game_bg;
         game_bg2 = &ResourceManager::getInstance().game_bg2;
         number = &ResourceManager::getInstance().number;
+        heart = &ResourceManager::getInstance().heart;
     };
-
+    ~Play_Scene();
 public:
 
     void render(LPVOID param) override;

@@ -1,6 +1,11 @@
 #include "Framework.h"
 
 
+Framework::~Framework()
+{
+	if (m_scene) delete m_scene;
+}
+
 void Framework::render(LPVOID param)
 {
 	if(m_scene)m_scene->render(param);
