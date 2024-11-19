@@ -149,7 +149,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     }
     if (uMsg == WM_DESTROY) {
         //À©µµ¿ìÆÄ±«
-
+        ResourceManager::getInstance().destroy();
 
     }
     if (uMsg == WM_QUIT) {
