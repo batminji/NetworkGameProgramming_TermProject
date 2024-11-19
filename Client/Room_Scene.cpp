@@ -37,7 +37,7 @@ void Room_Scene::render(LPVOID param)
     // 플레이어 그리기
 
     // 역할 체크
-    if (master_player->who_is_me) {
+    if (master_player->who_is_me) { // 내가 방장이면
         switch (master_player->job) {
         case 1:
             dealer_check->TransparentBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
@@ -47,7 +47,7 @@ void Room_Scene::render(LPVOID param)
             break;
         }
     }
-    else if (join_player->who_is_me) {
+    else if (join_player->who_is_me) { // 내가 조인이면
         switch (join_player->job) {
         case 1:
             dealer_check->TransparentBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));

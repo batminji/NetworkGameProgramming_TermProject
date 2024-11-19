@@ -40,8 +40,9 @@ public:
         m_sock = sock;
 
         //player
-        player1 = new Player(1, "1");
-        player2 = new Player(2, "1");
+        // room 씬에서 Player를 받아서 전달해주어야 함.
+        /*player1 = new Player(1, "1");
+        player2 = new Player(2, "1");*/
         //ui 이미지 로드
         game_bg = &ResourceManager::getInstance().game_bg;
         game_bg2 = &ResourceManager::getInstance().game_bg2;

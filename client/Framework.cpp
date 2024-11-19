@@ -28,7 +28,10 @@ void Framework::update()
 			break;
 		case ROOM_SCENE:
 			delete m_scene;
-			m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
+			// 내가 방장일 경우
+			m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, TRUE);
+			// 내가 조인일 경우
+			// m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, FALSE);
 			m_scene->next_scene = ROOM_SCENE;
 			break;
 		case PLAY_SCENE:
