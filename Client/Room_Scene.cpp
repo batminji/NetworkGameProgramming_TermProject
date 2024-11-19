@@ -42,9 +42,18 @@ void Room_Scene::render(LPVOID param)
     // 플레이어 그리기
     switch (master_player->job) {
     case 1:
-        pink_idle_left->TransparentBlt(m_hBufferDC, 25, 25, 50, 50, frame * 25, 0, 25, 25, RGB(0, 255, 0));
+        pink_idle_right->TransparentBlt(m_hBufferDC, 100, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
         break;
     case 2:
+        blue_idle_right->TransparentBlt(m_hBufferDC, 100, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
+        break;
+    }
+    switch (join_player->job) {
+    case 1:
+        pink_idle_left->TransparentBlt(m_hBufferDC, 474, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
+        break;
+    case 2:
+        blue_idle_left->TransparentBlt(m_hBufferDC, 474, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
         break;
     }
 
@@ -52,20 +61,20 @@ void Room_Scene::render(LPVOID param)
     if (master_player->who_is_me) { // 내가 방장이면
         switch (master_player->job) {
         case 1:
-            dealer_check->TransparentBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
+            dealer_check->TransparentBlt(m_hBufferDC, -10, -10, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
             break;
         case 2:
-            healer_check->TransparentBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
+            healer_check->TransparentBlt(m_hBufferDC, -10, -10, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
             break;
         }
     }
     else if (join_player->who_is_me) { // 내가 조인이면
         switch (join_player->job) {
         case 1:
-            dealer_check->TransparentBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
+            dealer_check->TransparentBlt(m_hBufferDC, -10, -10, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
             break;
         case 2:
-            healer_check->TransparentBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
+            healer_check->TransparentBlt(m_hBufferDC, -10, -10, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
             break;
         }
     }

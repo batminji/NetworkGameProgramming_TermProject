@@ -73,9 +73,9 @@ void Lobby_Scene::render(LPVOID param)
 	TextOut(m_hBufferDC, 555, 120, text_out_coin, lstrlen(text_out_coin));
 
 	// 메모리 해제
-	/*delete[] text_out_id;
+	delete[] text_out_id;
 	delete[] text_out_score;
-	delete[] text_out_coin;*/
+	delete[] text_out_coin;
 
 	//랭킹
 	WCHAR* number_text = new WCHAR[20];
@@ -92,11 +92,11 @@ void Lobby_Scene::render(LPVOID param)
 		TextOut(m_hBufferDC, 158, (60 * i) + 245, number_text, lstrlen(number_text));
 
 		// 메모리 해제
-		// delete[] user_name;
+		delete[] user_name;
 	}
 
 	// 메모리 해제
-	// delete[] number_text;
+	delete[] number_text;
 }
 
 
