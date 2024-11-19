@@ -48,8 +48,8 @@ void Lobby_Scene::render(LPVOID param)
 	RECT rect;
 	GetClientRect(m_hwnd, &rect);
 
-	main_screen->StretchBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, SRCCOPY);
-	start_button->TransparentBlt(m_hBufferDC, 10 - stbt_x, 10 - stbt_y, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
+	//기본 배경출력
+	main_screen->StretchBlt(m_hBufferDC, -20, -20, 800, 600, 0, 0, 800, 600, SRCCOPY);
 
 	//아이템구매
 	//for (int i = 0; i < 4; ++i)
@@ -63,13 +63,17 @@ void Lobby_Scene::render(LPVOID param)
 	MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, text_out_id, sizeof(DataManager::getInstance().my_data.ID));
 
 	SetBkMode(m_hBufferDC, TRANSPARENT);
-	TextOut(m_hBufferDC, 155, 85, text_out_id, lstrlen(text_out_id));
+	TextOut(m_hBufferDC, 155, 65, text_out_id, lstrlen(text_out_id));
 	wsprintf(text_out_score, L"%d", DataManager::getInstance().my_data.high_score);
 	SetBkMode(m_hBufferDC, TRANSPARENT);
-	TextOut(m_hBufferDC, 270, 110, text_out_score, lstrlen(text_out_score));
+	TextOut(m_hBufferDC, 270, 90, text_out_score, lstrlen(text_out_score));
 	wsprintf(text_out_coin, L"%d G", DataManager::getInstance().my_data.coin);
 	SetBkMode(m_hBufferDC, TRANSPARENT);
-	TextOut(m_hBufferDC, 555, 120, text_out_coin, lstrlen(text_out_coin));
+	TextOut(m_hBufferDC, 555, 100, text_out_coin, lstrlen(text_out_coin));
+
+	//방 참가하기 아이디 입력
+	SetBkMode(m_hBufferDC, TRANSPARENT);
+	TextOut(m_hBufferDC, 560, 528, join_room_id, lstrlen(join_room_id));
 
 	// 메모리 해제
 	delete[] text_out_id;
@@ -84,11 +88,11 @@ void Lobby_Scene::render(LPVOID param)
 		MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().rank_data[i].id, -1, user_name, sizeof(DataManager::getInstance().rank_data[i].id));
 
 		SetBkMode(m_hBufferDC, TRANSPARENT);
-		TextOut(m_hBufferDC, 158, (60 * i) + 225, user_name, lstrlen(user_name));
+		TextOut(m_hBufferDC, 158, (60 * i) + 205, user_name, lstrlen(user_name));
 
 		wsprintf(number_text, L"%d", DataManager::getInstance().rank_data[i].hs);
 		SetBkMode(m_hBufferDC, TRANSPARENT);
-		TextOut(m_hBufferDC, 158, (60 * i) + 245, number_text, lstrlen(number_text));
+		TextOut(m_hBufferDC, 158, (60 * i) + 225, number_text, lstrlen(number_text));
 
 		// 메모리 해제
 		delete[] user_name;
@@ -122,12 +126,36 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		EndPaint(hwnd, &ps);
         return 0;
     }
+	case WM_CHAR:
+	{
+		if (wParam == VK_BACK) {
+			if (input_cnt == 0);
+			else {
+				join_room_id[input_cnt - 1] = NULL;
+				input_cnt--;
+			}
+		}
+		else if (input_cnt < 20) join_room_id[input_cnt++] = wParam;
+
+	}
+	break;
 	case WM_LBUTTONDOWN:
 	{
 		int mx = LOWORD(lParam);
 		int my = HIWORD(lParam);
 		POINT mypt = { mx,my };
-		if (PtInRect(&stbt_rt, mypt)) { // start
+		if (PtInRect(&create_room_button, mypt)) { //create room
+
+			//방만들기를 눌렀을때 처리
+			DataManager::getInstance().room_master = true;
+			strcpy(DataManager::getInstance().ROOM_ID, DataManager::getInstance().my_data.ID); //참가 방아이디를 내아이디로
+			next_scene = ROOM_SCENE;
+		}
+		if (PtInRect(&join_room_button, mypt)) { //join room
+
+			//방 참가하기를 눌렀을때 처리
+			DataManager::getInstance().room_master = false;
+			WideCharToMultiByte(CP_ACP, 0, join_room_id, -1, DataManager::getInstance().ROOM_ID, sizeof(DataManager::getInstance().ROOM_ID), NULL, NULL);
 			next_scene = ROOM_SCENE;
 		}
 	}

@@ -39,18 +39,17 @@ void Framework::update()
 			CS_JOIN_ROOM_PACKET roomPacket;
 			roomPacket.size = sizeof(CS_JOIN_ROOM_PACKET);
 			roomPacket.type = CS_JOIN_ROOM;
-			strcpy(roomPacket.id, DataManager::getInstance().my_data.ID);
+			strcpy(roomPacket.id, DataManager::getInstance().ROOM_ID);
 
 			if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
 				std::cerr << "Send failed." << std::endl;
 				closesocket(*m_sock);
 				WSACleanup();
 			}
-			//delete m_scene;
-			// 내가 방장일 경우
-			//m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, TRUE);
-			// 내가 조인일 경우
-			// m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, FALSE);
+			delete m_scene;
+			if (DataManager::getInstance().room_master)m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, TRUE);
+			else m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, FALSE);
+
 			m_scene->next_scene = ROOM_SCENE;
 		}
 		break;

@@ -107,7 +107,7 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                }
               
             }
-            else if (count < 10) ID[count++] = wParam;
+            else if (count < 20) ID[count++] = wParam;
 
         break;
     case WM_KEYDOWN:
