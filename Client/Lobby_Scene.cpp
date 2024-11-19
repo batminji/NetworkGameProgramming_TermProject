@@ -145,14 +145,14 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		int my = HIWORD(lParam);
 		POINT mypt = { mx,my };
 		if (PtInRect(&create_room_button, mypt)) { //create room
-
+			printf("방만들귀\n");
 			//방만들기를 눌렀을때 처리
 			DataManager::getInstance().room_master = true;
 			strcpy(DataManager::getInstance().ROOM_ID, DataManager::getInstance().my_data.ID); //참가 방아이디를 내아이디로
 			next_scene = ROOM_SCENE;
 		}
 		if (PtInRect(&join_room_button, mypt)) { //join room
-
+			printf("방참가하귀\n");
 			//방 참가하기를 눌렀을때 처리
 			DataManager::getInstance().room_master = false;
 			WideCharToMultiByte(CP_ACP, 0, join_room_id, -1, DataManager::getInstance().ROOM_ID, sizeof(DataManager::getInstance().ROOM_ID), NULL, NULL);
