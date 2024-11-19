@@ -84,9 +84,13 @@ public:
     void setisPlaying(bool a) { isPlaying = a; }
     bool getisPlaying() { return isPlaying; }
     bool getisDealer(std::string myid) { return myid == dealer_id; }
+    void setDealer(std::string id) { dealer_id = id; }
     bool broadcast(char* res, size_t size)
     {
-        return (p1->broadcast(res, size) && p2->broadcast(res, size));
+        bool ret = false;
+        if (p1 != nullptr) ret = p1->broadcast(res, size);
+        if (p2 != nullptr) ret = ret && p2->broadcast(res, size);
+        return ret;
     }
 };
 
@@ -385,6 +389,8 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
             t_room.setP2(nullptr);
         }
         if (p->isPlaying) t_room.setisPlaying(true);
+        if (p->isDealer) t_room.setDealer(id);
+        else t_room.setDealer(t_room.getP2ID());
 
         if (false == send_room_change_packet(id)) return false; // 전송 실패.
         break;

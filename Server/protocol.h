@@ -36,6 +36,7 @@ struct CS_ROOM_STATE_PACKET // 방 설정을 변경하는 패킷
 {
 	unsigned short size;
 	PACKET type;
+	bool isDealer; // 클라이언트가 자기 딜러로 바꾸는 변수
 	bool isPlaying;
 	bool isQuit;
 };
