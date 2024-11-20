@@ -283,7 +283,6 @@ bool send_room_change_packet(std::string& id)
     res.isDealer = t_room.getisDealer(id);
     if (t_room.getP1ID() == id)  memcpy(res.other_pl, t_room.getP2ID().c_str(), ID_LEN);
     else memcpy(res.other_pl, t_room.getP1ID().c_str(), ID_LEN);
-
     if (t_room.broadcast(reinterpret_cast<char*>(&res), res.size))
         return true;
     return false;
