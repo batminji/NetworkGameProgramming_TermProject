@@ -6,6 +6,7 @@ Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     m_hBufferDC = hBufferDC;
     m_sock = sock;
     frame = 0;
+    isPlaying = FALSE;
     if (is_master) { // 내가 방장일 경우
         master_player = new Player(1, TRUE);
         join_player = new Player(2, FALSE);
@@ -14,11 +15,8 @@ Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     else { // 방에 참여하는 경우
         master_player = new Player(1, FALSE);
         join_player = new Player(2, TRUE);
+        join_player->room = TRUE;
     }
-
-    ////player
-    //master_player = new Player(1, "1");
-    //join_player = new Player(2, "1");
 
     //ui 이미지 로드
     room_screen = &ResourceManager::getInstance().Room_screen;
@@ -29,7 +27,6 @@ Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     pink_idle_right = &ResourceManager::getInstance().Kirby_pink_idle_right;
     blue_idle_left = &ResourceManager::getInstance().Kirby_blue_idle_left;
     blue_idle_right = &ResourceManager::getInstance().Kirby_blue_idle_right;
-
 }
 void Room_Scene::render(LPVOID param)
 {
@@ -87,9 +84,6 @@ void Room_Scene::update()
 {
     //애니메이션 프레임 갱신
     frame = (frame + 1) % 6;
-
-    
-
 }
 
 LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -119,6 +113,7 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 join_player->job = 1;
             }
             else if (PtInRect(&start_rt, mypt)) { //시작 누르기
+                isPlaying = TRUE;
                 next_scene = PLAY_SCENE;
             }
         }
@@ -145,7 +140,8 @@ int Room_Scene::room_data_update()
     roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
     roomPacket.type = CS_ROOM_STATE;
     (master_player->job==1)? roomPacket.isDealer = true: roomPacket.isDealer = false;
-    roomPacket.isPlaying =false;
+    if (isPlaying)roomPacket.isPlaying = TRUE;
+    else roomPacket.isPlaying = FALSE;
     roomPacket.isQuit = false ;
 
     if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
@@ -153,7 +149,6 @@ int Room_Scene::room_data_update()
         closesocket(*m_sock);
         WSACleanup();
     }
-
 
     //수신
     char recvBuf[BUFSIZE];
@@ -178,6 +173,7 @@ int Room_Scene::room_data_update()
                 if (roomPacket->isDealer) {
                     master_player->job = 1; join_player->job = 2;
                 }
+                join_player->room = TRUE;
             }
             else if (join_player->who_is_me) {
                 strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
