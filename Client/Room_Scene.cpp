@@ -145,7 +145,7 @@ int Room_Scene::room_data_update()
     roomPacket.isQuit = false ;
 
     if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
-        std::cerr << "방상태 전송실패 ㅠㅠㅠㅠ" << std::endl;
+        std::cerr << "방상태 전송실패" << std::endl;
         closesocket(*m_sock);
         WSACleanup();
     }

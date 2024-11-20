@@ -1,5 +1,22 @@
 #include "Play_Scene.h"
 
+Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock, Player* p1, Player* p2) {
+    m_hwnd = hwnd;
+    m_hBufferBitmap = hBufferBitmap;
+    m_hBufferDC = hBufferDC;
+    m_sock = sock;
+
+    //player
+    master_player = p1;
+    join_player = p2;
+
+    //ui 이미지 로드
+    game_bg = &ResourceManager::getInstance().game_bg;
+    game_bg2 = &ResourceManager::getInstance().game_bg2;
+    number = &ResourceManager::getInstance().number;
+    heart = &ResourceManager::getInstance().heart;
+};
+
 Play_Scene::~Play_Scene()
 {
     if (master_player) delete master_player;

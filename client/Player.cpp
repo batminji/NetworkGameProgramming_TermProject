@@ -18,7 +18,7 @@ Player::Player()
 Player::Player(short j, bool w)
 {
 	kirby_pink_fly = &ResourceManager::getInstance().Kirby_pink_fly;
-	kirby_pink_die = &ResourceManager::getInstance().Kirby_pink_die;
+	// kirby_pink_die = &ResourceManager::getInstance().Kirby_pink_die;
 	kirby_pink_hit = &ResourceManager::getInstance().Kirby_pink_hit;
 	kirby_pink_zombie = &ResourceManager::getInstance().Kirby_pink_zombie;
 
