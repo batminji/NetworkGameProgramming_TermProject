@@ -7,13 +7,13 @@ Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     m_sock = sock;
     frame = 0;
     if (is_master) { // 내가 방장일 경우
-        master_player = new Player(1, "1", TRUE);
-        join_player = new Player(2, "1", FALSE);
+        master_player = new Player(1, TRUE);
+        join_player = new Player(2, FALSE);
         join_player->room = FALSE; // 아직 상대가 들어오지 않음. 들어오면 TRUE
     }
     else { // 방에 참여하는 경우
-        master_player = new Player(1, "1", FALSE);
-        join_player = new Player(2, "1", TRUE);
+        master_player = new Player(1, FALSE);
+        join_player = new Player(2, TRUE);
     }
 
     ////player

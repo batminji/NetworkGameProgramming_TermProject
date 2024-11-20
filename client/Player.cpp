@@ -15,7 +15,7 @@ Player::Player()
 	job = 1;
 }
 
-Player::Player(short j, std::string i, bool w)
+Player::Player(short j, bool w)
 {
 	kirby_pink_fly = &ResourceManager::getInstance().Kirby_pink_fly;
 	kirby_pink_die = &ResourceManager::getInstance().Kirby_pink_die;
@@ -27,7 +27,6 @@ Player::Player(short j, std::string i, bool w)
 	kirby_blue_hit = &ResourceManager::getInstance().Kirby_blue_hit;
 	kirby_blue_zombie = &ResourceManager::getInstance().Kirby_blue_zombie;
 	job = j;
-	id = i;
 	who_is_me = w;
 	room = FALSE;
 }

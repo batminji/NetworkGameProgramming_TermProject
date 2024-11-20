@@ -22,8 +22,6 @@ class Player
 	short job;
 	bool room;
 	
-	std::string	id;
-	
 	bool inGame;
 
 	short x = 675;
@@ -46,7 +44,7 @@ public:
 public:
 
 	Player();
-	Player(short job, string id, bool who_is_me);
+	Player(short job, bool who_is_me);
 
 public:
 	
