@@ -47,7 +47,9 @@ void Framework::update()
 				WSACleanup();
 			}
 			delete m_scene;
-			if (DataManager::getInstance().room_master)m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, TRUE);
+			if (DataManager::getInstance().room_master){
+				m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, TRUE);
+			}
 			else m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, FALSE);
 
 			m_scene->next_scene = ROOM_SCENE;

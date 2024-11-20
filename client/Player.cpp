@@ -29,6 +29,7 @@ Player::Player(short j, std::string i, bool w)
 	job = j;
 	id = i;
 	who_is_me = w;
+	room = FALSE;
 }
 
 void Player::render(HDC mdc)

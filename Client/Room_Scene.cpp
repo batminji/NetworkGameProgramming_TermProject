@@ -9,6 +9,7 @@ Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     if (is_master) { // 내가 방장일 경우
         master_player = new Player(1, "1", TRUE);
         join_player = new Player(2, "1", FALSE);
+        join_player->room = FALSE; // 아직 상대가 들어오지 않음. 들어오면 TRUE
     }
     else { // 방에 참여하는 경우
         master_player = new Player(1, "1", FALSE);
@@ -48,13 +49,15 @@ void Room_Scene::render(LPVOID param)
         blue_idle_right->TransparentBlt(m_hBufferDC, 100, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
         break;
     }
-    switch (join_player->job) {
-    case 1:
-        pink_idle_left->TransparentBlt(m_hBufferDC, 474, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
-        break;
-    case 2:
-        blue_idle_left->TransparentBlt(m_hBufferDC, 474, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
-        break;
+    if (join_player->room) { // 조인이 들어왔으면..
+        switch (join_player->job) {
+        case 1:
+            pink_idle_left->TransparentBlt(m_hBufferDC, 474, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
+            break;
+        case 2:
+            blue_idle_left->TransparentBlt(m_hBufferDC, 474, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
+            break;
+        }
     }
 
     // 역할 체크
