@@ -10,8 +10,8 @@ class Play_Scene :
 {
 
 private:
-    Player* player1;
-    Player* player2;
+    Player* master_player;
+    Player* join_player;
 
     vector<Enemy> enemys;
     vector<Item> Items;
@@ -41,8 +41,8 @@ public:
         m_sock = sock;
         
         //player
-        player1 = p1;
-        player2 = p2;
+        master_player = p1;
+        join_player = p2;
 
         //ui 이미지 로드
         game_bg = &ResourceManager::getInstance().game_bg;

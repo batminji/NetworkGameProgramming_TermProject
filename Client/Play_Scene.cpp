@@ -2,8 +2,8 @@
 
 Play_Scene::~Play_Scene()
 {
-    if (player1) delete player1;
-    if (player2) delete player2;
+    if (master_player) delete master_player;
+    if (join_player) delete join_player;
 
 }
 
@@ -16,8 +16,8 @@ void Play_Scene::render(LPVOID param)
     //ui
     ui_render();
     // 캐릭터 그리기 (단순한 사각형으로 표현)
-    player1->render(m_hBufferDC);
-    player2->render(m_hBufferDC);
+    master_player->render(m_hBufferDC);
+    join_player->render(m_hBufferDC);
    
 }
 
@@ -62,8 +62,8 @@ void Play_Scene::item_draw()
 
 void Play_Scene::update()
 {
-    player1->update();
-    player2->update();
+    master_player->update();
+    join_player->update();
     for (Enemy& e : enemys) e.update();
 
     //배경
@@ -89,7 +89,15 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         EndPaint(hwnd, &ps);
         return 0;
     }
+    case WM_CHAR:
+    {
+        if (wParam == VK_RETURN) { // 스킬을 썼다.
+            // TODO 스킬 썼다는 패킷 보내야 함.
 
+            // 총알의 타입 변경 흠... 근데 흠...
+        }
+    }
+        break;
     case WM_KEYDOWN:
         switch (wParam) {
         default:break;
