@@ -21,7 +21,7 @@ class Player
 	
 	short job;
 	bool room;
-	
+
 	bool inGame;
 
 	short x = 675;

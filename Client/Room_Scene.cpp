@@ -162,18 +162,29 @@ int Room_Scene::room_data_update()
         std::cerr << "Receive failed or connection closed." << std::endl;
     }
     else {
-        SC_ROOM_CHANGE_PACKET* resPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
-        if (resPacket->isPlaying) {
+        SC_ROOM_CHANGE_PACKET* roomPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
+        if (roomPacket->isPlaying) {
             std::cout << "이 방은 게임중..." << std::endl;
         }
         else {
             std::cout << "이 방은 이런게임 안게임..." << std::endl;
 
             //TODO: 이제 이걸 잘써야함 넘졸령
-            resPacket->other_pl[ID_LEN]; // 친구 플레이어 이름
-            resPacket->isPlaying; // 시작했는지
-            resPacket->isDealer; // 내가 딜러인가?
-
+            //roomPacket->other_pl[ID_LEN]; // 친구 플레이어 이름
+            //roomPacket->isPlaying; // 시작했는지
+            //roomPacket->isDealer; // 내가 딜러인가?
+            if (master_player->who_is_me) {
+                strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
+                if (roomPacket->isDealer) {
+                    master_player->job = 1; join_player->job = 2;
+                }
+            }
+            else if (join_player->who_is_me) {
+                strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
+                if (roomPacket->isDealer) {
+                    master_player->job = 2; join_player->job = 1;
+                }
+            }
         }
     }
 

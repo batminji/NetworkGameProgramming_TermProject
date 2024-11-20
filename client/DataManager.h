@@ -13,6 +13,7 @@ public:
 	struct my_data_des
 	{
 		char ID[20]; //내 아이디
+		char otherID[20]; // 친구 아이디
 		unsigned int high_score;
 		unsigned int coin;
 	};
