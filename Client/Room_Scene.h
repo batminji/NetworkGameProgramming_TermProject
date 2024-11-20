@@ -22,7 +22,7 @@ private:
     Player* join_player;
 
 public:
-    char user_name[2][20]; //출력용 아이디, [0]이 방장. [1]이 팀원
+    WCHAR user_name[2][20]; //출력용 아이디, [0]이 방장. [1]이 팀원
 
 public:
     RECT dealer_rt = { 50,470,177,545 };

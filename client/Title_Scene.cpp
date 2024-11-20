@@ -69,10 +69,10 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                 WideCharToMultiByte(CP_ACP, 0, ID, -1, loginPacket.id, sizeof(loginPacket.id), NULL, NULL);
 
                if (send(*m_sock, reinterpret_cast<char*>(&loginPacket), sizeof(loginPacket), 0) == SOCKET_ERROR) {
-                   std::cerr << "Send failed." << std::endl;
+                   std::cerr << "로그인 Send failed." << std::endl;
                    closesocket(*m_sock);
                    WSACleanup();
-                   return -1;
+                   //return -1;
                }
                
                // 6. 로그인 결과 받기

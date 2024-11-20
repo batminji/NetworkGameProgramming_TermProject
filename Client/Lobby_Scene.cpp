@@ -17,28 +17,22 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 		std::cerr << "·©Å· ¹Þ±â ½ÇÆÐ" << std::endl;
 	}
 	else {
-		DataManager::getInstance().rank_data.clear();
-
 		SC_RANKING_PACKET* resPacket = reinterpret_cast<SC_RANKING_PACKET*>(recvBuf);
-		DataManager::getInstance().rank_data.push_back({});
-		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id1);
-		DataManager::getInstance().rank_data.back().hs = resPacket->hs1;
+		DataManager::getInstance().rank_arr[0].hs = resPacket->hs1;
+		strcpy(DataManager::getInstance().rank_arr[0].id, resPacket->id1);
 
-		DataManager::getInstance().rank_data.push_back({});
-		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id2);
-		DataManager::getInstance().rank_data.back().hs = resPacket->hs2;
+		DataManager::getInstance().rank_arr[1].hs = resPacket->hs2;
+		strcpy(DataManager::getInstance().rank_arr[1].id, resPacket->id2);
 
-		DataManager::getInstance().rank_data.push_back({});
-		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id3);
-		DataManager::getInstance().rank_data.back().hs = resPacket->hs3;
+		DataManager::getInstance().rank_arr[2].hs = resPacket->hs3;
+		strcpy(DataManager::getInstance().rank_arr[2].id, resPacket->id3);
 
-		DataManager::getInstance().rank_data.push_back({});
-		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id4);
-		DataManager::getInstance().rank_data.back().hs = resPacket->hs4;
+		DataManager::getInstance().rank_arr[3].hs = resPacket->hs4;
+		strcpy(DataManager::getInstance().rank_arr[3].id, resPacket->id4);
 
-		DataManager::getInstance().rank_data.push_back({});
-		strcpy(DataManager::getInstance().rank_data.back().id, resPacket->id5);
-		DataManager::getInstance().rank_data.back().hs = resPacket->hs5;
+		DataManager::getInstance().rank_arr[4].hs = resPacket->hs5;
+		strcpy(DataManager::getInstance().rank_arr[4].id, resPacket->id5);
+
 	}
 }
 
@@ -83,14 +77,14 @@ void Lobby_Scene::render(LPVOID param)
 	//·©Å·
 	WCHAR* number_text = new WCHAR[20];
 
-	for (int i = 0; (i < 5) && (i < DataManager::getInstance().rank_data.size()); i++) {
+	for (int i = 0; i < 5; i++) {
 		WCHAR* user_name = new WCHAR[20];
-		MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().rank_data[i].id, -1, user_name, sizeof(DataManager::getInstance().rank_data[i].id));
+		MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().rank_arr[i].id, -1, user_name, sizeof(DataManager::getInstance().rank_arr[i].id));
 
 		SetBkMode(m_hBufferDC, TRANSPARENT);
 		TextOut(m_hBufferDC, 158, (60 * i) + 205, user_name, lstrlen(user_name));
 
-		wsprintf(number_text, L"%d", DataManager::getInstance().rank_data[i].hs);
+		wsprintf(number_text, L"%d", DataManager::getInstance().rank_arr[i].hs);
 		SetBkMode(m_hBufferDC, TRANSPARENT);
 		TextOut(m_hBufferDC, 158, (60 * i) + 225, number_text, lstrlen(number_text));
 

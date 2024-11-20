@@ -388,7 +388,8 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
                 t_room.setP1(&players[t_room.getP2ID()]); // 2를 1로 바꾸기.
             t_room.setP2(nullptr);
         }
-        if (p->isPlaying) t_room.setisPlaying(true);
+ 
+        if (p->isPlaying) t_room.setisPlaying(true); 
         if (p->isDealer) t_room.setDealer(id);
         else t_room.setDealer(t_room.getP2ID());
 

@@ -38,6 +38,11 @@ void Room_Scene::render(LPVOID param)
     room_screen->TransparentBlt(m_hBufferDC, -20, -20, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
 
     // 플레이어 그리기
+
+    //방장 이름 출력
+    SetBkMode(m_hBufferDC, TRANSPARENT);
+    TextOut(m_hBufferDC,127, 130, user_name[0], lstrlen(user_name[0]));
+
     switch (master_player->job) {
     case 1:
         pink_idle_right->TransparentBlt(m_hBufferDC, 100, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
@@ -47,6 +52,11 @@ void Room_Scene::render(LPVOID param)
         break;
     }
     if (join_player->room) { // 조인이 들어왔으면..
+
+        //팀원 이름 출력
+        SetBkMode(m_hBufferDC, TRANSPARENT);
+        TextOut(m_hBufferDC, 478, 130, user_name[1], lstrlen(user_name[1]));
+
         switch (join_player->job) {
         case 1:
             pink_idle_left->TransparentBlt(m_hBufferDC, 474, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
@@ -84,6 +94,8 @@ void Room_Scene::update()
 {
     //애니메이션 프레임 갱신
     frame = (frame + 1) % 6;
+
+    room_data_update();
 }
 
 LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -158,11 +170,11 @@ int Room_Scene::room_data_update()
     }
     else {
         SC_ROOM_CHANGE_PACKET* roomPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
-        if (roomPacket->isPlaying) {
-            std::cout << "이 방은 게임중..." << std::endl;
-        }
-        else {
-            std::cout << "이 방은 이런게임 안게임..." << std::endl;
+       if (true == roomPacket->isPlaying) {
+     
+       }
+       else {
+  
 
             //TODO: 이제 이걸 잘써야함 넘졸령
             //roomPacket->other_pl[ID_LEN]; // 친구 플레이어 이름
@@ -170,17 +182,27 @@ int Room_Scene::room_data_update()
             //roomPacket->isDealer; // 내가 딜러인가?
             if (master_player->who_is_me) {
                 strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
+                MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, user_name[0], sizeof(DataManager::getInstance().my_data.ID));
+                MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.otherID, -1, user_name[1], sizeof(DataManager::getInstance().my_data.otherID));
+             
+
                 if (roomPacket->isDealer) {
                     master_player->job = 1; join_player->job = 2;
                 }
-                join_player->room = TRUE;
+               if(strlen(DataManager::getInstance().my_data.otherID)>=1) join_player->room = TRUE;
             }
             else if (join_player->who_is_me) {
                 strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
+
+
+                MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.otherID, -1, user_name[0], sizeof(DataManager::getInstance().my_data.otherID));
+                MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, user_name[1], sizeof(DataManager::getInstance().my_data.ID));
+
+
                 if (roomPacket->isDealer) {
                     master_player->job = 2; join_player->job = 1;
                 }
-            }
+           }
         }
     }
 

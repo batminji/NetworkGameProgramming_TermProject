@@ -24,7 +24,7 @@ public:
 	};
 	public:
 	my_data_des my_data;
-	std::vector<ranking_des> rank_data;
+	ranking_des rank_arr[5];
 
 public:
 	//방 참가 관련
