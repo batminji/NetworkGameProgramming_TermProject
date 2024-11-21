@@ -148,21 +148,24 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 int Room_Scene::room_data_update()
 {
     //송신
-    CS_ROOM_STATE_PACKET roomPacket;
-    roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
-    roomPacket.type = CS_ROOM_STATE;
-    (master_player->job==1)? roomPacket.isDealer = true: roomPacket.isDealer = false;
-    if (isPlaying)roomPacket.isPlaying = TRUE;
-    else roomPacket.isPlaying = FALSE;
-    roomPacket.isQuit = false ;
+    if (join_player->who_is_me) { // 조인은 송신 금지띠
+        CS_ROOM_STATE_PACKET roomPacket;
+        roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
+        roomPacket.type = CS_ROOM_STATE;
+        (master_player->job == 1) ? roomPacket.isDealer = true : roomPacket.isDealer = false;
+        if (isPlaying)roomPacket.isPlaying = TRUE;
+        else roomPacket.isPlaying = FALSE;
+        roomPacket.isQuit = false;
 
-    if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
-        std::cerr << "방상태 전송실패" << std::endl;
-        closesocket(*m_sock);
-        WSACleanup();
+        if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
+            std::cerr << "방상태 전송실패" << std::endl;
+            closesocket(*m_sock);
+            WSACleanup();
+        }
     }
 
     //수신
+
     char recvBuf[BUFSIZE];
     int recvLen = recv(*m_sock, recvBuf, sizeof(SC_ROOM_CHANGE_PACKET), 0);
     if (recvLen <= 0) {
@@ -184,11 +187,7 @@ int Room_Scene::room_data_update()
                 strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, user_name[0], sizeof(DataManager::getInstance().my_data.ID));
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.otherID, -1, user_name[1], sizeof(DataManager::getInstance().my_data.otherID));
-             
-     
-                if (roomPacket->isDealer) {
-                    master_player->job = 1; join_player->job = 2;
-                }
+
                if(strlen(roomPacket->other_pl)>=1) join_player->room = TRUE;
             }
             else if (join_player->who_is_me) {
@@ -199,6 +198,9 @@ int Room_Scene::room_data_update()
 
                 if (roomPacket->isDealer) {
                     master_player->job = 2; join_player->job = 1;
+                }
+                else {
+                    master_player->job = 1; join_player->job = 2;
                 }
            }
         }
