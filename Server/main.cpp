@@ -1,10 +1,55 @@
 #include "stdafx.h"
 #include "protocol.h"
 
-/*
-패킷 함수의 기본형 
-bool send_player_move_packet(SOCKET& s, std::string& id)
-*/
+constexpr unsigned short MOVE_DIST = 5;
+constexpr unsigned short DEFXPOS = 100; // todo: 플레이어 총알 생성되는 x좌표 수정해주세요
+
+// todo: 각 클래스에 collision 함수 만들어서 자기랑 충돌할 일이 있는 객체랑만 검사하도록..
+class Enemy_Bullet
+{
+private:
+    unsigned short x;
+    unsigned short y;
+    
+    POINT dir;
+public:
+
+    std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
+    void updatePosition()
+    {
+        x += MOVE_DIST * dir.x;
+        y += MOVE_DIST * dir.y
+    }
+    
+};
+
+class Player_Bullet // 무조건 왼쪽으로 이동하기만 함.
+{
+private:
+    unsigned short x = DEFXPOS;
+    unsigned short y;
+
+public:
+    Player_Bullet(unsigned short y) :y{ y } {}
+    std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
+    void updatePosition()
+    {
+        x += MOVE_DIST;
+    }
+
+};
+
+class Enemy
+{
+    unsigned short x;
+    unsigned short y;
+public:
+
+    void ai_move()
+    {
+        // todo: 여기 ai 로직 넣어줘
+    }
+};
 
 
 class Player
@@ -65,22 +110,52 @@ private:
     bool isPlaying = false;
     unsigned int score;
     unsigned short heart; // 음수가 없..?
- 
 
-    // 객체들 //
+    std::mutex update_lock; // todo: 락을 분리할지 고민하기
+
+    std::vector<Player_Bullet> p_bullets;
+    std::vector<Enemy> enemies;
+    std::vector<Enemy_Bullet> e_bullets;
 
 public:
+    // 객체들 //
+
     Room() {};
     ~Room() {};
+
+    // ai/충돌처리 관련
+    void doAIMove()
+    {
+        std::lock_guard<std::mutex> ll{ update_lock };
+        for (auto& e : enemies)
+            e.ai_move();
+    }
+
+    void doBulletsMove()
+    {
+        std::lock_guard<std::mutex> ll{ update_lock };
+        for (auto& b : p_bullets)
+            b.updatePosition();
+        for(auto& b:e_bullets)
+            b.updatePosition();
+    }
+    
+    void createPbullet() // 두 플레이어한테서 동시에 생성되게 해도 괜찮을까?
+    {
+        std::lock_guard<std::mutex> ll{ update_lock };
+        p_bullets.push_back({ p1->getY() });
+        p_bullets.push_back({ p2->getY() });
+    }
+
 
     // Getter - Setter
     unsigned short getP1Y() { return p1->getY(); }
     unsigned short getP2Y() { return p2->getY(); }
     std::string getP1ID() { return p1->getID(); }
-    std::string getP2ID() 
-    { 
+    std::string getP2ID()
+    {
         if (p2 == nullptr) return "";
-        return p2->getID(); 
+        return p2->getID();
     }
     void setP1(Player* p) { p1 = p; }
     void setP2(Player* p) { p2 = p; }
@@ -88,6 +163,8 @@ public:
     bool getisPlaying() { return isPlaying; }
     bool getisDealer(std::string myid) { return myid == dealer_id; }
     void setDealer(std::string id) { dealer_id = id; }
+
+
     bool broadcast(char* res, size_t size)
     {
         bool ret = false;
@@ -95,11 +172,9 @@ public:
         if (p2 != nullptr) ret = ret && p2->broadcast(res, size);
         return ret;
     }
-
-    /*void lock() { roomLock.lock(); }
-    void unlock() { roomLock.unlock(); }*/
 };
 
+// 플레이어 총알 생성, 적 총알 생성, 적 인공지능 이동
 enum TASK_TYPE { FIRE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE }; // 뭐가 있을까?
 class EVENT
 {
@@ -525,18 +600,20 @@ void ai_thread()
         evt_queue.try_pop(ev);
         switch (ev.evt_type) {
         case FIRE_PLAYER_BULLET:
-            // todo: 여기 플레이어 위치에서 bullet 생성해줘야 함
-
+            roomInfo[ev.room_id]->createPbullet();
             push_evt_queue(FIRE_PLAYER_BULLET, 1000, ev.room_id); // 1초에 한개씩 발사
             break;
 
         case FIRE_ENEMY_BULLET:
             // todo: 여기 적 위치에서 bullet 생성해줘야 함
+            roomInfo[ev.room_id]->createPbullet();
+            push_evt_queue(FIRE_ENEMY_BULLET, 1000, ev.room_id); // 1초에 한개씩 발사
 
             break;
 
         case AI_MOVE:
-            // todo: ai 로직 여기로 옮기기
+            roomInfo[ev.room_id]->doAIMove();
+            push_evt_queue(AI_MOVE, 1000, ev.room_id);
 
             break;
 
