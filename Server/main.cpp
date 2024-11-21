@@ -2,7 +2,7 @@
 #include "protocol.h"
 
 constexpr unsigned short MOVE_DIST = 5;
-constexpr unsigned short DEFXPOS = 100; // todo: 플레이어 총알 생성되는 x좌표 수정해주세요
+constexpr unsigned short DEFXPOS = 675; // todo: 플레이어 총알 생성되는 x좌표 수정해주세요
 
 // todo: 각 클래스에 collision 함수 만들어서 자기랑 충돌할 일이 있는 객체랑만 검사하도록..
 class Enemy_Bullet
@@ -18,7 +18,8 @@ public:
     void updatePosition()
     {
         x += MOVE_DIST * dir.x;
-        y += MOVE_DIST * dir.y
+        y += MOVE_DIST * dir.y;
+
     }
     
 };
@@ -28,10 +29,12 @@ class Player_Bullet // 무조건 왼쪽으로 이동하기만 함.
 private:
     unsigned short x = DEFXPOS;
     unsigned short y;
+    unsigned short type; //1:그냥총알 2:스킬총알
 
 public:
     Player_Bullet(unsigned short y) :y{ y } {}
     std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
+    unsigned short getType() { return type; }
     void updatePosition()
     {
         x += MOVE_DIST;
@@ -41,14 +44,60 @@ public:
 
 class Enemy
 {
+    short type; //0 잡몹 1~3 중간보스 4 최종보스
     unsigned short x;
     unsigned short y;
-public:
+    unsigned short hp;
+    unsigned short bullet_create_cnt;
 
+    unsigned short width;
+    unsigned short height;
+    POINT goal;
+public:
+    Enemy() {
+        type = type;
+        x = x;
+        y = y; //x,y초기화 어떻게?
+        
+        if (type == 0) width = 84, height = 96;
+        else if (type == 1 || type == 2)width = 90, height = 130;
+        else if (type == 3)width = 100, height = 120;
+        else if (type == 4)width = 256, height = 224;
+        goal = {rand() % 200 - 30, rand() % 400 + 50};
+    }
     void ai_move()
     {
         // todo: 여기 ai 로직 넣어줘
+        float dx = goal.x - x;
+        float dy = goal.y - y;
+        float distance = sqrt(dx * dx + dy * dy);
+        if (type == 0) distance = sqrt(dy);
+
+        if (distance < 1.0f) {
+            x = goal.x;
+            y = goal.y;
+            goal = { rand() % 200 - 30, rand() % 400 + 50 };
+        }
+
+        // 목표로 향하는 단위 벡터를 따라 이동
+        float speed = 10.0f;
+        if(type != 0) x += dx / distance * speed;
+        y += dy / distance * speed;
     }
+    bool collsion_player_bullet(Player_Bullet& bullet) {
+        //적과 총알 충돌 검사
+
+        RECT rect = { x, y, x + width, y + height };
+        POINT bullet_pos = { bullet.getPosition().first,bullet.getPosition().second };
+        if (PtInRect(&rect, bullet_pos)) { // bullet이 사각형 내부에 있을 때 실행할 코드
+            if (hp - bullet.getType() < 0) hp = 0;
+            else hp -= bullet.getType();
+            //점수 증가 , 이펙트 생성, 해당 총알 삭제 어디서?
+            return true; //인수로 들어온 총알과 충돌시 true리턴
+        }
+        else return false; //인수로 들어온 총알과 충돌하지 않았을시 false리턴
+    }
+
 };
 
 
