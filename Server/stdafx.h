@@ -22,6 +22,7 @@
 #include <fstream>
 #include <chrono>
 #include <array>
+#include <mutex>
 #include <concurrent_priority_queue.h>
 #include <concurrent_queue.h>
 #pragma comment(lib, "ws2_32") // ws2_32.lib ¸µÅ©

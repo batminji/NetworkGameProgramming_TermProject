@@ -8,7 +8,6 @@ ddd 0 140
 aaa 0 100
 youngyun 7020 11060
 asefwg 0 0
-¤·¤·¤·¤·¤©¤©¤©¤©¤·¤· 0 0
 aefwedg 0 0
 awefawe 0 0
 awewqqt 0 0
@@ -16,7 +15,7 @@ sdfghj 0 0
 asdf 0 0
 oihuegrhoerjio 0 0
 dsfd 0 0
-aqwergwe 0 0
- 0 0
 djafkjlf 0 0
 jonman 0 0
+hello 0 0
+
