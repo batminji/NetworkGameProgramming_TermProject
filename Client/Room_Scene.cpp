@@ -1,5 +1,7 @@
 #include "Room_Scene.h"
 //#include "../Server/protocol.h"
+
+// source\repos\NetworkGameProgramming_TermProject\client\x64\Release\Client.exe
 Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock, bool is_master) {
     m_hwnd = hwnd;
     m_hBufferBitmap = hBufferBitmap;
@@ -183,7 +185,7 @@ int Room_Scene::room_data_update()
             //roomPacket->other_pl[ID_LEN]; // 친구 플레이어 이름
             //roomPacket->isPlaying; // 시작했는지
             //roomPacket->isDealer; // 내가 딜러인가?
-            if (master_player->who_is_me) {
+            if (master_player->who_is_me && roomPacket->other_pl != NULL) {
                 strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, user_name[0], sizeof(DataManager::getInstance().my_data.ID));
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.otherID, -1, user_name[1], sizeof(DataManager::getInstance().my_data.otherID));
