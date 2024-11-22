@@ -170,8 +170,8 @@ int Play_Scene::recv_player_data()
             join_player->y = resPacket->other_y;
         }
         else {
-            master_player->y = resPacket->other_y;
-            join_player->y = resPacket->this_y;
+            master_player->y = resPacket->this_y;
+            join_player->y = resPacket->other_y;
         }
     }
 
