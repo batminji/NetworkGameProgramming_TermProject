@@ -49,7 +49,7 @@ public:
 public:
     short send_y = 0;
     int send_player_input(short y);
-
+   int recv_player_data();
 
    
 

@@ -3,6 +3,11 @@
 
 constexpr unsigned short MOVE_DIST = 5;
 constexpr unsigned short DEFXPOS = 675; // todo: 플레이어 총알 생성되는 x좌표 수정해주세요
+constexpr unsigned short SKILL_TIME = 5000; // MS단위임
+
+// 전방선언 라인
+void push_evt_queue(TASK_TYPE ev, int time, std::string& rid);
+
 
 // todo: 각 클래스에 collision 함수 만들어서 자기랑 충돌할 일이 있는 객체랑만 검사하도록..
 class Enemy_Bullet
@@ -19,9 +24,7 @@ public:
     {
         x += MOVE_DIST * dir.x;
         y += MOVE_DIST * dir.y;
-
     }
-    
 };
 
 class Player_Bullet // 무조건 왼쪽으로 이동하기만 함.
@@ -107,11 +110,13 @@ private:
     SOCKET s = -1;
     std::string id = "";
     bool inGame = false; // 현재 접속중인 아이디인가?
-    unsigned short y = 0; // winsize/2로 할것
+    unsigned short y = 300; 
     unsigned int high_score = 0;
     unsigned int coin = 0; // 오버플로우 떠서 int로 수정
 
     // 게임을 실행중일 때 
+    bool isSkill = false;
+
 
 public:
 
@@ -148,6 +153,8 @@ public:
     void setSocket(SOCKET& s) { this->s = s; }
     unsigned short getCoin() { return coin; }
     unsigned int getHigh_score() { return high_score; }
+    bool getSkill() { return isSkill; }
+    void setSkill(bool b) { isSkill = b; }
 };
 
 class Room
@@ -224,7 +231,7 @@ public:
 };
 
 // 플레이어 총알 생성, 적 총알 생성, 적 인공지능 이동
-enum TASK_TYPE { FIRE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE }; // 뭐가 있을까?
+enum TASK_TYPE { FIRE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END }; // 뭐가 있을까?
 class EVENT
 {
 public:
@@ -505,13 +512,13 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     {
         CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
         players[id].setY(p->y);
+        if ((true == p->keyDown) && (false == players[id].getSkill())) {// 스킬사용시.
+            players[id].setSkill(true);
+            push_evt_queue(SKILL_END, SKILL_TIME, id);
+        }
+
         if (false == send_player_move_packet(s, id)) return false;
 
-        break;
-    }
-    case CS_KEY_INPUT: // 플레이어의 키 입력(스킬 등)
-    {
-        CS_KEY_INPUT_PACKET* p = reinterpret_cast<CS_KEY_INPUT_PACKET*>(packet); // 얘는 바로 send 하지 말까?
         break;
     }
     case CS_ROOM_STATE: // 방 정보 변경
@@ -608,7 +615,15 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             send_player_move_packet(s, pid);
 
 
-            // recv.
+            // recv.CS_MOVE_PACKET
+            ZeroMemory(recv_buf, sizeof(recv_buf));
+            int ret = recv(s, recv_buf, sizeof(CS_MOVE_PACKET), 0);
+            if (ret == SOCKET_ERROR) { // 에러처리
+                int error = WSAGetLastError();
+                SERVER_err_display("recv() failed");
+                SERVER_err_display(error);  // 오류 코드 출력
+            }
+            process_packet(recv_buf, s, pid);
         }
 
     }
@@ -634,9 +649,13 @@ void timer_thread()
 
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid) // time: milisecond 단위.
 {
-    // todo
     EVENT evt;
     evt.setup(ev, time, rid);
+    evt_queue.push(evt);
+}
+
+void push_evt_queue(EVENT& evt)
+{
     evt_queue.push(evt);
 }
 
@@ -647,6 +666,7 @@ void ai_thread()
         EVENT ev;
         if (evt_queue.empty()) std::this_thread::yield();
         evt_queue.try_pop(ev);
+        if (ev.do_time < std::chrono::system_clock::now()) push_evt_queue(ev);
         switch (ev.evt_type) {
         case FIRE_PLAYER_BULLET:
             roomInfo[ev.room_id]->createPbullet();
@@ -654,16 +674,17 @@ void ai_thread()
             break;
 
         case FIRE_ENEMY_BULLET:
-            // todo: 여기 적 위치에서 bullet 생성해줘야 함
             roomInfo[ev.room_id]->createPbullet();
             push_evt_queue(FIRE_ENEMY_BULLET, 1000, ev.room_id); // 1초에 한개씩 발사
-
             break;
 
         case AI_MOVE:
             roomInfo[ev.room_id]->doAIMove();
             push_evt_queue(AI_MOVE, 1000, ev.room_id);
+            break;
 
+        case SKILL_END:
+            players[ev.room_id].setSkill(false);
             break;
 
         default:

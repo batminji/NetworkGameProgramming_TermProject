@@ -16,13 +16,7 @@ struct CS_MOVE_PACKET // 플레이어 마우스 위치 전송
 	unsigned short size;
 	PACKET type;
 	unsigned short y; // x값은 전송하지 않아도 됨
-};
-
-struct CS_KEY_INPUT_PACKET // 스킬 등 키 입력이 있을 떄
-{
-	unsigned short size;
-	PACKET type;
-	unsigned int key; // todo: 자료형 뭐로할지 고민 ->wParam 가능한지?
+	bool keyDown; // 스킬
 };
 
 struct CS_JOIN_ROOM_PACKET
