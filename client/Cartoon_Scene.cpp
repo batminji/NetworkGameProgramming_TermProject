@@ -21,6 +21,10 @@ void Cartoon_Scene::render(LPVOID param)
     click_cursor->TransparentBlt(m_hBufferDC, 800 - 100,600 - 100, 90, 90, click_xPos, 0, 52, 52, RGB(255, 0, 255));
 }
 
+void Cartoon_Scene::network()
+{
+}
+
 void Cartoon_Scene::update()
 {
     click_xPos = (click_xPos + 52) % 104;

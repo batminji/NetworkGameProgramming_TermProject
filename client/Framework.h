@@ -35,6 +35,8 @@ public:
 
 	void update();
 
+	void network();
+
 	LRESULT CALLBACK windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 };

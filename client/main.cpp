@@ -11,6 +11,7 @@
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 DWORD WINAPI client_render(LPVOID param);
 DWORD WINAPI client_update(LPVOID param);
+DWORD WINAPI client_network(LPVOID param);
 
 HBITMAP hBufferBitmap;
 HDC hBufferDC;
@@ -100,6 +101,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
     ShowWindow(hwnd, nCmdShow);
     HANDLE Render_Thread = NULL;
     HANDLE Update_Thread = NULL;
+    HANDLE Network_Thread = NULL;
     // 렌더링 스레드 시작
     if (m_framework) {
        Render_Thread = CreateThread(NULL, 0, client_render, hwnd, 0, NULL);
@@ -107,6 +109,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
     // 업데이트 스레드 시작
     if (m_framework) {
         Update_Thread = CreateThread(NULL, 0, client_update, hwnd, 0, NULL);
+    }
+    //네트워크 스레드 시작
+    if (m_framework) {
+        Network_Thread = CreateThread(NULL, 0, client_network, hwnd, 0, NULL);
     }
     MSG msg = {};
     while (GetMessage(&msg, NULL, 0, 0)) {
@@ -120,6 +126,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
     CloseHandle(Render_Thread); // 스레드 핸들 닫기
     WaitForSingleObject(Update_Thread, INFINITE); // 스레드가 종료될 때까지 대기
     CloseHandle(Update_Thread); // 스레드 핸들 닫기
+    WaitForSingleObject(Network_Thread, INFINITE); // 스레드가 종료될 때까지 대기
+    CloseHandle(Network_Thread); // 스레드 핸들 닫기
 
     DeleteDC(hBufferDC);
     DeleteObject(hBufferBitmap);
@@ -211,3 +219,22 @@ DWORD WINAPI client_update(LPVOID param) {
     return 0;
 }
 
+DWORD WINAPI client_network(LPVOID param) {
+    HWND hwnd = (HWND)param;
+
+    auto previousTime = std::chrono::high_resolution_clock::now();
+    const double frameDuration = 1.0 / 30.0f; // 30 FPS
+
+    while (isRunning) {
+       auto currentTime = std::chrono::high_resolution_clock::now();
+       double elapsedTime = std::chrono::duration<double>(currentTime - previousTime).count();
+
+       if (elapsedTime >= frameDuration) {
+           previousTime = currentTime;
+            m_framework->network();
+            InvalidateRect(hwnd, NULL, FALSE);
+       }
+    }
+
+    return 0;
+}

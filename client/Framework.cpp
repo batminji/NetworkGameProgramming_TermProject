@@ -92,6 +92,11 @@ void Framework::update()
 	}
 }
 
+void Framework::network()
+{
+	if (m_scene)m_scene->network();
+}
+
 LRESULT Framework::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg == WM_CHAR) {

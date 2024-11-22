@@ -96,6 +96,10 @@ void Lobby_Scene::render(LPVOID param)
 	delete[] number_text;
 }
 
+void Lobby_Scene::network()
+{
+}
+
 
 void Lobby_Scene::update()
 {

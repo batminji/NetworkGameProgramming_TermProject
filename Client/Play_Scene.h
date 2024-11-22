@@ -46,6 +46,7 @@ public:
     void enemy_render();
     void item_draw();
     void update() override;
+    void network() override;
     LRESULT CALLBACK windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 

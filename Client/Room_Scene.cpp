@@ -97,6 +97,11 @@ void Room_Scene::update()
     //애니메이션 프레임 갱신
     frame = (frame + 1) % 6;
 
+   
+}
+
+void Room_Scene::network()
+{
     room_data_update();
 }
 

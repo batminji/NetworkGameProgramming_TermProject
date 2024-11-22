@@ -36,6 +36,11 @@ void Title_Scene::update()
     }
 }
 
+void Title_Scene::network()
+{
+
+}
+
 LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg) {

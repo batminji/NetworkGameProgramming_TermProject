@@ -87,12 +87,14 @@ void Play_Scene::update()
     if (bg_xPos == 0) bg_xPos = 1600;
     else bg_xPos--;
 
+}
+
+void Play_Scene::network()
+{
     //플레이어 데이터 수신
     recv_player_data();
     //플레이어인풋 전송
     send_player_input(send_y);
-   
-    
 }
 
 LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -174,13 +176,13 @@ int Play_Scene::recv_player_data()
         if (master_player->who_is_me) {
             master_player->y = resPacket->this_y;
             join_player->y = resPacket->other_y;
-            std::cout << "나:" << master_player->y << "  니:" << join_player->y << std::endl;
+           // std::cout << "나:" << master_player->y << "  니:" << join_player->y << std::endl;
         }
         else {
             master_player->y = resPacket->this_y;
             join_player->y = resPacket->other_y;
         }
-        std::cout << master_player->y << ", " << join_player->y << std::endl;
+       // std::cout << master_player->y << ", " << join_player->y << std::endl;
     }
 
     return 1;
