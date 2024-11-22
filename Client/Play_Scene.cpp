@@ -87,10 +87,11 @@ void Play_Scene::update()
     if (bg_xPos == 0) bg_xPos = 1600;
     else bg_xPos--;
 
+    //플레이어 데이터 수신
+    recv_player_data();
     //플레이어인풋 전송
     send_player_input(send_y);
-    //플레이어 데이터 수신
-    //recv_player_data();
+   
     
 }
 
@@ -150,6 +151,30 @@ int Play_Scene::send_player_input(short y)
     }
 
     
+    return 1;
+}
+
+int Play_Scene::recv_player_data()
+{
+    //플레이어 좌표 받기
+    char recvBuf[BUFSIZE];
+    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), 0);
+    if (recvLen <= 0) {
+        std::cerr << "플레이어 좌표받기 실패" << std::endl;
+        return -1;
+    }
+    else {
+        SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuf);
+        if (master_player->who_is_me) {
+            master_player->y = resPacket->this_y;
+            join_player->y = resPacket->other_y;
+        }
+        else {
+            master_player->y = resPacket->other_y;
+            join_player->y = resPacket->this_y;
+        }
+    }
+
     return 1;
 }
 

@@ -62,18 +62,7 @@ void Player::update()
 		if (zombie_cnt > 30)zombie_cnt = 0;
 	}
 	
-	//플레이어 좌표 받기
-	/*char recvBuf[BUFSIZE];
-	int recvLen = recv(*m_sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), 0);
-	if (recvLen <= 0) {
-		std::cerr << "플레이어 좌표받기 실패" << std::endl;
-		return -1;
-	}
-	else {
-		SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuf);
-
-	}
-
+	/*
 	//플레이어 상태 받기
 	char recvBuf[BUFSIZE];
 	int recvLen = recv(*m_sock, recvBuf, sizeof(SC_PLAYER_STATE_CHANGE_PACKET), 0);
