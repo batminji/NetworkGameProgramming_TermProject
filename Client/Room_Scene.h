@@ -17,7 +17,7 @@ private:
     CImage* blue_idle_right;
     short frame;
 
-private:
+public:
     Player* master_player;
     Player* join_player;
 

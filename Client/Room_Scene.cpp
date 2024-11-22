@@ -128,7 +128,6 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             }
             else if (PtInRect(&start_rt, mypt)) { //시작 누르기
                 isPlaying = TRUE;
-                next_scene = PLAY_SCENE;
             }
         }
     }
@@ -174,7 +173,8 @@ int Room_Scene::room_data_update()
     else {
         SC_ROOM_CHANGE_PACKET* roomPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
        if (true == roomPacket->isPlaying) {
-     
+           isPlaying = TRUE;
+           next_scene = PLAY_SCENE;
        }
        else {
             if (master_player->who_is_me) { 
