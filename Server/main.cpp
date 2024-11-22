@@ -534,10 +534,11 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
             t_room->setP2(nullptr);
         }
  
-        if (p->isPlaying) t_room->setisPlaying(true);
+        
         if (id == t_room->getP1ID()) { // 1p만 동작
             if (p->isDealer) t_room->setDealer(id);
             else t_room->setDealer(t_room->getP2ID());
+            if (p->isPlaying) t_room->setisPlaying(true);
         }
 
         if (false == send_room_change_packet(s, id)) return false; // 전송 실패.
