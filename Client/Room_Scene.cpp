@@ -150,20 +150,18 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 int Room_Scene::room_data_update()
 {
     //송신
-    if (join_player->who_is_me) { // 조인은 송신 금지띠
-        CS_ROOM_STATE_PACKET roomPacket;
-        roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
-        roomPacket.type = CS_ROOM_STATE;
-        (master_player->job == 1) ? roomPacket.isDealer = true : roomPacket.isDealer = false;
-        if (isPlaying)roomPacket.isPlaying = TRUE;
-        else roomPacket.isPlaying = FALSE;
-        roomPacket.isQuit = false;
+    CS_ROOM_STATE_PACKET roomPacket;
+    roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
+    roomPacket.type = CS_ROOM_STATE;
+    (master_player->job == 1) ? roomPacket.isDealer = true : roomPacket.isDealer = false;
+    if (isPlaying)roomPacket.isPlaying = TRUE;
+    else roomPacket.isPlaying = FALSE;
+    roomPacket.isQuit = false;
 
-        if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
-            std::cerr << "방상태 전송실패" << std::endl;
-            closesocket(*m_sock);
-            WSACleanup();
-        }
+    if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
+        std::cerr << "방상태 전송실패" << std::endl;
+        closesocket(*m_sock);
+        WSACleanup();
     }
 
     //수신
@@ -179,18 +177,14 @@ int Room_Scene::room_data_update()
      
        }
        else {
-  
-
-            //TODO: 이제 이걸 잘써야함 넘졸령
-            //roomPacket->other_pl[ID_LEN]; // 친구 플레이어 이름
-            //roomPacket->isPlaying; // 시작했는지
-            //roomPacket->isDealer; // 내가 딜러인가?
-            if (master_player->who_is_me && roomPacket->other_pl != NULL) {
+            if (master_player->who_is_me) { 
                 strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
+
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, user_name[0], sizeof(DataManager::getInstance().my_data.ID));
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.otherID, -1, user_name[1], sizeof(DataManager::getInstance().my_data.otherID));
 
-               if(strlen(roomPacket->other_pl)>=1) join_player->room = TRUE;
+               if(strlen(roomPacket->other_pl)>=1) 
+                   join_player->room = TRUE;
             }
             else if (join_player->who_is_me) {
                 strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
