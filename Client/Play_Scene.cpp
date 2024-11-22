@@ -87,10 +87,11 @@ void Play_Scene::update()
     if (bg_xPos == 0) bg_xPos = 1600;
     else bg_xPos--;
 
-    //플레이어인풋 전송
-    send_player_input(send_y);
     //플레이어 데이터 수신
     recv_player_data();
+    //플레이어인풋 전송
+    send_player_input(send_y);
+   
     
 }
 
