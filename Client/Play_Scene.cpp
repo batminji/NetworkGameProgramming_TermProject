@@ -111,10 +111,15 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     {
         if (wParam == VK_RETURN) { // 스킬을 썼다.
             // TODO 스킬 썼다는 패킷 보내야 함.
-
+            skill_key_down = true;
             // 총알의 타입 변경 흠... 근데 흠...
         }
     }
+        break;
+    case WM_KEYUP:
+        if (wParam == VK_RETURN) {
+            skill_key_down = false;
+        }
         break;
     case WM_KEYDOWN:
         switch (wParam) {
@@ -142,6 +147,7 @@ int Play_Scene::send_player_input(short y)
     movePacket.size = sizeof(CS_MOVE_PACKET);
     movePacket.type = CS_MOVE;
     movePacket.y = y;
+    movePacket.keyDown = skill_key_down;
 
     if (send(*m_sock, reinterpret_cast<char*>(&movePacket), sizeof(movePacket), 0) == SOCKET_ERROR) {
         std::cerr << "Send failed." << std::endl;
@@ -168,10 +174,12 @@ int Play_Scene::recv_player_data()
         if (master_player->who_is_me) {
             master_player->y = resPacket->this_y;
             join_player->y = resPacket->other_y;
+            std::cout << "나:" << master_player->y << "  니:" << join_player->y << std::endl;
         }
         else {
             master_player->y = resPacket->other_y;
             join_player->y = resPacket->this_y;
+            std::cout << "나:" << join_player->y << "  니:" << master_player->y << std::endl;
         }
     }
 

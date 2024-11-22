@@ -32,6 +32,9 @@ private :
     int play_score = 0;//이번판의 점수
     int play_gold = 0;//이번판의 돈
 
+    //스킬키 눌럿더염?
+    bool skill_key_down = false;
+
 public:
 
     Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock, Player* p1, Player* p2);
