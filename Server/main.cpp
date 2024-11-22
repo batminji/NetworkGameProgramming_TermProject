@@ -19,9 +19,7 @@ public:
     {
         x += MOVE_DIST * dir.x;
         y += MOVE_DIST * dir.y;
-
     }
-    
 };
 
 class Player_Bullet // 무조건 왼쪽으로 이동하기만 함.
@@ -634,9 +632,13 @@ void timer_thread()
 
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid) // time: milisecond 단위.
 {
-    // todo
     EVENT evt;
     evt.setup(ev, time, rid);
+    evt_queue.push(evt);
+}
+
+void push_evt_queue(EVENT& evt)
+{
     evt_queue.push(evt);
 }
 
@@ -647,6 +649,7 @@ void ai_thread()
         EVENT ev;
         if (evt_queue.empty()) std::this_thread::yield();
         evt_queue.try_pop(ev);
+        if (ev.do_time < std::chrono::system_clock::now()) push_evt_queue(ev);
         switch (ev.evt_type) {
         case FIRE_PLAYER_BULLET:
             roomInfo[ev.room_id]->createPbullet();
@@ -654,16 +657,13 @@ void ai_thread()
             break;
 
         case FIRE_ENEMY_BULLET:
-            // todo: 여기 적 위치에서 bullet 생성해줘야 함
             roomInfo[ev.room_id]->createPbullet();
             push_evt_queue(FIRE_ENEMY_BULLET, 1000, ev.room_id); // 1초에 한개씩 발사
-
             break;
 
         case AI_MOVE:
             roomInfo[ev.room_id]->doAIMove();
             push_evt_queue(AI_MOVE, 1000, ev.room_id);
-
             break;
 
         default:
