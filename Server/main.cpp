@@ -6,6 +6,7 @@ constexpr unsigned short DEFXPOS = 675; // todo: 플레이어 총알 생성되는 x좌표 수
 constexpr unsigned short SKILL_TIME = 5000; // MS단위임
 
 // 전방선언 라인
+enum TASK_TYPE { FIRE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END }; // 뭐가 있을까?
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid);
 
 
@@ -231,7 +232,7 @@ public:
 };
 
 // 플레이어 총알 생성, 적 총알 생성, 적 인공지능 이동
-enum TASK_TYPE { FIRE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END }; // 뭐가 있을까?
+
 class EVENT
 {
 public:
@@ -512,6 +513,7 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     {
         CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
         players[id].setY(p->y);
+        std::cout << id << "의 y좌표: " << p->y << std::endl;
         if ((true == p->keyDown) && (false == players[id].getSkill())) {// 스킬사용시.
             players[id].setSkill(true);
             push_evt_queue(SKILL_END, SKILL_TIME, id);
