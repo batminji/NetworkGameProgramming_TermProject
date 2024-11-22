@@ -195,7 +195,7 @@ DWORD WINAPI client_update(LPVOID param) {
     HWND hwnd = (HWND)param;
 
     auto previousTime = std::chrono::high_resolution_clock::now();
-    const double frameDuration = 1.0 / 30.0; // 30 FPS
+    const double frameDuration = 1.0; // 30 FPS
 
     while (isRunning) {
         auto currentTime = std::chrono::high_resolution_clock::now();
