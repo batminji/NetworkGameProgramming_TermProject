@@ -150,20 +150,18 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 int Room_Scene::room_data_update()
 {
     //송신
-    if (master_player->who_is_me) { // 조인은 송신 금지띠
-        CS_ROOM_STATE_PACKET roomPacket;
-        roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
-        roomPacket.type = CS_ROOM_STATE;
-        (master_player->job == 1) ? roomPacket.isDealer = true : roomPacket.isDealer = false;
-        if (isPlaying)roomPacket.isPlaying = TRUE;
-        else roomPacket.isPlaying = FALSE;
-        roomPacket.isQuit = false;
+    CS_ROOM_STATE_PACKET roomPacket;
+    roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
+    roomPacket.type = CS_ROOM_STATE;
+    (master_player->job == 1) ? roomPacket.isDealer = true : roomPacket.isDealer = false;
+    if (isPlaying)roomPacket.isPlaying = TRUE;
+    else roomPacket.isPlaying = FALSE;
+    roomPacket.isQuit = false;
 
-        if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
-            std::cerr << "방상태 전송실패" << std::endl;
-            closesocket(*m_sock);
-            WSACleanup();
-        }
+    if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
+        std::cerr << "방상태 전송실패" << std::endl;
+        closesocket(*m_sock);
+        WSACleanup();
     }
 
     //수신
