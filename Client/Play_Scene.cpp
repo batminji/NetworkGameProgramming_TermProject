@@ -158,7 +158,7 @@ int Play_Scene::recv_player_data()
 {
     //플레이어 좌표 받기
     char recvBuf[BUFSIZE];
-    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), 0);
+    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), MSG_WAITALL);
     if (recvLen <= 0) {
         std::cerr << "플레이어 좌표받기 실패" << std::endl;
         return -1;
@@ -173,6 +173,7 @@ int Play_Scene::recv_player_data()
             master_player->y = resPacket->other_y;
             join_player->y = resPacket->this_y;
         }
+        std::cout << master_player->y << ", " << join_player->y << std::endl;
     }
 
     return 1;

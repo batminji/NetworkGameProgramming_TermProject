@@ -446,6 +446,9 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
         res.other_y = roomInfo[id]->getP1Y();
     }
 
+    std::cout << id << "의 y좌표: " << res.this_y << std::endl;
+
+
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
         int error = WSAGetLastError();
@@ -513,7 +516,6 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     {
         CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
         players[id].setY(p->y);
-        std::cout << id << "의 y좌표: " << p->y << std::endl;
         if ((true == p->keyDown) && (false == players[id].getSkill())) {// 스킬사용시.
             players[id].setSkill(true);
             push_evt_queue(SKILL_END, SKILL_TIME, id);
@@ -562,7 +564,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
     {
         // 1. 로그인 패킷 받기
         ZeroMemory(recv_buf, sizeof(recv_buf));
-        int ret = recv(s, recv_buf, sizeof(CS_LOGIN_PACKET), 0);
+        int ret = recv(s, recv_buf, sizeof(CS_LOGIN_PACKET), MSG_WAITALL);
         if (ret == SOCKET_ERROR) { // 에러처리
             int error = WSAGetLastError();
             SERVER_err_display("recv() failed");
@@ -591,7 +593,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         while (true) {
             // 2-1. 참여할 방의 플레이어 아이디 recv하기.
             ZeroMemory(recv_buf, sizeof(recv_buf));
-            int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), 0);
+            int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), MSG_WAITALL);
             if (ret == SOCKET_ERROR) { // 에러처리
                 int error = WSAGetLastError();
                 SERVER_err_display("recv() failed");
@@ -601,7 +603,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                 process_packet(recv_buf, s, pid);
                 
                 ZeroMemory(recv_buf, sizeof(recv_buf));
-                int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), 0);
+                int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), MSG_WAITALL);
                 if (ret == SOCKET_ERROR) { // 에러처리
                     int error = WSAGetLastError();
                     SERVER_err_display("recv() failed");
@@ -620,7 +622,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
 
             // recv.CS_MOVE_PACKET
             ZeroMemory(recv_buf, sizeof(recv_buf));
-            int ret = recv(s, recv_buf, sizeof(CS_MOVE_PACKET), 0);
+            int ret = recv(s, recv_buf, sizeof(CS_MOVE_PACKET), MSG_WAITALL);
             if (ret == SOCKET_ERROR) { // 에러처리
                 int error = WSAGetLastError();
                 SERVER_err_display("recv() failed");
@@ -638,7 +640,6 @@ void timer_thread()
     while (true)
     {
         EVENT ev;
-        bool event_processed = false;
 
         if (evt_queue.try_pop(ev))
         {
@@ -669,7 +670,6 @@ void ai_thread()
         EVENT ev;
         if (evt_queue.empty()) std::this_thread::yield();
         evt_queue.try_pop(ev);
-        if (ev.do_time < std::chrono::system_clock::now()) push_evt_queue(ev);
         switch (ev.evt_type) {
         case FIRE_PLAYER_BULLET:
             roomInfo[ev.room_id]->createPbullet();
