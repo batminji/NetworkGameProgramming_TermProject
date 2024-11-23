@@ -176,13 +176,12 @@ int Play_Scene::recv_player_data()
         if (master_player->who_is_me) {
             master_player->y = resPacket->this_y;
             join_player->y = resPacket->other_y;
-           // std::cout << "나:" << master_player->y << "  니:" << join_player->y << std::endl;
+            // std::cout << "나:" << master_player->y << "  니:" << join_player->y << std::endl;
         }
         else {
             master_player->y = resPacket->this_y;
             join_player->y = resPacket->other_y;
         }
-       // std::cout << master_player->y << ", " << join_player->y << std::endl;
     }
 
     return 1;

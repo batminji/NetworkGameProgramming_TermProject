@@ -615,11 +615,8 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             if (true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
         }
 
+        send_player_move_packet(s, pid);
         while (true) {
-            // send 먼저 player state랑 뭐지.. 뭐지.. 아무튼 보내야 함
-            send_player_move_packet(s, pid);
-
-
             // recv.CS_MOVE_PACKET
             ZeroMemory(recv_buf, sizeof(recv_buf));
             int ret = recv(s, recv_buf, sizeof(CS_MOVE_PACKET), MSG_WAITALL);
