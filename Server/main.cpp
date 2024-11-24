@@ -440,11 +440,12 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     if (roomInfo[id]->getP1ID() == id) {// 내가 p1이군
         res.this_y = roomInfo[id]->getP1Y();
         res.other_y = roomInfo[id]->getP2Y();
+        //std::cout << "1P: " << res.other_y << "  2P:" << res.this_y << std::endl;
     }
     else {
         res.this_y = roomInfo[id]->getP2Y();
         res.other_y = roomInfo[id]->getP1Y();
-        std::cout << "1P: " << res.other_y << "  2P:" << res.this_y << std::endl;
+        //std::cout << "1P: " << res.other_y << "  2P:" << res.this_y << std::endl;
         /*res.this_y = 300;
         res.other_y = 10;*/
     }
