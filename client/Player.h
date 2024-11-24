@@ -45,6 +45,7 @@ public:
 
 	Player();
 	Player(short job, bool who_is_me);
+	Player(const Player& other);
 
 public:
 	

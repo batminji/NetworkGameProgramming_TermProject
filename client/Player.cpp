@@ -31,6 +31,22 @@ Player::Player(short j, bool w)
 	room = FALSE;
 }
 
+Player::Player(const Player& other)
+{
+	kirby_pink_fly = &ResourceManager::getInstance().Kirby_pink_fly;
+	// kirby_pink_die = &ResourceManager::getInstance().Kirby_pink_die;
+	kirby_pink_hit = &ResourceManager::getInstance().Kirby_pink_hit;
+	kirby_pink_zombie = &ResourceManager::getInstance().Kirby_pink_zombie;
+
+	kirby_blue_fly = &ResourceManager::getInstance().Kirby_blue_fly;
+	// kirby_blue_die = &ResourceManager::getInstance().Kirby_blue_die;
+	kirby_blue_hit = &ResourceManager::getInstance().Kirby_blue_hit;
+	kirby_blue_zombie = &ResourceManager::getInstance().Kirby_blue_zombie;
+
+	job = other.job;
+	who_is_me = other.who_is_me;
+}
+
 void Player::render(HDC mdc)
 {
 	switch (job) {

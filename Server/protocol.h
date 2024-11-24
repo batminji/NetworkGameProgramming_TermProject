@@ -57,12 +57,11 @@ struct SC_ROOM_CHANGE_PACKET // 방 설정이 변경되면
 	bool isDealer; // 내가 딜러인가?
 };
 
-struct SC_PLAYER_MOVE_PACKET // 캐릭터 이동
-{
-	unsigned short size;
-	PACKET type;
-	unsigned short this_y; // 나의위치
-	unsigned short other_y; // 친구 위치
+struct SC_PLAYER_MOVE_PACKET {
+	int size;
+	int type;
+	float this_y;
+	float other_y;
 };
 
 struct SC_PLAYER_STATE_CHANGE_PACKET

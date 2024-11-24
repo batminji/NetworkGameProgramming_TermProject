@@ -8,7 +8,6 @@ class Lobby_Scene :
 {
 public:
     CImage* main_screen;
-    CImage* start_button;
 public:
     BOOL stbt_direction = TRUE;
     RECT stbt_rt = { 460,440,760,560 };

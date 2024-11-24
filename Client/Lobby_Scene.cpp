@@ -8,7 +8,6 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 	m_sock = sock;
 
 	main_screen = &ResourceManager::getInstance().main_screen;
-	start_button = &ResourceManager::getInstance().start_button;
 
 	// 6. ·©Å· ¹Þ±â
 	char recvBuf[BUFSIZE];

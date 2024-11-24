@@ -444,7 +444,7 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     else {
         res.this_y = roomInfo[id]->getP2Y();
         res.other_y = roomInfo[id]->getP1Y();
-
+        std::cout << "1P: " << res.other_y << "  2P:" << res.this_y << std::endl;
         /*res.this_y = 300;
         res.other_y = 10;*/
     }
@@ -468,7 +468,7 @@ bool send_player_state_change_packet(SOCKET& s, std::string& id)
     res.size = sizeof(SC_PLAYER_STATE_CHANGE_PACKET);
     res.type = SC_PLAYER_STATE_CHANGE;
 
-    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
+    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_STATE_CHANGE_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
         int error = WSAGetLastError();
         SERVER_err_display("send failed");

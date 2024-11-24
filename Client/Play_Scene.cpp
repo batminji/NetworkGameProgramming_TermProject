@@ -7,8 +7,7 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     m_sock = sock;
 
     //player
-    master_player = p1;
-    join_player = p2;
+    master_player = p1; join_player = p2;
 
     //ui 이미지 로드
     game_bg = &ResourceManager::getInstance().game_bg;
@@ -166,7 +165,8 @@ int Play_Scene::recv_player_data()
 {
     //플레이어 좌표 받기
     char recvBuf[BUFSIZE];
-    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), 0);
+    ZeroMemory(recvBuf, sizeof(recvBuf));
+    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), MSG_WAITALL);
     if (recvLen <= 0) {
         std::cerr << "플레이어 좌표받기 실패" << std::endl;
         return -1;
@@ -178,10 +178,23 @@ int Play_Scene::recv_player_data()
             join_player->y = resPacket->other_y;
             std::cout << "1P: " << resPacket->this_y << "  2P:" << resPacket->other_y << std::endl;
         }
-        if(join_player->who_is_me) {
-            join_player->y = resPacket->this_y;
-            master_player->y = resPacket->other_y;
+        else {
+            join_player->y = resPacket->this_y; // 1P의 좌표 값이 계속 돌어옴
+            master_player->y = resPacket->other_y; // 계속 이상한 값이 들어옴
+
+            // recvLen은 10으로 동일했음...
+            // 패딩 오류도 아님...
+            // 소켓 주소 때문인걸까?
+            // 안되면 노트북 두 대로 각각 접속해서 확인해야 할 듯
+            // 그것도 안되면 개망함 ㅋㅋ 모르겠음
+
+            // 서버에서 room에 좌표는 잘 저장되어 있음.
+            // 클라가 이상하게 읽는다기에는 1P가 잘 읽음.
+            // 서버가 이상하게 보낸다기에는 2P 좌표는 잘 출력됨...
+            
+            // 서버에서 this_y other_y 구별하지 말고 그냥 보내도 2P한테는 이상하게 옴 ㅋㅋ
             std::cout << "2P:" << resPacket->this_y << "  1P:" << resPacket->other_y << std::endl;
+            //std::cout << resPacket->other_y << " " << resPacket->size << " " << resPacket->this_y << " " << resPacket->type << std::endl;
         }
     }
 
