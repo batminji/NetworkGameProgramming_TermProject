@@ -51,8 +51,8 @@ public:
 
 
 public:
-    short send_y = 0;
-    int send_player_input(short y);
+    short send_y = 300;
+    int send_player_input(unsigned short y);
    int recv_player_data();
 
    

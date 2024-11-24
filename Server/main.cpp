@@ -444,9 +444,12 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     else {
         res.this_y = roomInfo[id]->getP2Y();
         res.other_y = roomInfo[id]->getP1Y();
+
+        /*res.this_y = 300;
+        res.other_y = 10;*/
     }
 
-    std::cout << id << "ÀÇ yÁÂÇ¥: " << res.this_y << std::endl;
+    // std::cout << id << "ÀÇ yÁÂÇ¥: " << res.this_y << std::endl;
 
 
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);

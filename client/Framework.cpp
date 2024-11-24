@@ -68,7 +68,7 @@ void Framework::update()
 				m_scene = new Play_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, &master_player, &join_player);
 				m_scene->next_scene = PLAY_SCENE;
 			}
-			else {
+			else if(dynamic_cast<Room_Scene*>(m_scene)->join_player->who_is_me){
 				Player master_player(dynamic_cast<Room_Scene*>(m_scene)->master_player->job, FALSE);
 				Player join_player(dynamic_cast<Room_Scene*>(m_scene)->join_player->job, TRUE);
 

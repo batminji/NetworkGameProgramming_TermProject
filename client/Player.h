@@ -25,7 +25,7 @@ class Player
 	bool inGame;
 
 	short x = 675;
-	short y = 300;
+	unsigned short y = 300;
 	
 	bool skill = FALSE;
 	short skill_cnt = 0;

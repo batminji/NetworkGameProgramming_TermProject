@@ -91,9 +91,9 @@ void Play_Scene::update()
 
 void Play_Scene::network()
 {
-    //플레이어 데이터 수신
+    // 플레이어 데이터 수신
     recv_player_data();
-    //플레이어인풋 전송
+    // 플레이어인풋 전송
     send_player_input(send_y);
 }
 
@@ -142,7 +142,7 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-int Play_Scene::send_player_input(short y)
+int Play_Scene::send_player_input(unsigned short y)
 {
 
     CS_MOVE_PACKET movePacket;
@@ -166,7 +166,7 @@ int Play_Scene::recv_player_data()
 {
     //플레이어 좌표 받기
     char recvBuf[BUFSIZE];
-    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), MSG_WAITALL);
+    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), 0);
     if (recvLen <= 0) {
         std::cerr << "플레이어 좌표받기 실패" << std::endl;
         return -1;
@@ -176,11 +176,12 @@ int Play_Scene::recv_player_data()
         if (master_player->who_is_me) {
             master_player->y = resPacket->this_y;
             join_player->y = resPacket->other_y;
-            // std::cout << "나:" << master_player->y << "  니:" << join_player->y << std::endl;
+            std::cout << "1P: " << resPacket->this_y << "  2P:" << resPacket->other_y << std::endl;
         }
-        else {
-            master_player->y = resPacket->this_y;
-            join_player->y = resPacket->other_y;
+        if(join_player->who_is_me) {
+            join_player->y = resPacket->this_y;
+            master_player->y = resPacket->other_y;
+            std::cout << "2P:" << resPacket->this_y << "  1P:" << resPacket->other_y << std::endl;
         }
     }
 
