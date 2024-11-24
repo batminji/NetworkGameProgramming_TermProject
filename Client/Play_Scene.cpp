@@ -161,35 +161,48 @@ int Play_Scene::send_player_input(unsigned short y)
     return 1;
 }
 
-int Play_Scene::recv_player_data()
-{
-    //플레이어 좌표 받기
+int Play_Scene::recv_player_data() {
+    // 수신 버퍼 및 누적 데이터 버퍼
+    static std::vector<uint8_t> recvBuffer;
     char recvBuf[BUFSIZE];
     ZeroMemory(recvBuf, sizeof(recvBuf));
-    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_PLAYER_MOVE_PACKET), MSG_WAITALL);
+
+    // 데이터 수신
+    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL 대신 0 사용
     if (recvLen <= 0) {
         std::cerr << "플레이어 좌표받기 실패" << std::endl;
         return -1;
     }
-    else {
-        SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuf);
+
+    // 수신한 데이터를 누적 버퍼에 추가
+    recvBuffer.insert(recvBuffer.end(), recvBuf, recvBuf + recvLen);
+
+    // 패킷 처리
+    while (recvBuffer.size() >= sizeof(SC_PLAYER_MOVE_PACKET)) { // 패킷 크기만큼 데이터가 도착했는지 확인
+        SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuffer.data());
+
+        // 패킷 유효성 확인 (예: 패킷의 크기와 타입)
+        if (recvBuffer.size() < resPacket->size) {
+            break; // 전체 패킷이 아직 도착하지 않은 경우 대기
+        }
+
+        // 데이터 처리
         if (master_player->who_is_me) {
             master_player->y = resPacket->this_y;
             join_player->y = resPacket->other_y;
-            // std::cout << "1P: " << resPacket->this_y << "  2P:" << resPacket->other_y << std::endl;
-            std::cout << resPacket->other_y << " " << resPacket->size << " " << resPacket->this_y << " " << resPacket->type << std::endl;
-            // 556 16 459 7
-        }   
-        else {
-            join_player->y = resPacket->this_y; // 1P의 좌표 값이 계속 돌어옴
-            master_player->y = resPacket->other_y; // 계속 이상한 값이 들어옴
-
-            // std::cout << "2P:" << resPacket->this_y << "  1P:" << resPacket->other_y << std::endl;
-            std::cout << resPacket->other_y << " " << resPacket->size << " " << resPacket->this_y << " " << resPacket->type << std::endl;
-            // 2.24208e-44 7 459 1141522432
+            std::cout << resPacket->other_y << " " << resPacket->size << " "
+                << resPacket->this_y << " " << resPacket->type << std::endl;
         }
+        else {
+            join_player->y = resPacket->this_y;
+            master_player->y = resPacket->other_y;
+            std::cout << resPacket->other_y << " " << resPacket->size << " "
+                << resPacket->this_y << " " << resPacket->type << std::endl;
+        }
+
+        // 처리한 패킷 데이터를 누적 버퍼에서 제거
+        recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + resPacket->size);
     }
 
     return 1;
 }
-
