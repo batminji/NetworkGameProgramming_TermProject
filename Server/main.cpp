@@ -654,7 +654,8 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             }
             while (true) {
                 process_packet(recv_buf, s, pid);
-
+                
+                if (true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
                 ZeroMemory(recv_buf, sizeof(recv_buf));
                 int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), MSG_WAITALL);
                 if (ret == SOCKET_ERROR) { // 에러처리
@@ -662,7 +663,6 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                     SERVER_err_display("recv() failed");
                     SERVER_err_display(error);  // 오류 코드 출력
                 }
-                if (true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
             }
 
             if (true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
@@ -721,8 +721,8 @@ void ai_thread()
 {
     while (true) {
         EVENT ev;
-        if (task_queue.empty() && !task_queue.try_pop(ev)) continue;
-
+        if (task_queue.empty() || !task_queue.try_pop(ev)) continue;
+       
         switch (ev.evt_type) {
         case FIRE_PLAYER_BULLET:
             roomInfo[ev.room_id]->createPbullet(ev.room_id);
@@ -732,6 +732,7 @@ void ai_thread()
 
         case MOVE_PLAYER_BULLET:
             if (ev.room_id == roomInfo[ev.room_id]->getP1ID()) {
+                std::cout << ev.room_id << ": 총알움직" << std::endl;
                 roomInfo[ev.room_id]->doBulletsMove();
                 push_evt_queue(MOVE_PLAYER_BULLET, 100, ev.room_id); // .5초에 한개씩 발사
             }
