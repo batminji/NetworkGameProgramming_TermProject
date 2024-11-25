@@ -47,6 +47,7 @@ public:
     void ui_render();
     void enemy_render();
     void item_draw();
+    void bullet_draw();
     void update() override;
     void network() override;
     LRESULT CALLBACK windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -56,7 +57,8 @@ public:
     short send_y = 300;
     int send_player_input(unsigned short y);
     int recv_player_data();
-    // 총알 주고 받기 함수 작성
+    // 오브젝트 좌표 수신 함수
+    int recv_object_data();
    
 
 };

@@ -34,6 +34,11 @@ void Play_Scene::render(LPVOID param)
     // 캐릭터 그리기 (단순한 사각형으로 표현)
     master_player->render(m_hBufferDC);
     join_player->render(m_hBufferDC);
+    
+    //총알 
+    for (bullet b : bullets) b.render(m_hBufferDC);
+    
+    
 }
 
 void Play_Scene::ui_render()
@@ -75,15 +80,25 @@ void Play_Scene::item_draw()
     for (Item& i : Items) i.render(m_hBufferDC);
 }
 
+void Play_Scene::bullet_draw()
+{
+
+    //나중에 그리다 터질때 이함수를 쓰도록하겟슴.
+    
+}
+
 void Play_Scene::update()
 {
     master_player->update();
     join_player->update();
     for (Enemy& e : enemys) e.update();
+    for (bullet& b : bullets)b.update();
 
     //배경
     if (bg_xPos == 0) bg_xPos = 1600;
     else bg_xPos--;
+
+
 
 }
 
@@ -91,6 +106,8 @@ void Play_Scene::network()
 {
     // 플레이어 데이터 수신
     recv_player_data();
+    //오브젝트 데이터 수신
+    recv_object_data();
     // 플레이어인풋 전송
     send_player_input(send_y);
 
@@ -203,6 +220,94 @@ int Play_Scene::recv_player_data() {
 
         // 처리한 패킷 데이터를 누적 버퍼에서 제거
         recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + resPacket->size);
+    }
+
+    return 1;
+}
+
+std::mutex bullets_mutex;
+int Play_Scene::recv_object_data() {
+    // 데이터 저장용 임시 벡터
+    vector<Enemy> temp_enemys;
+    vector<bullet> temp_bullets;
+    vector<Item> temp_items;
+    temp_enemys.clear();
+    temp_bullets.clear();
+    temp_items.clear();
+
+    // 수신 버퍼 및 누적 데이터 버퍼
+    static std::vector<uint8_t> recvBuffer;
+    char recvBuf[BUFSIZE];
+    ZeroMemory(recvBuf, sizeof(recvBuf));
+
+    // 데이터 수신
+    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL 대신 0 사용
+    if (recvLen <= 0) {
+        std::cerr << "오브젝트 정보받기 실패" << std::endl;
+      //  return -1;
+    }
+
+    // 수신한 데이터를 누적 버퍼에 추가
+    recvBuffer.insert(recvBuffer.end(), recvBuf, recvBuf + recvLen);
+
+    // 패킷 처리
+    while (recvBuffer.size() >= sizeof(SC_OBJECT_MOVE_PACKET)) { // 패킷 크기만큼 데이터가 도착했는지 확인
+        SC_OBJECT_MOVE_PACKET* resPacket = reinterpret_cast<SC_OBJECT_MOVE_PACKET*>(recvBuffer.data());
+
+        // 패킷 유효성 확인 (예: 패킷의 크기와 타입)
+        if (recvBuffer.size() < resPacket->size) {
+            break; // 전체 패킷이 아직 도착하지 않은 경우 대기
+        }
+
+        // 데이터 처리
+        for (int i = 0; i < resPacket->number; ++i) {
+            switch (resPacket->objs_type[i]) {
+            case ENEMY:
+                // 적 처리 로직
+                break;
+            case ENEMY_BULLETS: {
+                bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 3);
+                temp_bullets.push_back(temp_bullet);
+                break;
+            }
+            case MISSAIL:
+                // 미사일 처리 로직
+                break;
+            case P1_BULLET: {
+                bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 1, 1);
+                temp_bullets.push_back(temp_bullet);
+                break;
+            }
+            case P2_BULLET: {
+                bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 2);
+                temp_bullets.push_back(temp_bullet);
+                break;
+            }
+            case P1_SKILLBULLET: {
+                bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 2, 1);
+                temp_bullets.push_back(temp_bullet);
+                break;
+            }
+            case P2_SKILLBULLET:
+                // 스킬 탄환 처리 로직
+                break;
+            case ITEM:
+                // 아이템 처리 로직
+                break;
+            default:
+                break;                                          
+            }
+        }
+
+        // 처리한 패킷 데이터를 누적 버퍼에서 제거
+        recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + resPacket->size);
+    }
+
+    // temp_bullets의 값을 bullets로 이동
+    {
+        std::unique_lock<std::mutex> lock(bullets_mutex);
+        bullets.insert(bullets.end(), std::make_move_iterator(temp_bullets.begin()), std::make_move_iterator(temp_bullets.end()));
+        lock.unlock(); // 필요 시 잠금 해제
     }
 
     return 1;

@@ -7,14 +7,14 @@ Framework::~Framework()
 
 void Framework::render(LPVOID param)
 {
-	std::lock_guard ll{ m_scene->scene_lock };
+	//std::lock_guard ll{ m_scene->scene_lock };
 	if (m_scene != nullptr)
 		m_scene->render(param);
 }
 
 void Framework::update()
 {
-	std::lock_guard ll{ m_scene->scene_lock };
+	//std::lock_guard ll{ m_scene->scene_lock };
 	m_scene->update();
 
 	if (current_scene != m_scene->next_scene) {
@@ -105,7 +105,7 @@ void Framework::update()
 
 void Framework::network()
 {
-	std::lock_guard ll{ m_scene->scene_lock };
+	//std::lock_guard ll{ m_scene->scene_lock };
 	if (m_scene != nullptr)
 		m_scene->network();
 }
