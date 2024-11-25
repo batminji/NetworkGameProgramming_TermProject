@@ -29,8 +29,6 @@ public:
 public:
 	//방 참가 관련
 	char ROOM_ID[20];
-	bool room_master;
-
-
+	bool room_master; 
 };
 

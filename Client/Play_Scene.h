@@ -56,7 +56,5 @@ public:
     short send_y = 300;
     int send_player_input(unsigned short y);
     int recv_player_data();
-    // 총알 주고 받기 함수 작성
-   
 
 };
