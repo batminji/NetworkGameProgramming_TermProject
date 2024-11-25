@@ -19,7 +19,7 @@ class Enemy_Bullet
 private:
     unsigned short x;
     unsigned short y;
-    
+
     POINT dir;
 public:
 
@@ -39,7 +39,7 @@ private:
     OTYPE type;
 
 public:
-    
+
     Player_Bullet(unsigned short y, OTYPE type) :y{ y }, type{ type } {}
     std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
     OTYPE getType() { return type; }
@@ -66,12 +66,12 @@ public:
         type = type;
         x = x;
         y = y; //x,y초기화 어떻게?
-        
+
         if (type == 0) width = 84, height = 96;
         else if (type == 1 || type == 2)width = 90, height = 130;
         else if (type == 3)width = 100, height = 120;
         else if (type == 4)width = 256, height = 224;
-        goal = {rand() % 200 - 30, rand() % 400 + 50};
+        goal = { rand() % 200 - 30, rand() % 400 + 50 };
     }
     void ai_move()
     {
@@ -89,7 +89,7 @@ public:
 
         // 목표로 향하는 단위 벡터를 따라 이동
         float speed = 10.0f;
-        if(type != 0) x += dx / distance * speed;
+        if (type != 0) x += dx / distance * speed;
         y += dy / distance * speed;
     }
     bool collsion_player_bullet(Player_Bullet& bullet) {
@@ -118,7 +118,7 @@ private:
     SOCKET s = -1;
     std::string id = "";
     bool inGame = false; // 현재 접속중인 아이디인가?
-    unsigned short y = 300; 
+    unsigned short y = 300;
     unsigned int high_score = 0;
     unsigned int coin = 0; // 오버플로우 떠서 int로 수정
 
@@ -201,10 +201,10 @@ public:
         std::lock_guard<std::mutex> ll{ update_lock };
         for (auto& b : p_bullets)
             b.updatePosition();
-        for(auto& b:e_bullets)
+        for (auto& b : e_bullets)
             b.updatePosition();
     }
-    
+
     void createPbullet(std::string& s) // 두 플레이어한테서 동시에 생성되게 해도 괜찮을까?
     {
         std::lock_guard<std::mutex> ll{ update_lock };
@@ -277,7 +277,7 @@ class EVENT
 {
 public:
     TASK_TYPE evt_type;
-    std::string room_id; 
+    std::string room_id;
     std::chrono::system_clock::time_point do_time;
 
     EVENT() {}
@@ -392,11 +392,11 @@ bool send_top_high_scores(SOCKET& s) {
     strcpy(res.id3, playerData[cnt].first.c_str());
     res.hs3 = playerData[cnt].second;
     cnt++;
-    
+
     strcpy(res.id4, playerData[cnt].first.c_str());
     res.hs4 = playerData[cnt].second;
     cnt++;
-    
+
     strcpy(res.id5, playerData[cnt].first.c_str());
     res.hs5 = playerData[cnt].second;
     cnt++;
@@ -543,7 +543,7 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
 {
     switch (packet[2]) // 여기 정확하게 어디 들어오는지 봐야 할듯
     {
-    case CS_JOIN_ROOM: 
+    case CS_JOIN_ROOM:
     {
         CS_JOIN_ROOM_PACKET* p = reinterpret_cast<CS_JOIN_ROOM_PACKET*>(packet);
         // 만약 roomInfo에 p.id로 된 room이 있을때 조인
@@ -552,7 +552,7 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
         if (roomInfo.find(p->id) != roomInfo.end()) {  // roomID가 이미 존재하면
             roomInfo[p->id]->setP2(&players[id]);       // 플레이어를 해당 방에 추가
             roomInfo[id] = roomInfo[p->id];
-            std::cout << "Player " << id  << " joined existing room " << p->id << std::endl;
+            std::cout << "Player " << id << " joined existing room " << p->id << std::endl;
         }
         else { // roomID가 없다면 새로운 방을 생성하여 초기화
             roomInfo[id] = new Room(); // roomInfo에 새로운 방 추가
@@ -581,7 +581,7 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     case CS_ROOM_STATE: // 방 정보 변경
     {
         CS_ROOM_STATE_PACKET* p = reinterpret_cast<CS_ROOM_STATE_PACKET*>(packet);
-        if (! p->isDealer)
+        if (!p->isDealer)
             int k = 0;
         std::lock_guard<std::mutex> ll{ roomLock };
         auto t_room = roomInfo[id];
@@ -590,8 +590,8 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
                 t_room->setP1(&players[t_room->getP2ID()]); // 2를 1로 바꾸기.
             t_room->setP2(nullptr);
         }
- 
-        
+
+
         if (id == t_room->getP1ID()) { // 1p만 동작
             if (p->isDealer) t_room->setDealer(id);
             else t_room->setDealer(t_room->getP2ID());
@@ -630,16 +630,16 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             closesocket(s);
             return 0;
         }
-        
+
 
         // 1-1. 로그인 패킷 처리
         CS_LOGIN_PACKET* p = reinterpret_cast<CS_LOGIN_PACKET*>(recv_buf);
         client_info(s, p->id);
-        if (send_login_packet(s, p)){
+        if (send_login_packet(s, p)) {
             pid = p->id;
             send_top_high_scores(s);
         }
-        
+
         players[pid].setSocket(s);
 
         // 2. 방 관련 send - recv 
@@ -652,9 +652,9 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                 SERVER_err_display("recv() failed");
                 SERVER_err_display(error);  // 오류 코드 출력
             }
-            while(true){
+            while (true) {
                 process_packet(recv_buf, s, pid);
-                
+
                 ZeroMemory(recv_buf, sizeof(recv_buf));
                 int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), MSG_WAITALL);
                 if (ret == SOCKET_ERROR) { // 에러처리
@@ -668,11 +668,11 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             if (true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
         }
 
-        push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
-        push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
+        //push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
+        //push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
         send_player_move_packet(s, pid);
         while (true) {
-            send_object_move_packet(s, pid);
+            //send_object_move_packet(s, pid);
 
             // recv.CS_MOVE_PACKET
             ZeroMemory(recv_buf, sizeof(recv_buf));
@@ -722,14 +722,14 @@ void ai_thread()
     while (true) {
         EVENT ev;
         if (task_queue.empty() && !task_queue.try_pop(ev)) continue;
-       
+
         switch (ev.evt_type) {
         case FIRE_PLAYER_BULLET:
             roomInfo[ev.room_id]->createPbullet(ev.room_id);
-            std::cout << ev.room_id <<": 히히 발싸아~" << std::endl;
+            std::cout << ev.room_id << ": 히히 발싸아~" << std::endl;
             push_evt_queue(FIRE_PLAYER_BULLET, 500, ev.room_id); // .5초에 한개씩 발사
             break;
-            
+
         case MOVE_PLAYER_BULLET:
             if (ev.room_id == roomInfo[ev.room_id]->getP1ID()) {
                 roomInfo[ev.room_id]->doBulletsMove();
@@ -804,7 +804,7 @@ int main()
     }
 
     for (auto& th : threads) {
-         th.join();
+        th.join();
     }
 
     closesocket(listen_sock);

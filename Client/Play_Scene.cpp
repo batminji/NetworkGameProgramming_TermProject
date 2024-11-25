@@ -107,11 +107,11 @@ void Play_Scene::network()
     // 플레이어 데이터 수신
     recv_player_data();
     //오브젝트 데이터 수신
-    recv_object_data();
+    //recv_object_data();
     // 플레이어인풋 전송
     send_player_input(send_y);
 
-    // 총알 정보 주고 받기;
+
 }
 
 LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -205,17 +205,18 @@ int Play_Scene::recv_player_data() {
         }
 
         // 데이터 처리
+
+        cout << "현재 실행중인 함수 : recv_player(7)    받은 패킷타입 :" << resPacket->type <<endl;
+
         if (master_player->who_is_me) {
             master_player->y = resPacket->this_y;
             join_player->y = resPacket->other_y;
-            std::cout << resPacket->other_y << " " << resPacket->size << " "
-                << resPacket->this_y << " " << resPacket->type << std::endl;
+           
         }
         else {
             join_player->y = resPacket->this_y;
             master_player->y = resPacket->other_y;
-            std::cout << resPacket->other_y << " " << resPacket->size << " "
-                << resPacket->this_y << " " << resPacket->type << std::endl;
+          
         }
 
         // 처리한 패킷 데이터를 누적 버퍼에서 제거
@@ -256,6 +257,7 @@ int Play_Scene::recv_object_data() {
             break;
         }
 
+        cout << "현재 실행중인 함수 : recv_object(9)    받은 패킷타입 :" << resPacket->type <<endl;
         for (int i = 0; i < resPacket->number; ++i) {
             switch (resPacket->objs_type[i]) {
             case ENEMY:
