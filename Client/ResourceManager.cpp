@@ -113,11 +113,11 @@ void ResourceManager::destroy()
     Kirby_pink_hit.Destroy();
     Kirby_pink_zombie.Destroy();
     heart.Destroy();
-    basic_bullet.Destroy();
+    //basic_bullet.Destroy();
     game_bg2.Destroy();
     skill.Destroy();
     skill_color.Destroy();
-    skill_bullet.Destroy();
+    //skill_bullet.Destroy();
     m[5].Destroy();
     monster_bullet.Destroy();
     number.Destroy();

@@ -1,8 +1,11 @@
 #include "stdafx.h"
 #include "protocol.h"
 
+// todo: 접속 잘 안되는거 수정해야함
+
+
 constexpr unsigned short MOVE_DIST = 5;
-constexpr unsigned short DEFXPOS = 675; // todo: 플레이어 총알 생성되는 x좌표 수정해주세요.
+constexpr unsigned short DEFXPOS = 675;
 constexpr unsigned short SKILL_TIME = 5000; // MS단위임
 
 // 전방선언 라인
@@ -33,12 +36,13 @@ class Player_Bullet // 무조건 왼쪽으로 이동하기만 함.
 private:
     unsigned short x = DEFXPOS;
     unsigned short y;
-    unsigned short type; //1:그냥총알 2:스킬총알
+    OTYPE type;
 
 public:
-    Player_Bullet(unsigned short y) :y{ y } {}
+    
+    Player_Bullet(unsigned short y, OTYPE type) :y{ y }, type{ type } {}
     std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
-    unsigned short getType() { return type; }
+    OTYPE getType() { return type; }
     void updatePosition()
     {
         x += MOVE_DIST;
@@ -101,6 +105,9 @@ public:
         }
         else return false; //인수로 들어온 총알과 충돌하지 않았을시 false리턴
     }
+    //// getter - setter
+
+    std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
 
 };
 
@@ -117,6 +124,7 @@ private:
 
     // 게임을 실행중일 때 
     bool isSkill = false;
+    unsigned short skillCount = 0; // 몇마리를 잡았는지.
 
 
 public:
@@ -197,11 +205,43 @@ public:
             b.updatePosition();
     }
     
-    void createPbullet() // 두 플레이어한테서 동시에 생성되게 해도 괜찮을까?
+    void createPbullet(std::string& s) // 두 플레이어한테서 동시에 생성되게 해도 괜찮을까?
     {
         std::lock_guard<std::mutex> ll{ update_lock };
-        p_bullets.push_back({ p1->getY() });
-        p_bullets.push_back({ p2->getY() });
+        if (s == p1->getID()) { // p1만 생성하기
+            if (p1->getSkill()) p_bullets.push_back({ p1->getY(), P1_SKILLBULLET });
+            else p_bullets.push_back({ p1->getY(),P1_BULLET });
+        }
+        else { // p2만 생성하기
+            if (p2->getSkill()) p_bullets.push_back({ p2->getY(), P2_SKILLBULLET });
+            else p_bullets.push_back({ p2->getY(), P2_BULLET });
+        }
+    }
+
+    void sendSetup(SC_OBJECT_MOVE_PACKET& p)
+    {
+        std::lock_guard<std::mutex> ll{ update_lock };
+        int i = 0;
+        // player bullet 복사
+        for (i = 0; i < p_bullets.size(); ++i) {
+            p.objs_type[i] = p_bullets[i].getType();
+            p.objs_x[i] = p_bullets[i].getPosition().first;
+            p.objs_y[i] = p_bullets[i].getPosition().second;
+        }
+
+        for (int j = i; j < i + enemies.size(); ++j) {
+            p.objs_type[j] = ENEMY;
+            p.objs_x[j] = enemies[j].getPosition().first;
+            p.objs_y[j] = enemies[j].getPosition().second;
+        }
+
+        i += enemies.size();
+
+        for (int j = i; j < i + e_bullets.size(); ++j) {
+            p.objs_type[j] = ENEMY_BULLETS;
+            p.objs_x[j] = e_bullets[j].getPosition().first;
+            p.objs_y[j] = e_bullets[j].getPosition().second;
+        }
     }
 
 
@@ -220,7 +260,7 @@ public:
     bool getisPlaying() { return isPlaying; }
     bool getisDealer(std::string myid) { return myid == dealer_id; }
     void setDealer(std::string id) { dealer_id = id; }
-
+    unsigned short number() { return p_bullets.size() + enemies.size() + e_bullets.size(); }
 
     bool broadcast(char* res, size_t size)
     {
@@ -262,7 +302,7 @@ std::mutex roomLock;
 
 std::unordered_map<std::string, Player> players;
 concurrency::concurrent_priority_queue<EVENT> evt_queue;
-concurrency::concurrent_queue<EVENT> task_queue;
+concurrency::concurrent_priority_queue<EVENT> task_queue;
 
 // 유저데이터 관리용 : 전체 데이터 덮어쓰기
 bool save_all_player_info()
@@ -437,22 +477,16 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     SC_PLAYER_MOVE_PACKET res;
     res.size = sizeof(SC_PLAYER_MOVE_PACKET);
     res.type = SC_PLAYER_MOVE;
-    if (roomInfo[id]->getP1ID() == id) {// 내가 p1이군
+    if (roomInfo[id]->getP1ID() == id) { // 내가 p1이군
         res.this_y = roomInfo[id]->getP1Y();
         res.other_y = roomInfo[id]->getP2Y();
-        //std::cout << "1P: " << res.other_y << "  2P:" << res.this_y << std::endl;
     }
     else {
         res.this_y = roomInfo[id]->getP2Y();
         res.other_y = roomInfo[id]->getP1Y();
-        //std::cout << "1P: " << res.other_y << "  2P:" << res.this_y << std::endl;
-        /*res.this_y = 300;
-        res.other_y = 10;*/
     }
 
     // std::cout << id << "의 y좌표: " << res.this_y << std::endl;
-
-
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
         int error = WSAGetLastError();
@@ -479,8 +513,23 @@ bool send_player_state_change_packet(SOCKET& s, std::string& id)
     return true;
 }
 
-bool send_object_move_packet()
+bool send_object_move_packet(SOCKET& s, std::string& id)
 {
+    auto t_room = roomInfo[id];
+    SC_OBJECT_MOVE_PACKET res;
+    res.size = sizeof(SC_OBJECT_MOVE_PACKET);
+    res.number = t_room->number();
+    t_room->sendSetup(res);
+    res.type = SC_OBJECT_MOVE;
+
+
+    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_OBJECT_MOVE_PACKET), 0);
+    if (ret == SOCKET_ERROR) { // 에러 처리
+        int error = WSAGetLastError();
+        SERVER_err_display("send failed");
+        SERVER_err_display(error);  // 오류 코드 출력
+        return false;
+    }
     return true;
 }
 
@@ -619,8 +668,11 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             if (true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
         }
 
+        push_evt_queue(FIRE_PLAYER_BULLET, 500, pid); // 총알발사
         send_player_move_packet(s, pid);
         while (true) {
+            //send_object_move_packet(s, pid);
+
             // recv.CS_MOVE_PACKET
             ZeroMemory(recv_buf, sizeof(recv_buf));
             int ret = recv(s, recv_buf, sizeof(CS_MOVE_PACKET), MSG_WAITALL);
@@ -631,7 +683,6 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             }
             process_packet(recv_buf, s, pid);
         }
-
     }
 }
 
@@ -669,16 +720,17 @@ void ai_thread()
 {
     while (true) {
         EVENT ev;
-        if (evt_queue.empty()) std::this_thread::yield();
-        evt_queue.try_pop(ev);
+        if (task_queue.empty() && !task_queue.try_pop(ev)) continue;
+       
         switch (ev.evt_type) {
         case FIRE_PLAYER_BULLET:
-            roomInfo[ev.room_id]->createPbullet();
-            push_evt_queue(FIRE_PLAYER_BULLET, 1000, ev.room_id); // 1초에 한개씩 발사
+            roomInfo[ev.room_id]->createPbullet(ev.room_id);
+            std::cout << ev.room_id <<": 히히 발싸아~" << std::endl;
+            push_evt_queue(FIRE_PLAYER_BULLET, 500, ev.room_id); // 1초에 한개씩 발사
             break;
 
         case FIRE_ENEMY_BULLET:
-            roomInfo[ev.room_id]->createPbullet();
+            roomInfo[ev.room_id]->createPbullet(ev.room_id);
             push_evt_queue(FIRE_ENEMY_BULLET, 1000, ev.room_id); // 1초에 한개씩 발사
             break;
 
@@ -728,6 +780,8 @@ int main()
     int addrlen;
 
     std::vector<std::thread> threads;  // std::thread를 저장할 벡터
+    std::thread timer_th{ timer_thread };
+    std::thread ai_th{ ai_thread };
 
     while (true) {
         addrlen = sizeof(clientaddr);

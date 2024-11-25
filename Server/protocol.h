@@ -77,18 +77,10 @@ struct SC_OBJECT_MOVE_PACKET // 오브젝트 이동
 {
 	unsigned short size;
 	PACKET type;
-	OTYPE obj_type; // 어떤 오브젝트의 이동인가
 	unsigned short number; // 개수
 	unsigned short objs_x[MAX_OBJ_NUM];
 	unsigned short objs_y[MAX_OBJ_NUM];
-};
-
-struct SC_OBJECT_CHANGE_PACKET // 오브젝트 상태변경
-{
-	unsigned short size;
-	PACKET type;
-	OTYPE obj_type;
-	bool isRemove; // 삭제되었는가 혹은 죽었는가?
+	OTYPE objs_type[MAX_OBJ_NUM]; // 이거 다 맞춰서 알아서 확인하세욤
 };
 
 struct SC_RANKING_PACKET 

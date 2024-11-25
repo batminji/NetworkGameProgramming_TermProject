@@ -48,11 +48,14 @@ enum PACKET // 패킷 타입 정의.
 };
 
 enum OTYPE // 오브젝트 타입 정의.
-{ 
-	ENEMY, 
-	ENEMY_BULLETS, 
-	MISSAIL, 
-	MY_BULLET, 
+{
+	ENEMY,
+	ENEMY_BULLETS,
+	MISSAIL,
+	P1_BULLET,
+	P2_BULLET,
+	P1_SKILLBULLET,
+	P2_SKILLBULLET,
 	ITEM 
 };
 
