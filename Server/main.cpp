@@ -2,7 +2,7 @@
 #include "protocol.h"
 
 constexpr unsigned short MOVE_DIST = 5;
-constexpr unsigned short DEFXPOS = 675; // todo: 플레이어 총알 생성되는 x좌표 수정해주세요
+constexpr unsigned short DEFXPOS = 675; // todo: 플레이어 총알 생성되는 x좌표 수정해주세요.
 constexpr unsigned short SKILL_TIME = 5000; // MS단위임
 
 // 전방선언 라인

@@ -186,6 +186,7 @@
   <ItemGroup>
     <Image Include="..\..\..\..\Downloads\room_screen_bg.bmp" />
     <Image Include="resource_file\basic_bullets.bmp" />
+    <Image Include="resource_file\basic_bullet_2.bmp" />
     <Image Include="resource_file\big.bmp" />
     <Image Include="resource_file\Blue_fly_left.bmp" />
     <Image Include="resource_file\Blue_heart.bmp" />

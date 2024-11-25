@@ -94,6 +94,8 @@ void Play_Scene::network()
     recv_player_data();
     // 플레이어인풋 전송
     send_player_input(send_y);
+
+    // 총알 정보 주고 받기;
 }
 
 LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

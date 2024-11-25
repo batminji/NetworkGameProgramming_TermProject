@@ -20,6 +20,8 @@ public:
 	ResourceManager& operator=(const ResourceManager&) = delete;
 
 	// 그래픽 리소스들 선언
+	CImage Kirby_blue_bullet;
+	
 	CImage Kirby_pink_idle_left;
 	CImage Kirby_pink_idle_right;
 	CImage Kirby_blue_idle_left;
@@ -49,11 +51,11 @@ public:
 	CImage Kirby_pink_hit;
 	CImage Kirby_pink_zombie;
 	CImage heart;
-	CImage basic_bullet;
+	CImage Kirby_pink_bullet;
 	CImage game_bg2;
 	CImage skill;
 	CImage skill_color;
-	CImage skill_bullet;
+	CImage Kirby_pink_skill_bullet;
 	CImage m[5];
 	CImage monster_bullet;
 	CImage number;

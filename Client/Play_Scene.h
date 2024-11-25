@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Item.h"
+#include "Bullet.h"
 //#include "../Server/protocol.h"
 
 class Play_Scene :
@@ -15,6 +16,7 @@ private:
 
     vector<Enemy> enemys;
     vector<Item> Items;
+    vector<bullet> bullets;
 private:
     //ui image
     CImage* game_bg;
@@ -54,7 +56,7 @@ public:
     short send_y = 300;
     int send_player_input(unsigned short y);
     int recv_player_data();
-
+    // 총알 주고 받기 함수 작성
    
 
 };

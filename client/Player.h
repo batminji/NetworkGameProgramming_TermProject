@@ -1,6 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include "Bullet.h"
 #include "ResourceManager.h"
 
 static int Kirby_frame = 0;
@@ -34,9 +33,6 @@ class Player
 	bool die;
 	bool who_is_me;
 	bool equipments[4];
-
-	vector <bullet> basic_bullets;
-	vector <bullet> skill_bullets;
 
 public: 
 	SOCKET* p_sock;

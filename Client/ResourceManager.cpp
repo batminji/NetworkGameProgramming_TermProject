@@ -34,7 +34,8 @@ void ResourceManager::init(HINSTANCE g_hInst)
     game_bg.LoadFromResource(g_hInst, MAKEINTRESOURCE(GAME_BACKGROUND));
     Kirby_pink_fly.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_FLY_LEFT));
     heart.LoadFromResource(g_hInst, MAKEINTRESOURCE(HEART));
-    basic_bullet.LoadFromResource(g_hInst, MAKEINTRESOURCE(BASIC_BULLET));
+    Kirby_pink_bullet.LoadFromResource(g_hInst, MAKEINTRESOURCE(BASIC_BULLET));
+    Kirby_blue_bullet.LoadFromResource(g_hInst, MAKEINTRESOURCE(BASIC_BULLET_2));
     game_bg2.LoadFromResource(g_hInst, MAKEINTRESOURCE(GAME_BACKGROUND_2));
     item[0].LoadFromResource(g_hInst, MAKEINTRESOURCE(ITEM1));
     item[1].LoadFromResource(g_hInst, MAKEINTRESOURCE(ITEM2));
@@ -42,7 +43,7 @@ void ResourceManager::init(HINSTANCE g_hInst)
     item[3].LoadFromResource(g_hInst, MAKEINTRESOURCE(ITEM4));
     skill.LoadFromResource(g_hInst, MAKEINTRESOURCE(SKILL));
     skill_color.LoadFromResource(g_hInst, MAKEINTRESOURCE(SKILL_COLOR));
-    skill_bullet.LoadFromResource(g_hInst, MAKEINTRESOURCE(SKILL_BULLET));
+    Kirby_pink_skill_bullet.LoadFromResource(g_hInst, MAKEINTRESOURCE(SKILL_BULLET));
     m[0].LoadFromResource(g_hInst, MAKEINTRESOURCE(SMALL_MONSTER));
     m[1].LoadFromResource(g_hInst, MAKEINTRESOURCE(MID1_MONSTER));
     m[2].LoadFromResource(g_hInst, MAKEINTRESOURCE(MID2_MONSTER));

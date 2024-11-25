@@ -7,14 +7,17 @@ static int skill_bullet_frame = 0;
 
 class bullet
 {
-	CImage* Basic_bullet;
-	CImage* Skill_bullet;
+	CImage* Kirby_pink_bullet;
+	CImage* Kirby_blue_bullet;
+	CImage* Kirby_pink_skill_bullet;
 	CImage* Monster_bullet;
 
+	short job;
 	short type;
 	short xy[2];
 public:
-	bullet(short x, short y, short t);
+	bullet(short x, short y, short t, short j); // y ¡¬«•, √—æÀ ≈∏¿‘, ¥©±∏¿« √—æÀ¿Œ¡ˆ
+	// 1 : Dealer¿« √—æÀ 2 : Healer¿« √—æÀ 
 	void render(HDC mdc);
 	void update();
 };

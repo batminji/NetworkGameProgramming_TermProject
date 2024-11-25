@@ -360,5 +360,8 @@
     <Image Include="resource_file\room_screen_bg.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="resource_file\basic_bullet_2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>
