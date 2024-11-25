@@ -672,7 +672,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         //push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
         send_player_move_packet(s, pid);
         while (true) {
-            //send_object_move_packet(s, pid);
+            send_object_move_packet(s, pid); // todo: 왜?
 
             // recv.CS_MOVE_PACKET
             ZeroMemory(recv_buf, sizeof(recv_buf));
