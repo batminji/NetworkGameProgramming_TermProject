@@ -16,9 +16,11 @@ void Title_Scene::render(LPVOID param)
     m_hwnd = (HWND)param;
     RECT rect;
     GetClientRect(m_hwnd, &rect);
-
-    start_screen->StretchBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, SRCCOPY);
-    title->TransparentBlt(m_hBufferDC, 10 - title_x, 10 - title_y, title_x + 800, title_y + 600, 0, 0, 800, 600, RGB(255, 0, 255));
+    
+    if(start_screen != nullptr)
+        start_screen->StretchBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, SRCCOPY);
+    if(title != nullptr)
+        title->TransparentBlt(m_hBufferDC, 10 - title_x, 10 - title_y, title_x + 800, title_y + 600, 0, 0, 800, 600, RGB(255, 0, 255));
     SetBkMode(m_hBufferDC, TRANSPARENT);
     TextOut(m_hBufferDC, 285, 460, ID, lstrlen(ID));
     
@@ -46,7 +48,6 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     switch (uMsg) {
     case WM_PAINT:
     {
-      
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
         BitBlt(hdc, 0, 0, 800, 600, m_hBufferDC, 0, 0, SRCCOPY);

@@ -9,7 +9,7 @@ constexpr unsigned short DEFXPOS = 675;
 constexpr unsigned short SKILL_TIME = 5000; // MS단위임
 
 // 전방선언 라인
-enum TASK_TYPE { FIRE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END }; // 뭐가 있을까?
+enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END }; // 뭐가 있을까?
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid);
 
 
@@ -668,7 +668,8 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             if (true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
         }
 
-        push_evt_queue(FIRE_PLAYER_BULLET, 500, pid); // 총알발사
+        push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
+        push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
         send_player_move_packet(s, pid);
         while (true) {
             //send_object_move_packet(s, pid);
@@ -726,7 +727,14 @@ void ai_thread()
         case FIRE_PLAYER_BULLET:
             roomInfo[ev.room_id]->createPbullet(ev.room_id);
             std::cout << ev.room_id <<": 히히 발싸아~" << std::endl;
-            push_evt_queue(FIRE_PLAYER_BULLET, 500, ev.room_id); // 1초에 한개씩 발사
+            push_evt_queue(FIRE_PLAYER_BULLET, 500, ev.room_id); // .5초에 한개씩 발사
+            break;
+            
+        case MOVE_PLAYER_BULLET:
+            if (ev.room_id == roomInfo[ev.room_id]->getP1ID()) {
+                roomInfo[ev.room_id]->doBulletsMove();
+                push_evt_queue(MOVE_PLAYER_BULLET, 100, ev.room_id); // .5초에 한개씩 발사
+            }
             break;
 
         case FIRE_ENEMY_BULLET:

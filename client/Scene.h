@@ -11,6 +11,8 @@ public:
 
 	short next_scene;
 public:
+	std::mutex scene_lock;
+
 
 	Scene() {};
 	Scene(HWND hwnd,HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock) {

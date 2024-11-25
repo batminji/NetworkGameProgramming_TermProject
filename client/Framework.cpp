@@ -7,12 +7,14 @@ Framework::~Framework()
 
 void Framework::render(LPVOID param)
 {
-	if (m_scene)m_scene->render(param);
+	std::lock_guard ll{ m_scene->scene_lock };
+	if (m_scene != nullptr)
+		m_scene->render(param);
 }
 
 void Framework::update()
 {
-
+	std::lock_guard ll{ m_scene->scene_lock };
 	m_scene->update();
 
 	if (current_scene != m_scene->next_scene) {
@@ -22,16 +24,18 @@ void Framework::update()
 		{
 		case TITLE_SCENE:
 		{
-			delete m_scene;
+			auto tmp = m_scene;
 			m_scene = new Title_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
 			m_scene->next_scene = TITLE_SCENE;
+			delete tmp;
 		}
 		break;
 		case LOBBY_SCENE:
 		{
-			delete m_scene;
+			auto tmp = m_scene;
 			m_scene = new Lobby_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
 			m_scene->next_scene = LOBBY_SCENE;
+			delete tmp;
 		}
 		break;
 		case ROOM_SCENE:
@@ -46,13 +50,14 @@ void Framework::update()
 				closesocket(*m_sock);
 				WSACleanup();
 			}
-			delete m_scene;
+			auto tmp = m_scene;
 			if (DataManager::getInstance().room_master){
 				m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, TRUE);
 			}
 			else m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, FALSE);
 
 			m_scene->next_scene = ROOM_SCENE;
+			delete tmp;
 		}
 		break;
 		case PLAY_SCENE:
@@ -64,25 +69,31 @@ void Framework::update()
 				Player master_player(dynamic_cast<Room_Scene*>(m_scene)->master_player->job, TRUE);
 				Player join_player(dynamic_cast<Room_Scene*>(m_scene)->join_player->job, FALSE);
 
-				delete m_scene;
+				auto tmp = m_scene;
+				m_scene = nullptr;
 				m_scene = new Play_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, &master_player, &join_player);
 				m_scene->next_scene = PLAY_SCENE;
+				delete tmp;
 			}
 			else if(dynamic_cast<Room_Scene*>(m_scene)->join_player->who_is_me){
 				Player master_player(dynamic_cast<Room_Scene*>(m_scene)->master_player->job, FALSE);
 				Player join_player(dynamic_cast<Room_Scene*>(m_scene)->join_player->job, TRUE);
 
-				delete m_scene;
+				auto tmp = m_scene;
+				m_scene = nullptr;
 				m_scene = new Play_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, &master_player, &join_player);
 				m_scene->next_scene = PLAY_SCENE;
+				delete tmp;
 			}
 		}
 		break;
 		case CARTOON_SCENE:
 		{
-			delete m_scene;
+			auto tmp = m_scene;
+			m_scene = nullptr;
 			m_scene = new Cartoon_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock);
 			m_scene->next_scene = CARTOON_SCENE;
+			delete tmp;
 		}
 		break;
 		default:
@@ -94,7 +105,8 @@ void Framework::update()
 
 void Framework::network()
 {
-	if (m_scene)
+	std::lock_guard ll{ m_scene->scene_lock };
+	if (m_scene != nullptr)
 		m_scene->network();
 }
 
@@ -105,6 +117,7 @@ LRESULT Framework::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		if (wParam - 48 >= (char)TITLE_SCENE && wParam - 48 <= (char)CARTOON_SCENE)
 			m_scene->next_scene = (short)(wParam - 48);
 	}
-	if (m_scene)m_scene->windowproc(hwnd, uMsg, wParam, lParam);
+	if (m_scene != nullptr)
+		m_scene->windowproc(hwnd, uMsg, wParam, lParam);
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
