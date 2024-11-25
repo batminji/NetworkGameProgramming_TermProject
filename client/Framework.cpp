@@ -105,7 +105,7 @@ void Framework::update()
 
 void Framework::network()
 {
-	//std::lock_guard ll{ m_scene->scene_lock };
+//	std::lock_guard ll{ m_scene->scene_lock };
 	if (m_scene != nullptr)
 		m_scene->network();
 }

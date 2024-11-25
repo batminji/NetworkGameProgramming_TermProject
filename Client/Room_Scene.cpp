@@ -169,27 +169,49 @@ int Room_Scene::room_data_update()
     }
 
     //수신
-
+    // 수신 버퍼 및 누적 데이터 버퍼
+    static std::vector<uint8_t> recvBuffer;
     char recvBuf[BUFSIZE];
-    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_ROOM_CHANGE_PACKET), 0);
+    ZeroMemory(recvBuf, sizeof(recvBuf));
+
+    // 데이터 수신
+    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL 대신 0 사용
     if (recvLen <= 0) {
-        std::cerr << "Receive failed or connection closed." << std::endl;
+        std::cerr << "플레이어 좌표받기 실패" << std::endl;
+        return -1;
     }
-    else {
-        SC_ROOM_CHANGE_PACKET* roomPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
-       if (true == roomPacket->isPlaying) {
-           isPlaying = TRUE;
-           next_scene = PLAY_SCENE;
-       }
-       else {
-            if (master_player->who_is_me) { 
+
+    // 수신한 데이터를 누적 버퍼에 추가
+    recvBuffer.insert(recvBuffer.end(), recvBuf, recvBuf + recvLen);
+
+    // 패킷 처리
+    while (recvBuffer.size() >= sizeof(SC_PLAYER_MOVE_PACKET)) { // 패킷 크기만큼 데이터가 도착했는지 확인
+        SC_ROOM_CHANGE_PACKET* roomPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuffer.data());
+        // 패킷 유효성 확인 (예: 패킷의 크기와 타입)
+        if (recvBuffer.size() < roomPacket->size) {
+            break; // 전체 패킷이 아직 도착하지 않은 경우 대기
+        }
+
+        // 데이터 처리
+
+
+        if (true == roomPacket->isPlaying) {
+            isPlaying = TRUE;
+            next_scene = PLAY_SCENE;
+        }
+        else if (roomPacket->type != SC_ROOM_CHANGE) {
+            isPlaying = TRUE;
+            next_scene = PLAY_SCENE;
+        }
+        else {
+            if (master_player->who_is_me) {
                 strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
 
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, user_name[0], sizeof(DataManager::getInstance().my_data.ID));
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.otherID, -1, user_name[1], sizeof(DataManager::getInstance().my_data.otherID));
 
-               if(strlen(roomPacket->other_pl)>=1) 
-                   join_player->room = TRUE;
+                if (strlen(roomPacket->other_pl) >= 1)
+                    join_player->room = TRUE;
             }
             else if (join_player->who_is_me) {
                 strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
@@ -202,9 +224,15 @@ int Room_Scene::room_data_update()
                 else {
                     master_player->job = 1; join_player->job = 2;
                 }
-           }
+            }
         }
-    }
 
-    return 1;
+            // 처리한 패킷 데이터를 누적 버퍼에서 제거
+            recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + roomPacket->size);
+        
+    }
+        return 1;
+        //////////////
+
+    
 }

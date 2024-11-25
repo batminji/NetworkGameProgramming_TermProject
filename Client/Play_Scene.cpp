@@ -1,4 +1,4 @@
-#include "Play_Scene.h"
+ï»¿#include "Play_Scene.h"
 
 Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock, Player* p1, Player* p2) {
     m_hwnd = hwnd;
@@ -9,7 +9,7 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     //player
     master_player = p1; join_player = p2;
 
-    //ui ÀÌ¹ÌÁö ·Îµå
+    //ui ì´ë¯¸ì§€ ë¡œë“œ
     game_bg = &ResourceManager::getInstance().game_bg;
     game_bg2 = &ResourceManager::getInstance().game_bg2;
     number = &ResourceManager::getInstance().number;
@@ -31,11 +31,11 @@ void Play_Scene::render(LPVOID param)
 
     //ui
     ui_render();
-    // Ä³¸¯ÅÍ ±×¸®±â (´Ü¼øÇÑ »ç°¢ÇüÀ¸·Î Ç¥Çö)
+    // ìºë¦­í„° ê·¸ë¦¬ê¸° (ë‹¨ìˆœí•œ ì‚¬ê°í˜•ìœ¼ë¡œ í‘œí˜„)
     master_player->render(m_hBufferDC);
     join_player->render(m_hBufferDC);
     
-    //ÃÑ¾Ë 
+    //ì´ì•Œ 
     for (bullet b : bullets) b.render(m_hBufferDC);
     
     
@@ -46,14 +46,14 @@ void Play_Scene::ui_render()
     game_bg->StretchBlt(m_hBufferDC, 0, 50, 800, 600 - 50, bg_xPos, 0, 800, 500, SRCCOPY);
     if (bg_xPos >= 800)game_bg->StretchBlt(m_hBufferDC, 1600 - bg_xPos, 50, bg_xPos - 800, 600 - 50, 0, 0, bg_xPos - 800, 500, SRCCOPY);
     game_bg2->StretchBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, SRCCOPY);
-  //  // ¾ÆÀÌÅÛ
+  //  // ì•„ì´í…œ
   //  for (int i = 0; i < 4; ++i)
   //      if (item[i].buy)item[i].img.TransparentBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, RGB(255, 0, 255));
-  //  // ÇÏÆ®
+  //  // í•˜íŠ¸
     for (int i = 0; i < heart_cnt; ++i)
         heart->TransparentBlt(m_hBufferDC, heart_pt[i].x - 15, heart_pt[i].y - 15, 30, 30, 0, 0, 18, 16, RGB(0, 255, 0));
    
-  //  //Á¡¼ö
+  //  //ì ìˆ˜
     int num;
     wsprintf(number_text, L"%d", play_score);
     if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 10, 12, 24, 28, 0, 0, 12, 14, RGB(255, 0, 255));
@@ -61,7 +61,7 @@ void Play_Scene::ui_render()
         num = number_text[i] - 48;
         number->TransparentBlt(m_hBufferDC, i * 24 + 10, 12, 24, 28, num * 12, 0, 12, 14, RGB(255, 0, 255));
     }
-   // ÄÚÀÎ ¼ö
+   // ì½”ì¸ ìˆ˜
     wsprintf(number_text, L"%d", play_gold);
     if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 10, 12, 24, 28, 0, 0, 12, 14, RGB(255, 0, 255));
     for (int i = 0; i < lstrlen(number_text); i++) {
@@ -83,7 +83,7 @@ void Play_Scene::item_draw()
 void Play_Scene::bullet_draw()
 {
 
-    //³ªÁß¿¡ ±×¸®´Ù ÅÍÁú¶§ ÀÌÇÔ¼ö¸¦ ¾²µµ·ÏÇÏ°Ù½¿.
+    //ë‚˜ì¤‘ì— ê·¸ë¦¬ë‹¤ í„°ì§ˆë•Œ ì´í•¨ìˆ˜ë¥¼ ì“°ë„ë¡í•˜ê²ŸìŠ´.
     
 }
 
@@ -94,7 +94,7 @@ void Play_Scene::update()
     for (Enemy& e : enemys) e.update();
     for (bullet& b : bullets)b.update();
 
-    //¹è°æ
+    //ë°°ê²½
     if (bg_xPos == 0) bg_xPos = 1600;
     else bg_xPos--;
 
@@ -104,14 +104,14 @@ void Play_Scene::update()
 
 void Play_Scene::network()
 {
-    // ÇÃ·¹ÀÌ¾î µ¥ÀÌÅÍ ¼ö½Å
+    // í”Œë ˆì´ì–´ ë°ì´í„° ìˆ˜ì‹ 
     recv_player_data();
-    //¿ÀºêÁ§Æ® µ¥ÀÌÅÍ ¼ö½Å
+    //ì˜¤ë¸Œì íŠ¸ ë°ì´í„° ìˆ˜ì‹ 
     recv_object_data();
-    // ÇÃ·¹ÀÌ¾îÀÎÇ² Àü¼Û
+    // í”Œë ˆì´ì–´ì¸í’‹ ì „ì†¡
     send_player_input(send_y);
 
-    // ÃÑ¾Ë Á¤º¸ ÁÖ°í ¹Ş±â;
+    // ì´ì•Œ ì •ë³´ ì£¼ê³  ë°›ê¸°;
 }
 
 LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -128,10 +128,10 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     }
     case WM_CHAR:
     {
-        if (wParam == VK_RETURN) { // ½ºÅ³À» ½è´Ù.
-            // TODO ½ºÅ³ ½è´Ù´Â ÆĞÅ¶ º¸³»¾ß ÇÔ.
+        if (wParam == VK_RETURN) { // ìŠ¤í‚¬ì„ ì¼ë‹¤.
+            // TODO ìŠ¤í‚¬ ì¼ë‹¤ëŠ” íŒ¨í‚· ë³´ë‚´ì•¼ í•¨.
             skill_key_down = true;
-            // ÃÑ¾ËÀÇ Å¸ÀÔ º¯°æ Èì... ±Ùµ¥ Èì...
+            // ì´ì•Œì˜ íƒ€ì… ë³€ê²½ í ... ê·¼ë° í ...
         }
     }
         break;
@@ -180,31 +180,31 @@ int Play_Scene::send_player_input(unsigned short y)
 }
 
 int Play_Scene::recv_player_data() {
-    // ¼ö½Å ¹öÆÛ ¹× ´©Àû µ¥ÀÌÅÍ ¹öÆÛ
+    // ìˆ˜ì‹  ë²„í¼ ë° ëˆ„ì  ë°ì´í„° ë²„í¼
     static std::vector<uint8_t> recvBuffer;
     char recvBuf[BUFSIZE];
     ZeroMemory(recvBuf, sizeof(recvBuf));
 
-    // µ¥ÀÌÅÍ ¼ö½Å
-    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL ´ë½Å 0 »ç¿ë
+    // ë°ì´í„° ìˆ˜ì‹ 
+    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL ëŒ€ì‹  0 ì‚¬ìš©
     if (recvLen <= 0) {
-        std::cerr << "ÇÃ·¹ÀÌ¾î ÁÂÇ¥¹Ş±â ½ÇÆĞ" << std::endl;
+        std::cerr << "í”Œë ˆì´ì–´ ì¢Œí‘œë°›ê¸° ì‹¤íŒ¨" << std::endl;
         return -1;
     }
 
-    // ¼ö½ÅÇÑ µ¥ÀÌÅÍ¸¦ ´©Àû ¹öÆÛ¿¡ Ãß°¡
+    // ìˆ˜ì‹ í•œ ë°ì´í„°ë¥¼ ëˆ„ì  ë²„í¼ì— ì¶”ê°€
     recvBuffer.insert(recvBuffer.end(), recvBuf, recvBuf + recvLen);
 
-    // ÆĞÅ¶ Ã³¸®
-    while (recvBuffer.size() >= sizeof(SC_PLAYER_MOVE_PACKET)) { // ÆĞÅ¶ Å©±â¸¸Å­ µ¥ÀÌÅÍ°¡ µµÂøÇß´ÂÁö È®ÀÎ
+    // íŒ¨í‚· ì²˜ë¦¬
+    while (recvBuffer.size() >= sizeof(SC_PLAYER_MOVE_PACKET)) { // íŒ¨í‚· í¬ê¸°ë§Œí¼ ë°ì´í„°ê°€ ë„ì°©í–ˆëŠ”ì§€ í™•ì¸
         SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuffer.data());
 
-        // ÆĞÅ¶ À¯È¿¼º È®ÀÎ (¿¹: ÆĞÅ¶ÀÇ Å©±â¿Í Å¸ÀÔ)
+        // íŒ¨í‚· ìœ íš¨ì„± í™•ì¸ (ì˜ˆ: íŒ¨í‚·ì˜ í¬ê¸°ì™€ íƒ€ì…)
         if (recvBuffer.size() < resPacket->size) {
-            break; // ÀüÃ¼ ÆĞÅ¶ÀÌ ¾ÆÁ÷ µµÂøÇÏÁö ¾ÊÀº °æ¿ì ´ë±â
+            break; // ì „ì²´ íŒ¨í‚·ì´ ì•„ì§ ë„ì°©í•˜ì§€ ì•Šì€ ê²½ìš° ëŒ€ê¸°
         }
 
-        // µ¥ÀÌÅÍ Ã³¸®
+        // ë°ì´í„° ì²˜ë¦¬
         if (master_player->who_is_me) {
             master_player->y = resPacket->this_y;
             join_player->y = resPacket->other_y;
@@ -218,7 +218,7 @@ int Play_Scene::recv_player_data() {
                 << resPacket->this_y << " " << resPacket->type << std::endl;
         }
 
-        // Ã³¸®ÇÑ ÆĞÅ¶ µ¥ÀÌÅÍ¸¦ ´©Àû ¹öÆÛ¿¡¼­ Á¦°Å
+        // ì²˜ë¦¬í•œ íŒ¨í‚· ë°ì´í„°ë¥¼ ëˆ„ì  ë²„í¼ì—ì„œ ì œê±°
         recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + resPacket->size);
     }
 
@@ -227,7 +227,7 @@ int Play_Scene::recv_player_data() {
 
 std::mutex bullets_mutex;
 int Play_Scene::recv_object_data() {
-    // µ¥ÀÌÅÍ ÀúÀå¿ë ÀÓ½Ã º¤ÅÍ
+    // ë°ì´í„° ì €ì¥ìš© ì„ì‹œ ë²¡í„°
     vector<Enemy> temp_enemys;
     vector<bullet> temp_bullets;
     vector<Item> temp_items;
@@ -235,35 +235,31 @@ int Play_Scene::recv_object_data() {
     temp_bullets.clear();
     temp_items.clear();
 
-    // ¼ö½Å ¹öÆÛ ¹× ´©Àû µ¥ÀÌÅÍ ¹öÆÛ
     static std::vector<uint8_t> recvBuffer;
     char recvBuf[BUFSIZE];
     ZeroMemory(recvBuf, sizeof(recvBuf));
 
-    // µ¥ÀÌÅÍ ¼ö½Å
-    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL ´ë½Å 0 »ç¿ë
+    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL ï¿½ï¿½ï¿½ 0 ï¿½ï¿½ï¿½
     if (recvLen <= 0) {
-        std::cerr << "¿ÀºêÁ§Æ® Á¤º¸¹Ş±â ½ÇÆĞ" << std::endl;
-      //  return -1;
+        std::cerr << "ì˜¤ë¸Œì íŠ¸ì¢Œí‘œë°›ê¸° ì‹¤íŒ¨" << std::endl;
+        //  return -1;
     }
 
-    // ¼ö½ÅÇÑ µ¥ÀÌÅÍ¸¦ ´©Àû ¹öÆÛ¿¡ Ãß°¡
     recvBuffer.insert(recvBuffer.end(), recvBuf, recvBuf + recvLen);
 
-    // ÆĞÅ¶ Ã³¸®
-    while (recvBuffer.size() >= sizeof(SC_OBJECT_MOVE_PACKET)) { // ÆĞÅ¶ Å©±â¸¸Å­ µ¥ÀÌÅÍ°¡ µµÂøÇß´ÂÁö È®ÀÎ
+   
+    while (recvBuffer.size() >= sizeof(SC_OBJECT_MOVE_PACKET)) { 
         SC_OBJECT_MOVE_PACKET* resPacket = reinterpret_cast<SC_OBJECT_MOVE_PACKET*>(recvBuffer.data());
 
-        // ÆĞÅ¶ À¯È¿¼º È®ÀÎ (¿¹: ÆĞÅ¶ÀÇ Å©±â¿Í Å¸ÀÔ)
+  
         if (recvBuffer.size() < resPacket->size) {
-            break; // ÀüÃ¼ ÆĞÅ¶ÀÌ ¾ÆÁ÷ µµÂøÇÏÁö ¾ÊÀº °æ¿ì ´ë±â
+            break;
         }
 
-        // µ¥ÀÌÅÍ Ã³¸®
         for (int i = 0; i < resPacket->number; ++i) {
             switch (resPacket->objs_type[i]) {
             case ENEMY:
-                // Àû Ã³¸® ·ÎÁ÷
+            
                 break;
             case ENEMY_BULLETS: {
                 bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 3);
@@ -271,7 +267,7 @@ int Play_Scene::recv_object_data() {
                 break;
             }
             case MISSAIL:
-                // ¹Ì»çÀÏ Ã³¸® ·ÎÁ÷
+     
                 break;
             case P1_BULLET: {
                 bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 1, 1);
@@ -289,26 +285,24 @@ int Play_Scene::recv_object_data() {
                 break;
             }
             case P2_SKILLBULLET:
-                // ½ºÅ³ ÅºÈ¯ Ã³¸® ·ÎÁ÷
+         
                 break;
             case ITEM:
-                // ¾ÆÀÌÅÛ Ã³¸® ·ÎÁ÷
+         
                 break;
             default:
-                break;                                          
+                break;
             }
         }
 
-        // Ã³¸®ÇÑ ÆĞÅ¶ µ¥ÀÌÅÍ¸¦ ´©Àû ¹öÆÛ¿¡¼­ Á¦°Å
+
         recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + resPacket->size);
     }
 
-    // temp_bulletsÀÇ °ªÀ» bullets·Î ÀÌµ¿
+  
     {
         std::unique_lock<std::mutex> lock(bullets_mutex);
         bullets.insert(bullets.end(), std::make_move_iterator(temp_bullets.begin()), std::make_move_iterator(temp_bullets.end()));
-        lock.unlock(); // ÇÊ¿ä ½Ã Àá±İ ÇØÁ¦
+        lock.unlock(); 
     }
-
-    return 1;
 }
