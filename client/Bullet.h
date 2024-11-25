@@ -12,12 +12,11 @@ class bullet
 	CImage* Kirby_pink_skill_bullet;
 	CImage* Monster_bullet;
 
-	short job;
-	short type;
-	short xy[2];
+	short job; // 1 : Dealer 2 : Healer 3 : Monster
+	short type; // 1 : Basic bullet 2 : Skill Bullet
+	short xy[2]; // 그리는 위치
 public:
-	bullet(short x, short y, short t, short j); // y 좌표, 총알 타입, 누구의 총알인지
-	// 1 : Dealer의 총알 2 : Healer의 총알 
+	bullet(short x, short y, short t, short j); // x좌표, y좌표, x방향 속도, y방향 속도, 총알 타입, 누구의 총알인지
 	void render(HDC mdc);
 	void update();
 };

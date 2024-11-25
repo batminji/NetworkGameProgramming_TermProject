@@ -1,14 +1,13 @@
 #include "Enemy.h"
 #include "Bullet.h"
 
-Enemy::Enemy(short arg_type, RECT arg_rt, short arg_hp, short arg_cnt, short arg_frame, short arg_attack_type)
+Enemy::Enemy(short arg_type, RECT arg_rt, short arg_hp, short arg_cnt, short arg_frame)
 {
 	type             = arg_type;
 	rt               = arg_rt;
 	hp               = arg_hp;
 	cnt              = arg_cnt;
 	frame            = arg_frame;
-	attack_type       = arg_attack_type;
 
 	monster[0] = &ResourceManager::getInstance().m[0];
 	monster[1] = &ResourceManager::getInstance().m[1];
@@ -17,6 +16,8 @@ Enemy::Enemy(short arg_type, RECT arg_rt, short arg_hp, short arg_cnt, short arg
 	monster[4] = &ResourceManager::getInstance().m[4];
 	monster_create = &ResourceManager::getInstance().monster_create;
 	monster_die = &ResourceManager::getInstance().monster_die;
+	hp_bar = &ResourceManager::getInstance().hp_bar;
+	hp_empty = &ResourceManager::getInstance().hp_empty;
 }
 
 void Enemy::render(HDC mdc)
@@ -28,15 +29,20 @@ void Enemy::render(HDC mdc)
 		monster[type]->TransparentBlt(mdc, rt.left, rt.top, (rt.right - rt.left), (rt.bottom - rt.top), ((rt.right - rt.left) / 2) * (ani % (frame)), 0, (rt.right - rt.left) / 2, (rt.bottom - rt.top) / 2, RGB(255, 0, 255));
 		if (type > 0) {
 			num = rt.right - rt.left;
-			/*hp_empty.TransparentBlt(mdc, paint_enemy.rt.left - 30, paint_enemy.rt.top - 22, 224 * ((double)num / 160), 22, 0, 0, 224, 22, RGB(0, 255, 0));
-			hp_bar.TransparentBlt(mdc, paint_enemy.rt.left - 30, paint_enemy.rt.top - 22, abs((((double)paint_enemy.hp / (double)full_hp[paint_enemy.type]) * 224) * ((double)num / 160) + 1), 22, 0, 0, ((double)paint_enemy.hp / (double)full_hp[paint_enemy.type]) * 224, 22, RGB(0, 255, 0));*/
+			hp_empty->TransparentBlt(mdc, rt.left - 30, rt.top - 22, 224 * ((double)num / 160), 22, 0, 0, 224, 22, RGB(0, 255, 0));
+			hp_bar->TransparentBlt(mdc, rt.left - 30, rt.top - 22, (((double)hp / (double)50 * 224) * ((double)num / 160) + 1), 22, 0, 0, ((double)hp / (double)50) * 224, 22, RGB(0, 255, 0)); 
 		}
 	}
 
-	// 이펙트를 여기에 넣나요?
+	// 일단 생성 되는 부분을 안 넣는다고 했을 때
+	monster[type]->TransparentBlt(mdc, rt.left, rt.top, (rt.right - rt.left), (rt.bottom - rt.top), ((rt.right - rt.left) / 2) * (ani % (frame)), 0, (rt.right - rt.left) / 2, (rt.bottom - rt.top) / 2, RGB(255, 0, 255));
+	if (type > 0) {
+		num = rt.right - rt.left;
+		hp_empty->TransparentBlt(mdc, rt.left - 30, rt.top - 22, 224 * ((double)num / 160), 22, 0, 0, 224, 22, RGB(0, 255, 0));
+		hp_bar->TransparentBlt(mdc, rt.left - 30, rt.top - 22, (((double)hp / (double)50 * 224) * ((double)num / 160) + 1), 22, 0, 0, ((double)hp / (double)50) * 224, 22, RGB(0, 255, 0));
+	}
 
-	// 탄막
-	for (int i = 0; i < bullets.size(); ++i) bullets[i].render(mdc);
+	// 이펙트를 여기에 넣나요?
 }
 
 void Enemy::update()
