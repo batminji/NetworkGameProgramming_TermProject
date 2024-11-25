@@ -34,7 +34,6 @@ void Play_Scene::render(LPVOID param)
     // 캐릭터 그리기 (단순한 사각형으로 표현)
     master_player->render(m_hBufferDC);
     join_player->render(m_hBufferDC);
-   
 }
 
 void Play_Scene::ui_render()
