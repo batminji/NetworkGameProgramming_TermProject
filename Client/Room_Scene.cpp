@@ -121,7 +121,7 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         int mx = LOWORD(lParam);
         int my = HIWORD(lParam);
         POINT mypt = { mx,my };
-        printf("x : %d y : %d\n", mx, my);
+        // printf("x : %d y : %d\n", mx, my);
         if (master_player->who_is_me) {
             if (PtInRect(&dealer_rt, mypt)) { // 딜러 누르기
                 master_player->job = 1;
@@ -158,8 +158,14 @@ int Room_Scene::room_data_update()
     roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
     roomPacket.type = CS_ROOM_STATE;
     (master_player->job == 1) ? roomPacket.isDealer = true : roomPacket.isDealer = false;
-    if (isPlaying)roomPacket.isPlaying = TRUE;
-    else roomPacket.isPlaying = FALSE;
+    if (master_player->who_is_me) {
+        if (isPlaying)roomPacket.isPlaying = TRUE;
+        else roomPacket.isPlaying = FALSE;
+    }
+    else {
+        if (isPlaying) return 1; // 2P인데 이게 TRUE이다? 그럼 보내지마
+        else roomPacket.isPlaying = FALSE;
+    }
     roomPacket.isQuit = false;
 
     if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
@@ -168,11 +174,11 @@ int Room_Scene::room_data_update()
         WSACleanup();
     }
 
-    //����
+    // 리시브
 
     char recvBuf[BUFSIZE];
-    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_ROOM_CHANGE_PACKET), 0);
-    if (recvLen <= 0) {
+    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_ROOM_CHANGE_PACKET), MSG_WAITALL);
+    if (recvLen != sizeof(SC_ROOM_CHANGE_PACKET)) {
         std::cerr << "Receive failed or connection closed." << std::endl;
     }
     else {
@@ -180,6 +186,7 @@ int Room_Scene::room_data_update()
         if (true == roomPacket->isPlaying) {
             isPlaying = TRUE;
             next_scene = PLAY_SCENE;
+            return 1;
         }
         else {
             if (master_player->who_is_me) {
