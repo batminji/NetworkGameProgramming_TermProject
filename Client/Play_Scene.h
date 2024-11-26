@@ -59,6 +59,8 @@ public:
     int recv_player_data();
     // 오브젝트 좌표 수신 함수
     int recv_object_data();
-   
+    int recv_process();
+    void handle_player_data(const uint8_t* packetData);
+    void handle_object_data(const uint8_t* packetData);
 
 };

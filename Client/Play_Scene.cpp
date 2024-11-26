@@ -105,13 +105,15 @@ void Play_Scene::update()
 void Play_Scene::network()
 {
     // 플레이어 데이터 수신
-    recv_player_data();
+    //recv_player_data();
     //오브젝트 데이터 수신
-    recv_object_data();
+    //recv_object_data();
+    // 
+    recv_process();
     // 플레이어인풋 전송
     send_player_input(send_y);
 
-    // 총알 정보 주고 받기;
+
 }
 
 LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -208,14 +210,14 @@ int Play_Scene::recv_player_data() {
         if (master_player->who_is_me) {
             master_player->y = resPacket->this_y;
             join_player->y = resPacket->other_y;
-            std::cout << resPacket->other_y << " " << resPacket->size << " "
-                << resPacket->this_y << " " << resPacket->type << std::endl;
+            /*std::cout << resPacket->other_y << " " << resPacket->size << " "
+                << resPacket->this_y << " " << resPacket->type << std::endl;*/
         }
         else {
             join_player->y = resPacket->this_y;
             master_player->y = resPacket->other_y;
-            std::cout << resPacket->other_y << " " << resPacket->size << " "
-                << resPacket->this_y << " " << resPacket->type << std::endl;
+            /*std::cout << resPacket->other_y << " " << resPacket->size << " "
+                << resPacket->this_y << " " << resPacket->type << std::endl;*/
         }
 
         // 처리한 패킷 데이터를 누적 버퍼에서 제거
@@ -256,6 +258,7 @@ int Play_Scene::recv_object_data() {
             break;
         }
 
+        cout << "현재 실행중인 함수 : recv_object(9)    받은 패킷타입 :" << resPacket->type <<endl;
         for (int i = 0; i < resPacket->number; ++i) {
             switch (resPacket->objs_type[i]) {
             case ENEMY:
@@ -305,4 +308,122 @@ int Play_Scene::recv_object_data() {
         bullets.insert(bullets.end(), std::make_move_iterator(temp_bullets.begin()), std::make_move_iterator(temp_bullets.end()));
         lock.unlock(); 
     }
+}
+
+int Play_Scene::recv_process()
+{ // 수신 버퍼 및 누적 데이터 버퍼
+    static std::vector<uint8_t> recvBuffer;
+    char recvBuf[BUFSIZE];
+    ZeroMemory(recvBuf, sizeof(recvBuf));
+
+    // 데이터 수신
+    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL 대신 0 사용
+    if (recvLen <= 0) {
+        std::cerr << "플레이어 좌표받기 실패" << std::endl;
+        return -1;
+    }
+
+    // 수신한 데이터를 누적 버퍼에 추가
+    recvBuffer.insert(recvBuffer.end(), recvBuf, recvBuf + recvLen);
+
+    // 패킷 처리
+    while (recvBuffer.size() >= sizeof(SC_PLAYER_MOVE_PACKET)) { // 패킷 크기만큼 데이터가 도착했는지 확인
+        SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuffer.data());
+
+        // 패킷 유효성 확인 (예: 패킷의 크기와 타입)
+        if (recvBuffer.size() < resPacket->size) {
+            break; // 전체 패킷이 아직 도착하지 않은 경우 대기
+        }
+
+        switch (resPacket->type) {
+        case SC_PLAYER_MOVE:
+            handle_player_data(recvBuffer.data());
+            break;
+        case SC_OBJECT_MOVE:
+            handle_object_data(recvBuffer.data());
+            break;
+        default:
+            std::cerr << "알 수 없는 패킷 타입: " << resPacket->type << std::endl;
+            break;
+        }
+
+        // 처리한 패킷 데이터를 누적 버퍼에서 제거
+        recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + resPacket->size);
+    }
+
+    return 1;
+}
+
+void Play_Scene::handle_player_data(const uint8_t* packetData)
+{
+    // 패킷 데이터 구조체로 변환
+    const SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<const SC_PLAYER_MOVE_PACKET*>(packetData);
+    cout << "현재 실행중인 함수 : recv_player(7)    받은 패킷타입 :" << resPacket->type << endl;
+    // 데이터 갱신
+    if (master_player->who_is_me) {
+        // 현재 플레이어가 마스터인 경우
+        master_player->y = resPacket->this_y;
+        join_player->y = resPacket->other_y;
+    }
+    else {
+        // 현재 플레이어가 조인한 클라이언트인 경우
+        join_player->y = resPacket->this_y;
+        master_player->y = resPacket->other_y;
+    }
+}
+
+void Play_Scene::handle_object_data(const uint8_t* packetData)
+{
+   const  SC_OBJECT_MOVE_PACKET* resPacket = reinterpret_cast<const SC_OBJECT_MOVE_PACKET*>(packetData);
+   vector<Enemy> temp_enemys;
+   vector<bullet> temp_bullets;
+   vector<Item> temp_items;
+   temp_enemys.clear();
+   temp_bullets.clear();
+   temp_items.clear();
+
+   cout << "현재 실행중인 함수 : recv_object(9)    받은 패킷타입 :" << resPacket->type << endl;
+   for (int i = 0; i < resPacket->number; ++i) {
+       switch (resPacket->objs_type[i]) {
+       case ENEMY:
+
+           break;
+       case ENEMY_BULLETS: {
+           bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 3);
+           temp_bullets.push_back(temp_bullet);
+           break;
+       }
+       case MISSAIL:
+
+           break;
+       case P1_BULLET: {
+           bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 1, 1);
+           temp_bullets.push_back(temp_bullet);
+           break;
+       }
+       case P2_BULLET: {
+           bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 2);
+           temp_bullets.push_back(temp_bullet);
+           break;
+       }
+       case P1_SKILLBULLET: {
+           bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 2, 1);
+           temp_bullets.push_back(temp_bullet);
+           break;
+       }
+       case P2_SKILLBULLET:
+
+           break;
+       case ITEM:
+
+           break;
+       default:
+           break;
+       }
+   }
+   {
+       std::unique_lock<std::mutex> lock(bullets_mutex);
+       bullets.insert(bullets.end(), std::make_move_iterator(temp_bullets.begin()), std::make_move_iterator(temp_bullets.end()));
+       lock.unlock();
+   }
 }

@@ -1,4 +1,4 @@
-#include "Room_Scene.h"
+ï»¿#include "Room_Scene.h"
 //#include "../Server/protocol.h"
 
 // source\repos\NetworkGameProgramming_TermProject\client\x64\Release\Client.exe
@@ -9,18 +9,18 @@ Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     m_sock = sock;
     frame = 0;
     isPlaying = FALSE;
-    if (is_master) { // ³»°¡ ¹æÀåÀÏ °æ¿ì
+    if (is_master) { // ë‚´ê°€ ë°©ìž¥ì¼ ê²½ìš°
         master_player = new Player(1, TRUE);
         join_player = new Player(2, FALSE);
-        join_player->room = FALSE; // ¾ÆÁ÷ »ó´ë°¡ µé¾î¿ÀÁö ¾ÊÀ½. µé¾î¿À¸é TRUE
+        join_player->room = FALSE; // ì•„ì§ ìƒëŒ€ê°€ ë“¤ì–´ì˜¤ì§€ ì•ŠìŒ. ë“¤ì–´ì˜¤ë©´ TRUE
     }
-    else { // ¹æ¿¡ Âü¿©ÇÏ´Â °æ¿ì
+    else { // ë°©ì— ì°¸ì—¬í•˜ëŠ” ê²½ìš°
         master_player = new Player(1, FALSE);
         join_player = new Player(2, TRUE);
         join_player->room = TRUE;
     }
 
-    //ui ÀÌ¹ÌÁö ·Îµå
+    //ui ì´ë¯¸ì§€ ë¡œë“œ
     room_screen = &ResourceManager::getInstance().Room_screen;
     room_screen_bg = &ResourceManager::getInstance().Room_screen_bg;
     dealer_check = &ResourceManager::getInstance().Dealer_check;
@@ -39,9 +39,9 @@ void Room_Scene::render(LPVOID param)
     room_screen_bg->StretchBlt(m_hBufferDC, 0, 0, 800, 600, 0, 0, 800, 600, SRCCOPY);
     room_screen->TransparentBlt(m_hBufferDC, -20, -20, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
 
-    // ÇÃ·¹ÀÌ¾î ±×¸®±â
+    // í”Œë ˆì´ì–´ ê·¸ë¦¬ê¸°
 
-    //¹æÀå ÀÌ¸§ Ãâ·Â
+    //ë°©ìž¥ ì´ë¦„ ì¶œë ¥
     SetBkMode(m_hBufferDC, TRANSPARENT);
     TextOut(m_hBufferDC,127, 130, user_name[0], lstrlen(user_name[0]));
 
@@ -53,9 +53,9 @@ void Room_Scene::render(LPVOID param)
         blue_idle_right->TransparentBlt(m_hBufferDC, 100, 180, 200, 200, frame * 25, 0, 25, 25, RGB(0, 255, 0));
         break;
     }
-    if (join_player->room) { // Á¶ÀÎÀÌ µé¾î¿ÔÀ¸¸é..
+    if (join_player->room) { // ì¡°ì¸ì´ ë“¤ì–´ì™”ìœ¼ë©´..
 
-        //ÆÀ¿ø ÀÌ¸§ Ãâ·Â
+        //íŒ€ì› ì´ë¦„ ì¶œë ¥
         SetBkMode(m_hBufferDC, TRANSPARENT);
         TextOut(m_hBufferDC, 478, 130, user_name[1], lstrlen(user_name[1]));
 
@@ -69,8 +69,8 @@ void Room_Scene::render(LPVOID param)
         }
     }
 
-    // ¿ªÇÒ Ã¼Å©
-    if (master_player->who_is_me) { // ³»°¡ ¹æÀåÀÌ¸é
+    // ì—­í•  ì²´í¬
+    if (master_player->who_is_me) { // ë‚´ê°€ ë°©ìž¥ì´ë©´
         switch (master_player->job) {
         case 1:
             dealer_check->TransparentBlt(m_hBufferDC, -10, -10, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
@@ -80,7 +80,7 @@ void Room_Scene::render(LPVOID param)
             break;
         }
     }
-    else if (join_player->who_is_me) { // ³»°¡ Á¶ÀÎÀÌ¸é
+    else if (join_player->who_is_me) { // ë‚´ê°€ ì¡°ì¸ì´ë©´
         switch (join_player->job) {
         case 1:
             dealer_check->TransparentBlt(m_hBufferDC, -10, -10, 800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
@@ -94,7 +94,7 @@ void Room_Scene::render(LPVOID param)
 
 void Room_Scene::update()
 {
-    //¾Ö´Ï¸ÞÀÌ¼Ç ÇÁ·¹ÀÓ °»½Å
+    //ì• ë‹ˆë©”ì´ì…˜ í”„ë ˆìž„ ê°±ì‹ 
     frame = (frame + 1) % 6;
 
    
@@ -123,15 +123,15 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         POINT mypt = { mx,my };
         printf("x : %d y : %d\n", mx, my);
         if (master_player->who_is_me) {
-            if (PtInRect(&dealer_rt, mypt)) { // µô·¯ ´©¸£±â
+            if (PtInRect(&dealer_rt, mypt)) { // ë”œëŸ¬ ëˆ„ë¥´ê¸°
                 master_player->job = 1;
                 join_player->job = 2;
             }
-            else if (PtInRect(&healer_rt, mypt)) { // Èú·¯ ´©¸£±â
+            else if (PtInRect(&healer_rt, mypt)) { // ížëŸ¬ ëˆ„ë¥´ê¸°
                 master_player->job = 2;
                 join_player->job = 1;
             }
-            else if (PtInRect(&start_rt, mypt)) { //½ÃÀÛ ´©¸£±â
+            else if (PtInRect(&start_rt, mypt)) { //ì‹œìž‘ ëˆ„ë¥´ê¸°
                 isPlaying = TRUE;
             }
         }
@@ -153,7 +153,7 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 int Room_Scene::room_data_update()
 {
-    //¼Û½Å
+    //ï¿½Û½ï¿½
     CS_ROOM_STATE_PACKET roomPacket;
     roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
     roomPacket.type = CS_ROOM_STATE;
@@ -163,43 +163,21 @@ int Room_Scene::room_data_update()
     roomPacket.isQuit = false;
 
     if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
-        std::cerr << "¹æ»óÅÂ Àü¼Û½ÇÆÐ" << std::endl;
+        std::cerr << "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û½ï¿½ï¿½ï¿½" << std::endl;
         closesocket(*m_sock);
         WSACleanup();
     }
 
-    //¼ö½Å
-    // ¼ö½Å ¹öÆÛ ¹× ´©Àû µ¥ÀÌÅÍ ¹öÆÛ
-    static std::vector<uint8_t> recvBuffer;
+    //ï¿½ï¿½ï¿½ï¿½
+
     char recvBuf[BUFSIZE];
-    ZeroMemory(recvBuf, sizeof(recvBuf));
-
-    // µ¥ÀÌÅÍ ¼ö½Å
-    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL ´ë½Å 0 »ç¿ë
+    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_ROOM_CHANGE_PACKET), 0);
     if (recvLen <= 0) {
-        std::cerr << "ÇÃ·¹ÀÌ¾î ÁÂÇ¥¹Þ±â ½ÇÆÐ" << std::endl;
-        return -1;
+        std::cerr << "Receive failed or connection closed." << std::endl;
     }
-
-    // ¼ö½ÅÇÑ µ¥ÀÌÅÍ¸¦ ´©Àû ¹öÆÛ¿¡ Ãß°¡
-    recvBuffer.insert(recvBuffer.end(), recvBuf, recvBuf + recvLen);
-
-    // ÆÐÅ¶ Ã³¸®
-    while (recvBuffer.size() >= sizeof(SC_PLAYER_MOVE_PACKET)) { // ÆÐÅ¶ Å©±â¸¸Å­ µ¥ÀÌÅÍ°¡ µµÂøÇß´ÂÁö È®ÀÎ
-        SC_ROOM_CHANGE_PACKET* roomPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuffer.data());
-        // ÆÐÅ¶ À¯È¿¼º È®ÀÎ (¿¹: ÆÐÅ¶ÀÇ Å©±â¿Í Å¸ÀÔ)
-        if (recvBuffer.size() < roomPacket->size) {
-            break; // ÀüÃ¼ ÆÐÅ¶ÀÌ ¾ÆÁ÷ µµÂøÇÏÁö ¾ÊÀº °æ¿ì ´ë±â
-        }
-
-        // µ¥ÀÌÅÍ Ã³¸®
-
-
+    else {
+        SC_ROOM_CHANGE_PACKET* roomPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
         if (true == roomPacket->isPlaying) {
-            isPlaying = TRUE;
-            next_scene = PLAY_SCENE;
-        }
-        else if (roomPacket->type != SC_ROOM_CHANGE) {
             isPlaying = TRUE;
             next_scene = PLAY_SCENE;
         }
@@ -226,13 +204,8 @@ int Room_Scene::room_data_update()
                 }
             }
         }
-
-            // Ã³¸®ÇÑ ÆÐÅ¶ µ¥ÀÌÅÍ¸¦ ´©Àû ¹öÆÛ¿¡¼­ Á¦°Å
-            recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + roomPacket->size);
-        
     }
-        return 1;
-        //////////////
 
+    return 1;
     
 }
