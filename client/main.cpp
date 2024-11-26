@@ -102,15 +102,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
     HANDLE Render_Thread = NULL;
     HANDLE Update_Thread = NULL;
     HANDLE Network_Thread = NULL;
+    //네트워크 스레드 시작
+    if (m_framework) {
+        Network_Thread = CreateThread(NULL, 0, client_network, hwnd, 0, NULL);
+    }
 
     // 업데이트 스레드 시작
     if (m_framework) {
         Update_Thread = CreateThread(NULL, 0, client_update, hwnd, 0, NULL);
     }
-    //네트워크 스레드 시작
-    if (m_framework) {
-        Network_Thread = CreateThread(NULL, 0, client_network, hwnd, 0, NULL);
-    }
+    
     // 렌더링 스레드 시작
     if (m_framework) {
         Render_Thread = CreateThread(NULL, 0, client_render, hwnd, 0, NULL);

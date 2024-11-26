@@ -665,11 +665,15 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                 }
             }
 
-            if (true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
+            if (true == roomInfo[pid]->getisPlaying()) {
+                std::cout << pid << "   플레이씬 넘어가기" << std::endl;
+                break; // 게임 시작
+            }
+
         }
 
-        //push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
-        //push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
+        push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
+        push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
         send_player_move_packet(s, pid);
         while (true) {
             send_object_move_packet(s, pid); // todo: 왜?
