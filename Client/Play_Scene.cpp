@@ -331,9 +331,11 @@ int Play_Scene::recv_process()
         SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuffer.data());
 
         // 패킷 유효성 확인 (예: 패킷의 크기와 타입)
-        if (recvBuffer.size() < resPacket->size) {
+        if (recvBuffer.size() < resPacket->size || resPacket->size == 0) {
             break; // 전체 패킷이 아직 도착하지 않은 경우 대기
         }
+
+        std::cout << "size: " << resPacket->size << ", Type: " << resPacket->type;
 
         switch (resPacket->type) {
         case SC_PLAYER_MOVE:
@@ -341,6 +343,8 @@ int Play_Scene::recv_process()
             break;
         case SC_OBJECT_MOVE:
             handle_object_data(recvBuffer.data());
+            break;
+        case SC_ROOM_CHANGE:
             break;
         default:
             std::cerr << "알 수 없는 패킷 타입: " << resPacket->type << std::endl;

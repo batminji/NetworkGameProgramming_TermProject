@@ -83,6 +83,7 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                
                // 6. 로그인 결과 받기
                char recvBuf[BUFSIZE];
+               ZeroMemory(recvBuf, sizeof(recvBuf));
                int recvLen = recv(*m_sock, recvBuf, sizeof(SC_LOGIN_RESULT_PACKET), 0);
                if (recvLen <= 0) {
                    std::cerr << "Receive failed or connection closed." << std::endl;

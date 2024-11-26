@@ -4,7 +4,7 @@
 // todo: 접속 잘 안되는거 수정해야함
 
 
-constexpr unsigned short MOVE_DIST = 5;
+constexpr unsigned short MOVE_DIST = -10;
 constexpr unsigned short DEFXPOS = 675;
 constexpr unsigned short SKILL_TIME = 5000; // MS단위임
 
@@ -172,7 +172,7 @@ private:
     Player* p1 = nullptr;
     Player* p2 = nullptr;
     std::string dealer_id; // 누가 딜러인가.
-    bool isPlaying = false;
+    std::atomic_bool isPlaying = false;
     unsigned int score;
     unsigned short heart; // 음수가 없..?
 
@@ -580,11 +580,18 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     }
     case CS_ROOM_STATE: // 방 정보 변경
     {
+        auto t_room = roomInfo[id];
         CS_ROOM_STATE_PACKET* p = reinterpret_cast<CS_ROOM_STATE_PACKET*>(packet);
+        if (t_room->getisPlaying()) {
+            if (id == t_room->getP2ID()) {
+                send_room_change_packet(s, id);
+            }
+            send_player_move_packet(s, id);
+            break;
+        }
         if (!p->isDealer)
             int k = 0;
         std::lock_guard<std::mutex> ll{ roomLock };
-        auto t_room = roomInfo[id];
         if (p->isQuit) { // 나가기
             if (t_room->getP1ID() == id)
                 t_room->setP1(&players[t_room->getP2ID()]); // 2를 1로 바꾸기.
@@ -666,14 +673,14 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             }
 
             if (true == roomInfo[pid]->getisPlaying()) {
-                std::cout << pid << "   플레이씬 넘어가기" << std::endl;
+                std::cout << pid << " 플레이씬 넘어가기" << std::endl;
                 break; // 게임 시작
             }
 
         }
 
-        push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
-        push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
+        //push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
+        //push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
         send_player_move_packet(s, pid);
         while (true) {
             send_object_move_packet(s, pid); // todo: 왜?
@@ -698,7 +705,7 @@ void timer_thread()
     {
         EVENT ev;
 
-        if (evt_queue.try_pop(ev))
+        if (! evt_queue.empty() && evt_queue.try_pop(ev))
         {
             if (ev.getTime() <= std::chrono::system_clock::now())
                 task_queue.push(ev);
