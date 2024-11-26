@@ -62,6 +62,7 @@ void Framework::update()
 		break;
 		case PLAY_SCENE:
 		{
+			std::cout << "room to play 전환" << std::endl;
 			// Room_Scene에서 플레이어 데이터를 가져옴
 			/*Player master_player()
 			Player join_player = *dynamic_cast<Room_Scene*>(m_scene)->getJoinPlayer();*/

@@ -154,6 +154,10 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 int Room_Scene::room_data_update()
 {
     //�۽�
+    if (true == isPlaying and next_scene == PLAY_SCENE) {
+        std::cout << "저는 send를 한번 더하고싶어하는 바보에요." << std::endl;
+        return 1;
+    }
     CS_ROOM_STATE_PACKET roomPacket;
     roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
     roomPacket.type = CS_ROOM_STATE;
@@ -169,7 +173,7 @@ int Room_Scene::room_data_update()
     roomPacket.isQuit = false;
 
     if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
-        std::cerr << "����� ���۽���" << std::endl;
+        std::cerr << "//?" << std::endl;
         closesocket(*m_sock);
         WSACleanup();
     }
@@ -177,6 +181,9 @@ int Room_Scene::room_data_update()
     // 리시브
 
     char recvBuf[BUFSIZE];
+    ZeroMemory(recvBuf, sizeof(recvBuf));
+
+
     int recvLen = recv(*m_sock, recvBuf, sizeof(SC_ROOM_CHANGE_PACKET), MSG_WAITALL);
     if (recvLen != sizeof(SC_ROOM_CHANGE_PACKET)) {
         std::cerr << "Receive failed or connection closed." << std::endl;
