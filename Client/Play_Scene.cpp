@@ -80,13 +80,6 @@ void Play_Scene::item_draw()
     for (Item& i : Items) i.render(m_hBufferDC);
 }
 
-void Play_Scene::bullet_draw()
-{
-
-    //나중에 그리다 터질때 이함수를 쓰도록하겟슴.
-    
-}
-
 void Play_Scene::update()
 {
     master_player->update();
@@ -104,11 +97,6 @@ void Play_Scene::update()
 
 void Play_Scene::network()
 {
-    // 플레이어 데이터 수신
-    //recv_player_data();
-    //오브젝트 데이터 수신
-    //recv_object_data();
-    // 
     recv_process();
     // 플레이어인풋 전송
     send_player_input(send_y);
@@ -227,89 +215,6 @@ int Play_Scene::recv_player_data() {
     return 1;
 }
 
-std::mutex bullets_mutex;
-int Play_Scene::recv_object_data() {
-    // 데이터 저장용 임시 벡터
-    vector<Enemy> temp_enemys;
-    vector<bullet> temp_bullets;
-    vector<Item> temp_items;
-    temp_enemys.clear();
-    temp_bullets.clear();
-    temp_items.clear();
-
-    static std::vector<uint8_t> recvBuffer;
-    char recvBuf[BUFSIZE];
-    ZeroMemory(recvBuf, sizeof(recvBuf));
-
-    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL ��� 0 ���
-    if (recvLen <= 0) {
-        std::cerr << "오브젝트좌표받기 실패" << std::endl;
-        //  return -1;
-    }
-
-    recvBuffer.insert(recvBuffer.end(), recvBuf, recvBuf + recvLen);
-
-   
-    while (recvBuffer.size() >= sizeof(SC_OBJECT_MOVE_PACKET)) { 
-        SC_OBJECT_MOVE_PACKET* resPacket = reinterpret_cast<SC_OBJECT_MOVE_PACKET*>(recvBuffer.data());
-
-  
-        if (recvBuffer.size() < resPacket->size) {
-            break;
-        }
-
-        cout << "현재 실행중인 함수 : recv_object(9)    받은 패킷타입 :" << resPacket->type <<endl;
-        for (int i = 0; i < resPacket->number; ++i) {
-            switch (resPacket->objs_type[i]) {
-            case ENEMY:
-            
-                break;
-            case ENEMY_BULLETS: {
-                bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 3);
-                temp_bullets.push_back(temp_bullet);
-                break;
-            }
-            case MISSAIL:
-     
-                break;
-            case P1_BULLET: {
-                bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 1, 1);
-                temp_bullets.push_back(temp_bullet);
-                break;
-            }
-            case P2_BULLET: {
-                bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 2);
-                temp_bullets.push_back(temp_bullet);
-                break;
-            }
-            case P1_SKILLBULLET: {
-                bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 2, 1);
-                temp_bullets.push_back(temp_bullet);
-                break;
-            }
-            case P2_SKILLBULLET:
-         
-                break;
-            case ITEM:
-         
-                break;
-            default:
-                break;
-            }
-        }
-
-
-        recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + resPacket->size);
-    }
-
-  
-    {
-        std::unique_lock<std::mutex> lock(bullets_mutex);
-        bullets.insert(bullets.end(), std::make_move_iterator(temp_bullets.begin()), std::make_move_iterator(temp_bullets.end()));
-        lock.unlock(); 
-    }
-}
-
 int Play_Scene::recv_process()
 { // 수신 버퍼 및 누적 데이터 버퍼
     static std::vector<uint8_t> recvBuffer;
@@ -335,7 +240,7 @@ int Play_Scene::recv_process()
             break; // 전체 패킷이 아직 도착하지 않은 경우 대기
         }
 
-        std::cout << "size: " << resPacket->size << ", Type: " << resPacket->type;
+        // std::cout << "size: " << resPacket->size << ", Type: " << resPacket->type;
 
         switch (resPacket->type) {
         case SC_PLAYER_MOVE:
@@ -362,7 +267,7 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
 {
     // 패킷 데이터 구조체로 변환
     const SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<const SC_PLAYER_MOVE_PACKET*>(packetData);
-    cout << "현재 실행중인 함수 : recv_player(7)    받은 패킷타입 :" << resPacket->type << endl;
+    // cout << "현재 실행중인 함수 : recv_player(7)    받은 패킷타입 :" << resPacket->type << endl;
     // 데이터 갱신
     if (master_player->who_is_me) {
         // 현재 플레이어가 마스터인 경우
@@ -376,17 +281,15 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
     }
 }
 
+std::mutex bullets_mutex;
 void Play_Scene::handle_object_data(const uint8_t* packetData)
 {
    const  SC_OBJECT_MOVE_PACKET* resPacket = reinterpret_cast<const SC_OBJECT_MOVE_PACKET*>(packetData);
    vector<Enemy> temp_enemys;
    vector<bullet> temp_bullets;
    vector<Item> temp_items;
-   temp_enemys.clear();
-   temp_bullets.clear();
-   temp_items.clear();
 
-   cout << "현재 실행중인 함수 : recv_object(9)    받은 패킷타입 :" << resPacket->type << endl;
+   // cout << "현재 실행중인 함수 : recv_object(9)    받은 패킷타입 :" << resPacket->type << endl;
    for (int i = 0; i < resPacket->number; ++i) {
        switch (resPacket->objs_type[i]) {
        case ENEMY:
@@ -427,7 +330,7 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
    }
    {
        std::unique_lock<std::mutex> lock(bullets_mutex);
-       bullets.insert(bullets.end(), std::make_move_iterator(temp_bullets.begin()), std::make_move_iterator(temp_bullets.end()));
+       std::swap(bullets, temp_bullets);
        lock.unlock();
    }
 }
