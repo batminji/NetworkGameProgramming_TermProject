@@ -10,7 +10,13 @@ Cartoon_Scene::Cartoon_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SO
     for (int i = 0; i < 6; i++) {
         cartoon[i] = &ResourceManager::getInstance().cartoon[i];
     }
-
+    result = System_Create(&ssystem);
+    if (result != FMOD_OK)
+        exit(0);
+    ssystem->init(32, FMOD_INIT_NORMAL, extradriverdata);
+    ssystem->createSound("sound_file/cartoon_bgm.OGG", FMOD_LOOP_NORMAL, 0, &cartoon_bgm);
+    ssystem->createSound("sound_file/click.OGG", FMOD_DEFAULT, 0, &click_sound);
+    ssystem->playSound(cartoon_bgm, 0, false, &channel);
 }
 
 void Cartoon_Scene::render(LPVOID param)
@@ -43,9 +49,14 @@ LRESULT Cartoon_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
     }
     case WM_LBUTTONDOWN:
         cartoon_cnt++;
+        ssystem->playSound(click_sound, 0, false, &channel);
         if (cartoon_cnt == 6) {
-     
             next_scene = LOBBY_SCENE;
+            channel->stop();
+            cartoon_bgm->release();
+            click_sound->release();
+            ssystem->close();
+            ssystem->release();
         }
         break;
     case WM_KEYDOWN:
