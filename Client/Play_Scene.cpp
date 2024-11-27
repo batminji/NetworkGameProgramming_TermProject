@@ -252,14 +252,22 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
    for (int i = 0; i < resPacket->number; ++i) {
        switch (resPacket->objs_type[i]) {
        case ENEMY_0:
-       case ENEMY_1:
-       case ENEMY_2:
-       case ENEMY_3:
-       case ENEMY_4:
-           temp_enemys.push_back({resPacket->objs_type[i],resPacket->objs_x[i] ,resPacket->objs_y[i] ,100});
-           //왜 0 0 67이 들어오는가... 0 280 265 이런값이 와야하는데
-           cout << resPacket->objs_type[i] << " " << resPacket->objs_x[i] << " " << resPacket->objs_y[i] << endl;
+           temp_enemys.push_back({ 0,resPacket->objs_x[i] ,resPacket->objs_y[i] ,100 });
            break;
+       case ENEMY_1:
+           temp_enemys.push_back({ 1,resPacket->objs_x[i] ,resPacket->objs_y[i] ,100 });
+           break;
+       case ENEMY_2:
+           temp_enemys.push_back({ 2,resPacket->objs_x[i] ,resPacket->objs_y[i] ,100 });
+           break;
+       case ENEMY_3:
+           temp_enemys.push_back({ 3,resPacket->objs_x[i] ,resPacket->objs_y[i] ,100 });
+           break;
+       case ENEMY_4:
+           temp_enemys.push_back({4,resPacket->objs_x[i] ,resPacket->objs_y[i] ,100});
+           break;
+    
+           //cout << resPacket->objs_type[i] << " " << resPacket->objs_x[i] << " " << resPacket->objs_y[i] << endl;
        case ENEMY_BULLETS: {
            bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 3);
            temp_bullets.push_back(temp_bullet);
@@ -294,11 +302,14 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
        }
    }
    {
-       std::unique_lock<std::mutex> b_lock(bullets_mutex);
+       std::cout << temp_enemys.size() << "도착" << std::endl;
+      // std::unique_lock<std::mutex> b_lock(bullets_mutex);
        std::swap(bullets, temp_bullets);
-       b_lock.unlock();
-       std::unique_lock<std::mutex> e_lock(enemys_mutex);
+     //  b_lock.unlock();
+     //std::unique_lock<std::mutex> e_lock(enemys_mutex);
        std::swap(enemys, temp_enemys);
-       e_lock.unlock();
+     //  e_lock.unlock();
+
+       //std::cout <<enemys.size()<< "마리 받았어염" << std::endl;
    }
 }

@@ -9,7 +9,7 @@ static int num;
 class Enemy
 {
 public :
-	short type; //0:½º¸ô 1~3:¹Ìµå 4:ºò
+	int type; //0:½º¸ô 1~3:¹Ìµå 4:ºò
 	short x, y;
 	short width, height;
 	short hp;
@@ -24,7 +24,7 @@ public:
 	CImage* hp_empty;
 
 public: 
-	Enemy(const OTYPE arg_type, const unsigned short arg_x, const unsigned short arg_y, const unsigned short arg_hp);
+	Enemy(int arg_type, const unsigned short arg_x, const unsigned short arg_y, const unsigned short arg_hp);
 	void render(HDC mdc);
 	void update();
 };

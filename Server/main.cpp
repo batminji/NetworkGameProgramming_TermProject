@@ -52,7 +52,7 @@ public:
 
 class Enemy
 {
-    short type; //0 잡몹 1~3 중간보스 4 최종보스
+    OTYPE type; //0 잡몹 1~3 중간보스 4 최종보스
     unsigned short x;
     unsigned short y;
     unsigned short hp;
@@ -63,8 +63,8 @@ class Enemy
     unsigned short height;
     POINT goal;
 public:
-    Enemy(short a_type, int a_x, int a_y , int a_hp) {
-        type = static_cast<unsigned short>(a_type);
+    Enemy(OTYPE a_type, int a_x, int a_y , int a_hp) {
+        type = a_type;
         x =  static_cast<unsigned short>(a_x);
         y =  static_cast<unsigned short>(a_y); 
         hp = static_cast<unsigned short>(a_hp);
@@ -110,7 +110,7 @@ public:
     //// getter - setter
 
     std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
-    short getType() { return type; }
+    OTYPE getType() { return type; }
     short getHP() { return hp; }
     void setHP(unsigned short new_hp) { hp = new_hp; };
 };
@@ -239,21 +239,23 @@ public:
             int mid3 = 0;
             if (clear_set % 4 == 2) mid3 = 1;
             //중간몬스터생성
-            enemies.push_back({ (clear_set % 4 + 1),100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10)});
+            enemies.push_back({ ENEMY_1,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10)});
             //작은 몬스터 생성
-            enemies.push_back({ 0,220,100,10 + (clear_stage * 5) });
-            enemies.push_back({ 0,280,265,10 + (clear_stage * 5) });
-            enemies.push_back({ 0,220,450,10 + (clear_stage * 5) });
+            enemies.push_back({ ENEMY_0,220,100,10 + (clear_stage * 5) });
+            enemies.push_back({ ENEMY_0,280,265,10 + (clear_stage * 5) });
+            enemies.push_back({ ENEMY_0,220,450,10 + (clear_stage * 5) });
+
+           // std::cout <<"몬스터 생성!"<< enemies[0].getType() << " " << enemies[0].getPosition().first << enemies[0].getPosition().second << std::endl;
         }
         else { //보스세트
             //큰몬스터
-            enemies.push_back({ 4,10,150,100 + (clear_stage * 20)});
+            enemies.push_back({ ENEMY_4,10,150,100 + (clear_stage * 20)});
             //작은 몬스터 생성
-            enemies.push_back({ 0,210,100,10 + (clear_stage * 5)});
-            enemies.push_back({ 0,240,170,10 + (clear_stage * 5)});
-            enemies.push_back({ 0,270,265,10 + (clear_stage * 5)});
-            enemies.push_back({ 0,240,350,10 + (clear_stage * 5)});
-            enemies.push_back({ 0,210,450,10 + (clear_stage * 5)});
+            enemies.push_back({ ENEMY_0,210,100,10 + (clear_stage * 5)});
+            enemies.push_back({ ENEMY_0,240,170,10 + (clear_stage * 5)});
+            enemies.push_back({ ENEMY_0,270,265,10 + (clear_stage * 5)});
+            enemies.push_back({ ENEMY_0,240,350,10 + (clear_stage * 5)});
+            enemies.push_back({ ENEMY_0,210,450,10 + (clear_stage * 5)});
         }
     }
 
@@ -268,13 +270,16 @@ public:
             p.objs_y[i] = p_bullets[i].getPosition().second;
         }
 
+        i += p_bullets.size();
+        int m = 0;
         for (int j = i; j < i + enemies.size(); ++j) {
+            p.objs_type[j] = enemies[m].getType();
+            p.objs_x[j] = enemies[m].getPosition().first;
+            p.objs_y[j] = enemies[m].getPosition().second;
 
-            p.objs_type[j] = OTYPE(enemies[j].getType());
-            p.objs_x[j] = enemies[j].getPosition().first;
-            p.objs_y[j] = enemies[j].getPosition().second;
-
-            std::cout << p.objs_type[j] << " " << p.objs_x[j] << " " << p.objs_y[j] << std::endl;
+            m++;
+            //std::cout << j - p_bullets.size() << "번째 몬스터" << enemies[j - p_bullets.size()].getType() <<" "<< enemies[j - p_bullets.size()].getPosition().first<< ","<< enemies[j - p_bullets.size()].getPosition().second << std::endl;
+           // std::cout << p.objs_type[j] << " " << p.objs_x[j] << " " << p.objs_y[j] << std::endl;
         }
 
         i += enemies.size();
