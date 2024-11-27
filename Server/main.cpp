@@ -9,7 +9,7 @@ constexpr unsigned short DEFXPOS = 675;
 constexpr unsigned short SKILL_TIME = 5000; // MS단위임
 
 // 전방선언 라인
-enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END }; // 뭐가 있을까?
+enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END , BULLET_DELETE}; // 뭐가 있을까?
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid);
 
 
@@ -216,6 +216,15 @@ public:
             if (p2->getSkill()) p_bullets.push_back({ p2->getY(), P2_SKILLBULLET });
             else p_bullets.push_back({ p2->getY(), P2_BULLET });
         }
+    }
+
+    void deletebullet() {
+        std::lock_guard<std::mutex> ll{ update_lock };  // 동일한 뮤텍스 사용
+        std::cout << "총알갯수" << p_bullets.size() << std::endl;
+
+        std::erase_if(p_bullets, [](Player_Bullet pb) { return (pb.getPosition().first < 10); });
+        std::erase_if(e_bullets, [](Enemy_Bullet eb) { return (eb.getPosition().first > 800); });
+
     }
 
     void sendSetup(SC_OBJECT_MOVE_PACKET& p)
@@ -681,6 +690,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
 
         push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
         push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
+        push_evt_queue(BULLET_DELETE, 0, pid); // 총알삭제
         send_player_move_packet(s, pid);
         while (true) {
             send_object_move_packet(s, pid); // todo: 왜?
@@ -749,6 +759,11 @@ void ai_thread()
             }
             break;
 
+        case BULLET_DELETE:
+            roomInfo[ev.room_id]->deletebullet();
+            push_evt_queue(BULLET_DELETE, 100, ev.room_id);
+            break;
+
         case FIRE_ENEMY_BULLET:
             roomInfo[ev.room_id]->createPbullet(ev.room_id);
             push_evt_queue(FIRE_ENEMY_BULLET, 1000, ev.room_id); // 1초에 한개씩 발사
@@ -762,6 +777,8 @@ void ai_thread()
         case SKILL_END:
             players[ev.room_id].setSkill(false);
             break;
+
+      
 
         default:
             std::cout << "unknown event" << std::endl;
