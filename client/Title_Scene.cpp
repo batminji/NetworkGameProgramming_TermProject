@@ -9,6 +9,14 @@ Title_Scene::Title_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 
     start_screen = &ResourceManager::getInstance().start_screen;
     title = &ResourceManager::getInstance().title;
+
+    result = System_Create(&ssystem);
+    if (result != FMOD_OK)
+        exit(0);
+    ssystem->init(32, FMOD_INIT_NORMAL, extradriverdata);
+    ssystem->createSound("sound_file/title_bgm.OGG", FMOD_LOOP_NORMAL, 0, &title_bgm);
+    ssystem->createSound("sound_file/click.OGG", FMOD_DEFAULT, 0, &click_sound);
+    ssystem->playSound(title_bgm, 0, false, &channel);
 }
 
 void Title_Scene::render(LPVOID param)
@@ -63,11 +71,8 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                 }
             }
             else if (wParam == VK_RETURN) {
-               // channel->stop();
-               // title_bgm->release();
-               // ssystem->playSound(click_sound, 0, false, &channel);
-               // ssystem->playSound(cartoon_bgm, 0, false, &channel);
-              
+                ssystem->playSound(click_sound, 0, false, &channel);
+
                 CS_LOGIN_PACKET loginPacket;
                 loginPacket.size = sizeof(CS_LOGIN_PACKET);
                 loginPacket.type = CS_LOGIN;
@@ -98,6 +103,10 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                            strcpy(DataManager::getInstance().my_data.ID, loginPacket.id);
                            DataManager::getInstance().my_data.high_score = 0;
                            DataManager::getInstance().my_data.coin = 0;
+                           channel->stop();
+                           title_bgm->release();
+                           ssystem->close();
+                           ssystem->release();
                        }
                        else {
                            std::cout << "기존유저!" << std::endl;
@@ -105,6 +114,10 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                            strcpy(DataManager::getInstance().my_data.ID, loginPacket.id);
                            DataManager::getInstance().my_data.high_score = resPacket->high_score;
                            DataManager::getInstance().my_data.coin = resPacket->coin;
+                           channel->stop();
+                           title_bgm->release();
+                           ssystem->close();
+                           ssystem->release();
                        }
                    }
                    else {
@@ -125,6 +138,7 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         return 0;
 
     case WM_DESTROY:
+
         PostQuitMessage(0);
         return 0;
     }
