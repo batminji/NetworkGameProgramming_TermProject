@@ -186,8 +186,8 @@ private:
     std::vector<Enemy> enemies;
     std::vector<Enemy_Bullet> e_bullets;
 public:
-    unsigned short clear_set = 0; //몇세트 클리어?
-    unsigned short clear_stage = 0; //1스테이지에 4세트, 이걸로 난이도 점점 오르게
+    int clear_set = 0; //몇세트 클리어?
+    int clear_stage = 0; //1스테이지에 4세트, 이걸로 난이도 점점 오르게
 
 public:
     // 객체들 //
@@ -269,6 +269,7 @@ public:
         }
 
         for (int j = i; j < i + enemies.size(); ++j) {
+
             p.objs_type[j] = OTYPE(enemies[j].getType());
             p.objs_x[j] = enemies[j].getPosition().first;
             p.objs_y[j] = enemies[j].getPosition().second;

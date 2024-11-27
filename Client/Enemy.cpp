@@ -12,6 +12,7 @@ Enemy::Enemy(const OTYPE arg_type,const unsigned short arg_x, const unsigned sho
 	else if (type == 1 || type == 2)width = 90, height = 130;
 	else if (type == 3)width = 100, height = 120;
 	else if (type == 4)width = 256, height = 224;
+	else width = 84, height = 96;
 
 	type == 4 ? frame = 6 : frame = 3;
 
