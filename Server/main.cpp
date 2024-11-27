@@ -9,7 +9,7 @@ constexpr unsigned short DEFXPOS = 675;
 constexpr unsigned short SKILL_TIME = 5000; // MS단위임
 
 // 전방선언 라인
-enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END , BULLET_DELETE}; // 뭐가 있을까?
+enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END , BULLET_DELETE,CREATE_SET}; // 뭐가 있을까?
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid);
 
 
@@ -58,14 +58,16 @@ class Enemy
     unsigned short hp;
     unsigned short bullet_create_cnt;
 
+    //유도되는 정보
     unsigned short width;
     unsigned short height;
     POINT goal;
 public:
-    Enemy() {
-        type = type;
-        x = x;
-        y = y; //x,y초기화 어떻게?
+    Enemy(short a_type, int a_x, int a_y , int a_hp) {
+        type = static_cast<unsigned short>(a_type);
+        x =  static_cast<unsigned short>(a_x);
+        y =  static_cast<unsigned short>(a_y); 
+        hp = static_cast<unsigned short>(a_hp);
 
         if (type == 0) width = 84, height = 96;
         else if (type == 1 || type == 2)width = 90, height = 130;
@@ -108,7 +110,9 @@ public:
     //// getter - setter
 
     std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
-
+    short getType() { return type; }
+    short getHP() { return hp; }
+    void setHP(unsigned short new_hp) { hp = new_hp; };
 };
 
 
@@ -181,6 +185,9 @@ private:
     std::vector<Player_Bullet> p_bullets;
     std::vector<Enemy> enemies;
     std::vector<Enemy_Bullet> e_bullets;
+public:
+    unsigned short clear_set = 0; //몇세트 클리어?
+    unsigned short clear_stage = 0; //1스테이지에 4세트, 이걸로 난이도 점점 오르게
 
 public:
     // 객체들 //
@@ -219,12 +226,35 @@ public:
     }
 
     void deletebullet() {
-        std::lock_guard<std::mutex> ll{ update_lock };  // 동일한 뮤텍스 사용
-        std::cout << "총알갯수" << p_bullets.size() << std::endl;
-
+        std::lock_guard<std::mutex> ll{ update_lock }; 
         std::erase_if(p_bullets, [](Player_Bullet pb) { return (pb.getPosition().first < 10); });
-        std::erase_if(e_bullets, [](Enemy_Bullet eb) { return (eb.getPosition().first > 800); });
+        std::erase_if(e_bullets, [](Enemy_Bullet eb) { return (eb.getPosition().first > 800||eb.getPosition().first<10); });
 
+    }
+
+    void Create_enemy() {
+        std::lock_guard<std::mutex> ll{ update_lock };
+        enemies.clear();
+        if (clear_set % 4 < 3) { //중간세트
+            int mid3 = 0;
+            if (clear_set % 4 == 2) mid3 = 1;
+            //중간몬스터생성
+            enemies.push_back({ (clear_set % 4 + 1),100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10)});
+            //작은 몬스터 생성
+            enemies.push_back({ 0,220,100,10 + (clear_stage * 5) });
+            enemies.push_back({ 0,280,265,10 + (clear_stage * 5) });
+            enemies.push_back({ 0,220,450,10 + (clear_stage * 5) });
+        }
+        else { //보스세트
+            //큰몬스터
+            enemies.push_back({ 4,10,150,100 + (clear_stage * 20)});
+            //작은 몬스터 생성
+            enemies.push_back({ 0,210,100,10 + (clear_stage * 5)});
+            enemies.push_back({ 0,240,170,10 + (clear_stage * 5)});
+            enemies.push_back({ 0,270,265,10 + (clear_stage * 5)});
+            enemies.push_back({ 0,240,350,10 + (clear_stage * 5)});
+            enemies.push_back({ 0,210,450,10 + (clear_stage * 5)});
+        }
     }
 
     void sendSetup(SC_OBJECT_MOVE_PACKET& p)
@@ -239,9 +269,11 @@ public:
         }
 
         for (int j = i; j < i + enemies.size(); ++j) {
-            p.objs_type[j] = ENEMY;
+            p.objs_type[j] = OTYPE(enemies[j].getType());
             p.objs_x[j] = enemies[j].getPosition().first;
             p.objs_y[j] = enemies[j].getPosition().second;
+
+            std::cout << p.objs_type[j] << " " << p.objs_x[j] << " " << p.objs_y[j] << std::endl;
         }
 
         i += enemies.size();
@@ -270,7 +302,7 @@ public:
     bool getisDealer(std::string myid) { return myid == dealer_id; }
     void setDealer(std::string id) { dealer_id = id; }
     unsigned short number() { return p_bullets.size() + enemies.size() + e_bullets.size(); }
-
+    unsigned short getEnemy_cnt() { return enemies.size(); }
     bool broadcast(char* res, size_t size)
     {
         bool ret = false;
@@ -278,6 +310,8 @@ public:
         if (p2 != nullptr) ret = ret && p2->broadcast(res, size);
         return ret;
     }
+
+
 };
 
 // 플레이어 총알 생성, 적 총알 생성, 적 인공지능 이동
@@ -687,10 +721,12 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             }
 
         }
-
+        roomInfo[pid]->Create_enemy();
         push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
         push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
         push_evt_queue(BULLET_DELETE, 0, pid); // 총알삭제
+       // push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
+        push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
         send_player_move_packet(s, pid);
         while (true) {
             send_object_move_packet(s, pid); // todo: 왜?
@@ -771,13 +807,22 @@ void ai_thread()
 
         case AI_MOVE:
             roomInfo[ev.room_id]->doAIMove();
-            push_evt_queue(AI_MOVE, 1000, ev.room_id);
+            push_evt_queue(AI_MOVE, 100, ev.room_id);
             break;
 
         case SKILL_END:
             players[ev.room_id].setSkill(false);
             break;
 
+        case CREATE_SET:
+            if (roomInfo[ev.room_id]->getEnemy_cnt() < 1) { 
+                roomInfo[ev.room_id]->clear_set++;
+                if (roomInfo[ev.room_id]->clear_set % 4 == 0 && roomInfo[ev.room_id]->clear_set != 0) roomInfo[ev.room_id]->clear_stage++;
+                roomInfo[ev.room_id]->Create_enemy();
+            }
+
+            push_evt_queue(CREATE_SET, 1000, ev.room_id);
+            break;
       
 
         default:

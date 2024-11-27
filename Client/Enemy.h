@@ -10,10 +10,12 @@ class Enemy
 {
 public :
 	short type; //0:스몰 1~3:미드 4:빅
-	RECT rt;
+	short x, y;
+	short width, height;
 	short hp;
 	short cnt; //탄막생성카운트
-	short frame;
+	short frame; //걍 애니메이션프레임이 몇개인지였음...;
+	short ani; //현재프레임
 public:
 	CImage* monster[5];
 	CImage* monster_create;
@@ -22,7 +24,7 @@ public:
 	CImage* hp_empty;
 
 public: 
-	Enemy(short arg_type, RECT arg_rt, short arg_hp, short arg_cnt, short arg_frame);
+	Enemy(const OTYPE arg_type, const unsigned short arg_x, const unsigned short arg_y, const unsigned short arg_hp);
 	void render(HDC mdc);
 	void update();
 };

@@ -35,6 +35,9 @@ void Play_Scene::render(LPVOID param)
     master_player->render(m_hBufferDC);
     join_player->render(m_hBufferDC);
     
+    //적그리기 
+    for (Enemy e : enemys) e.render(m_hBufferDC);
+
     //총알 
     for (bullet b : bullets) b.render(m_hBufferDC);
     
@@ -169,51 +172,6 @@ int Play_Scene::send_player_input(unsigned short y)
     return 1;
 }
 
-int Play_Scene::recv_player_data() {
-    // 수신 버퍼 및 누적 데이터 버퍼
-    static std::vector<uint8_t> recvBuffer;
-    char recvBuf[BUFSIZE];
-    ZeroMemory(recvBuf, sizeof(recvBuf));
-
-    // 데이터 수신
-    int recvLen = recv(*m_sock, recvBuf, sizeof(recvBuf), 0); // MSG_WAITALL 대신 0 사용
-    if (recvLen <= 0) {
-        std::cerr << "플레이어 좌표받기 실패" << std::endl;
-        return -1;
-    }
-
-    // 수신한 데이터를 누적 버퍼에 추가
-    recvBuffer.insert(recvBuffer.end(), recvBuf, recvBuf + recvLen);
-
-    // 패킷 처리
-    while (recvBuffer.size() >= sizeof(SC_PLAYER_MOVE_PACKET)) { // 패킷 크기만큼 데이터가 도착했는지 확인
-        SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuffer.data());
-
-        // 패킷 유효성 확인 (예: 패킷의 크기와 타입)
-        if (recvBuffer.size() < resPacket->size) {
-            break; // 전체 패킷이 아직 도착하지 않은 경우 대기
-        }
-
-        // 데이터 처리
-        if (master_player->who_is_me) {
-            master_player->y = resPacket->this_y;
-            join_player->y = resPacket->other_y;
-            /*std::cout << resPacket->other_y << " " << resPacket->size << " "
-                << resPacket->this_y << " " << resPacket->type << std::endl;*/
-        }
-        else {
-            join_player->y = resPacket->this_y;
-            master_player->y = resPacket->other_y;
-            /*std::cout << resPacket->other_y << " " << resPacket->size << " "
-                << resPacket->this_y << " " << resPacket->type << std::endl;*/
-        }
-
-        // 처리한 패킷 데이터를 누적 버퍼에서 제거
-        recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + resPacket->size);
-    }
-
-    return 1;
-}
 
 int Play_Scene::recv_process()
 { // 수신 버퍼 및 누적 데이터 버퍼
@@ -282,6 +240,7 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
 }
 
 std::mutex bullets_mutex;
+std::mutex enemys_mutex;
 void Play_Scene::handle_object_data(const uint8_t* packetData)
 {
    const  SC_OBJECT_MOVE_PACKET* resPacket = reinterpret_cast<const SC_OBJECT_MOVE_PACKET*>(packetData);
@@ -289,11 +248,17 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
    vector<bullet> temp_bullets;
    vector<Item> temp_items;
 
-   // cout << "현재 실행중인 함수 : recv_object(9)    받은 패킷타입 :" << resPacket->type << endl;
+   
    for (int i = 0; i < resPacket->number; ++i) {
        switch (resPacket->objs_type[i]) {
-       case ENEMY:
-
+       case ENEMY_0:
+       case ENEMY_1:
+       case ENEMY_2:
+       case ENEMY_3:
+       case ENEMY_4:
+           temp_enemys.push_back({resPacket->objs_type[i],resPacket->objs_x[i] ,resPacket->objs_y[i] ,100});
+           //왜 0 0 67이 들어오는가... 0 280 265 이런값이 와야하는데
+           cout << resPacket->objs_type[i] << " " << resPacket->objs_x[i] << " " << resPacket->objs_y[i] << endl;
            break;
        case ENEMY_BULLETS: {
            bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 3);
@@ -329,8 +294,11 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
        }
    }
    {
-       std::unique_lock<std::mutex> lock(bullets_mutex);
+       std::unique_lock<std::mutex> b_lock(bullets_mutex);
        std::swap(bullets, temp_bullets);
-       lock.unlock();
+       b_lock.unlock();
+       std::unique_lock<std::mutex> e_lock(enemys_mutex);
+       std::swap(enemys, temp_enemys);
+       e_lock.unlock();
    }
 }
