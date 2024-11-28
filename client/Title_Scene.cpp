@@ -122,7 +122,20 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                    }
                    else {
                        std::cout << "Login failed." << std::endl;
-                       
+                       MessageBox(
+                           NULL,              
+                           L"해당 아이디는 이미 접속중입니다",      
+                           L"로그인 실패",           
+                           MB_OK             
+                       );
+                       if (*m_sock != INVALID_SOCKET) {
+                           shutdown(*m_sock, SD_BOTH); // 양방향 종료 알림
+                           closesocket(*m_sock);      // 소켓 닫기
+                       }
+
+                       // Winsock 정리
+                       WSACleanup();
+                       PostQuitMessage(0);
                    }
                }
               

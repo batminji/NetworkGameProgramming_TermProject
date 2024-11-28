@@ -39,6 +39,12 @@ void CreateConsole()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow) {
     CreateConsole(); // 메세지확인용 콘솔 생성
+    string input_ip;
+    std::cout << "접속 IP주소 입력:";
+    std::cin >> input_ip;
+
+
+
   // 1. 윈속 초기화
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         std::cerr << "WSAStartup failed." << std::endl;
@@ -59,8 +65,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow
     serverAddr.sin_port = htons(SERVER_PORT);
    
     // InetPton으로 IP 주소 설정
-    if (InetPton(AF_INET, SERVER_IP, &serverAddr.sin_addr) <= 0) {
-        std::cerr << "Invalid address or address not supported." << std::endl;
+    WCHAR* w_input_ip = new WCHAR[input_ip.size() + 1]; // 종료 문자 포함
+    std::mbstowcs(w_input_ip, input_ip.c_str(), input_ip.size());
+    w_input_ip[input_ip.size()] = L'\0'; // 종료 문자 추가
+    
+    std::mbstowcs(w_input_ip, input_ip.c_str(), input_ip.size());
+    if (InetPton(AF_INET, w_input_ip, &serverAddr.sin_addr) <= 0) {
+        std::cout << "잘못된 IP주소 입력 , 접속실패" << std::endl;
         closesocket(sock);
         WSACleanup();
         return -1;
