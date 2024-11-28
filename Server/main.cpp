@@ -1,19 +1,12 @@
 #include "stdafx.h"
 #include "protocol.h"
-
-// todo: 접속 잘 안되는거 수정해야함
-
-
-constexpr unsigned short MOVE_DIST = -10;
-constexpr unsigned short DEFXPOS = 675;
-constexpr unsigned short SKILL_TIME = 5000; // MS단위임
+#include "Player.h"
 
 // 전방선언 라인
 enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END , BULLET_DELETE,CREATE_SET}; // 뭐가 있을까?
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid);
+void addSkillCount(OTYPE type, std::string& id);
 
-
-// todo: 각 클래스에 collision 함수 만들어서 자기랑 충돌할 일이 있는 객체랑만 검사하도록..
 class Enemy_Bullet
 {
 private:
@@ -43,6 +36,11 @@ public:
     Player_Bullet(unsigned short y, OTYPE type) :y{ y }, type{ type } {}
     std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
     OTYPE getType() { return type; }
+    unsigned short damage()
+    {
+        if (type == P1_SKILLBULLET || type == P2_SKILLBULLET) return DAMAGE * 2;
+        else return DAMAGE;
+    }
     void updatePosition()
     {
         x += MOVE_DIST;
@@ -63,11 +61,11 @@ class Enemy
     unsigned short height = 0;
     POINT goal = { 0, 0 };
 public:
-    Enemy(OTYPE a_type, int a_x, int a_y , int a_hp) 
+    Enemy(OTYPE a_type, int a_x, int a_y, int a_hp)
     {
         type = a_type;
-        x =  static_cast<unsigned short>(a_x);
-        y =  static_cast<unsigned short>(a_y); 
+        x = static_cast<unsigned short>(a_x);
+        y = static_cast<unsigned short>(a_y);
         hp = static_cast<unsigned short>(a_hp);
 
         if (type == 0) width = 84, height = 96;
@@ -95,15 +93,19 @@ public:
         if (type != 0) x += dx / distance * speed;
         y += dy / distance * speed;
     }
-    bool collsion_player_bullet(Player_Bullet& bullet) {
+    bool collsion_player_bullet(Player_Bullet& bullet, std::string& id) {
         //적과 총알 충돌 검사
 
         RECT rect = { x, y, x + width, y + height };
         POINT bullet_pos = { bullet.getPosition().first,bullet.getPosition().second };
         if (PtInRect(&rect, bullet_pos)) { // bullet이 사각형 내부에 있을 때 실행할 코드
-            if (hp - bullet.getType() < 0) hp = 0;
-            else hp -= bullet.getType();
-            //점수 증가 , 이펙트 생성, 해당 총알 삭제 어디서?
+            if (hp - bullet.damage() < 0) hp = 0; // 이게 머여
+            else hp -= bullet.damage();
+
+            // todo: 이펙트 생성 어디서?
+            addSkillCount(bullet.getType(), id);
+
+
             return true; //인수로 들어온 총알과 충돌시 true리턴
         }
         else return false; //인수로 들어온 총알과 충돌하지 않았을시 false리턴
@@ -114,61 +116,7 @@ public:
     OTYPE getType() { return type; }
     short getHP() { return hp; }
     void setHP(unsigned short new_hp) { hp = new_hp; };
-};
-
-
-class Player
-{
-private:
-    SOCKET s = -1;
-    std::string id = "";
-    bool inGame = false; // 현재 접속중인 아이디인가?
-    unsigned short y = 300;
-    unsigned int high_score = 0;
-    unsigned int coin = 0; // 오버플로우 떠서 int로 수정
-
-    // 게임을 실행중일 때 
-    bool isSkill = false;
-    unsigned short skillCount = 0; // 몇마리를 잡았는지.
-
-
-public:
-
-    Player() {}
-
-    bool broadcast(char* res, size_t size)
-    {
-        int ret = send(s, reinterpret_cast<char*>(&res), size, 0);
-        if (ret == SOCKET_ERROR) { // 에러 처리
-            int error = WSAGetLastError();
-            SERVER_err_display("send failed");
-            SERVER_err_display(error);  // 오류 코드 출력
-            return false;
-        }
-        return true;
-    }
-
-    void init(std::string& str, unsigned int high_score, unsigned short gold)
-    {
-        this->high_score = high_score;
-        this->coin = gold;
-        id = str;
-        s = -1; // 접속 전이니까 대충 초기화
-    }
-
-    // getter - setter 부류
-    bool isPlaying() { return inGame; }
-    void setPlaying(bool x) { inGame = x; }
-    unsigned short getY() { return y; }
-    void setY(unsigned short y) { this->y = y; }
-    std::string getID() { return id; }
-    void setID(std::string& str) { id = str; }
-    void setID(char* str) { id = std::string(str); }
-    void setSocket(SOCKET& s) { this->s = s; }
-    unsigned short getCoin() { return coin; }
-    unsigned int getHigh_score() { return high_score; }
-    bool getSkill() { return isSkill; }
-    void setSkill(bool b) { isSkill = b; }
+    bool isDie() { return (hp <= 0); }
 };
 
 class Room
@@ -191,7 +139,6 @@ public:
     int clear_stage = 0; //1스테이지에 4세트, 이걸로 난이도 점점 오르게
 
 public:
-    // 객체들 //
 
     Room() {};
     ~Room() {};
@@ -226,36 +173,45 @@ public:
         }
     }
 
-    void deletebullet() {
-        std::lock_guard<std::mutex> ll{ update_lock }; 
-        std::erase_if(p_bullets, [](Player_Bullet pb) { return (pb.getPosition().first < 10); });
-        std::erase_if(e_bullets, [](Enemy_Bullet eb) { return (eb.getPosition().first > 800||eb.getPosition().first<10); });
+    void deletebullet(std::string& id)
+    {
+        std::lock_guard<std::mutex> ll{ update_lock };
+        // 1. 나간 총알 지우기
+        std::erase_if(p_bullets, [](Player_Bullet& pb) { return (pb.getPosition().first < 10); });
+        std::erase_if(e_bullets, [](Enemy_Bullet& eb) { return (eb.getPosition().first > 800 || eb.getPosition().first < 10); });
+
+        // 2. 충돌체크 총알
+        for (auto& e : enemies) {
+            std::erase_if(p_bullets, [&e, &id](Player_Bullet& pb) { return e.collsion_player_bullet(pb, id); });
+            // 죽었는지 확인해야하는데..
+        }
     }
 
-    void Create_enemy() {
+    void Create_enemy()
+    {
         std::lock_guard<std::mutex> ll{ update_lock };
         enemies.clear();
         if (clear_set % 4 < 3) { //중간세트
             int mid3 = 0;
             if (clear_set % 4 == 2) mid3 = 1;
             //중간몬스터생성
-            enemies.push_back({ ENEMY_1,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10)});
+            enemies.push_back({ ENEMY_1,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10) });
             //작은 몬스터 생성
             enemies.push_back({ ENEMY_0,220,100,10 + (clear_stage * 5) });
             enemies.push_back({ ENEMY_0,280,265,10 + (clear_stage * 5) });
             enemies.push_back({ ENEMY_0,220,450,10 + (clear_stage * 5) });
 
-           // std::cout <<"몬스터 생성!"<< enemies[0].getType() << " " << enemies[0].getPosition().first << enemies[0].getPosition().second << std::endl;
+            // std::cout <<"몬스터 생성!"<< enemies[0].getType() << " " << enemies[0].getPosition().first << enemies[0].getPosition().second << std::endl;
         }
         else { //보스세트
             //큰몬스터
-            enemies.push_back({ ENEMY_4,10,150,100 + (clear_stage * 20)});
+            enemies.push_back({ ENEMY_4,10,150,100 + (clear_stage * 20) });
             //작은 몬스터 생성
-            enemies.push_back({ ENEMY_0,210,100,10 + (clear_stage * 5)});
-            enemies.push_back({ ENEMY_0,240,170,10 + (clear_stage * 5)});
-            enemies.push_back({ ENEMY_0,270,265,10 + (clear_stage * 5)});
-            enemies.push_back({ ENEMY_0,240,350,10 + (clear_stage * 5)});
-            enemies.push_back({ ENEMY_0,210,450,10 + (clear_stage * 5)});
+            enemies.push_back({ ENEMY_0,210,100,10 + (clear_stage * 5) });
+            enemies.push_back({ ENEMY_0,240,170,10 + (clear_stage * 5) });
+            enemies.push_back({ ENEMY_0,270,265,10 + (clear_stage * 5) });
+            enemies.push_back({ ENEMY_0,240,350,10 + (clear_stage * 5) });
+            enemies.push_back({ ENEMY_0,210,450,10 + (clear_stage * 5) });
         }
     }
 
@@ -263,18 +219,20 @@ public:
     {
         std::lock_guard<std::mutex> ll{ update_lock };
         int i = 0;
-        // player bullet 복사
+        // enemies
         for (i = 0; i < p_bullets.size(); ++i) {
-            p.objs_type[i] = p_bullets[i].getType();
-            p.objs_x[i] = p_bullets[i].getPosition().first;
-            p.objs_y[i] = p_bullets[i].getPosition().second;
+            p.objs_type[i] = enemies[i].getType();
+            p.objs_x[i] = enemies[i].getPosition().first;
+            p.objs_y[i] = enemies[i].getPosition().second;
+            p.objs_hp[i] = enemies[i].getHP();
         }
 
         int m = 0;
+        // player bullet
         for (int j = i; j < i + enemies.size(); ++j) {
-            p.objs_type[j] = enemies[m].getType();
-            p.objs_x[j] = enemies[m].getPosition().first;
-            p.objs_y[j] = enemies[m].getPosition().second;
+            p.objs_type[j] = p_bullets[m].getType();
+            p.objs_x[j] = p_bullets[m].getPosition().first;
+            p.objs_y[j] = p_bullets[m].getPosition().second;
 
             m++;
             //std::cout << j - p_bullets.size() << "번째 몬스터" << enemies[j - p_bullets.size()].getType() <<" "<< enemies[j - p_bullets.size()].getPosition().first<< ","<< enemies[j - p_bullets.size()].getPosition().second << std::endl;
@@ -317,11 +275,7 @@ public:
         if (p2 != nullptr) ret = ret && p2->broadcast(res, size);
         return ret;
     }
-
-
 };
-
-// 플레이어 총알 생성, 적 총알 생성, 적 인공지능 이동
 
 class EVENT
 {
@@ -349,7 +303,6 @@ public:
 
 std::unordered_map<std::string, Room*> roomInfo;
 std::mutex roomLock;
-
 std::unordered_map<std::string, Player> players;
 concurrency::concurrent_priority_queue<EVENT> evt_queue;
 concurrency::concurrent_priority_queue<EVENT> task_queue;
@@ -820,6 +773,22 @@ void push_evt_queue(TASK_TYPE ev, int time, std::string& rid) // time: milisecon
     evt_queue.push(evt);
 }
 
+void addSkillCount(OTYPE type, std::string& id)
+{
+    switch (type) // 점수증가
+    {
+    case P1_BULLET:
+    case P1_SKILLBULLET:
+        roomInfo[id]->getP1()->addSkillCount();
+        break;
+
+    case P2_BULLET:
+    case P2_SKILLBULLET:
+        roomInfo[id]->getP2()->addSkillCount();
+        break;
+    }
+}
+
 void push_evt_queue(EVENT& evt)
 {
     evt_queue.push(evt);
@@ -844,7 +813,7 @@ void ai_thread()
                 // std::cout << ev.room_id << ": 총알움직" << std::endl;
                 roomInfo[ev.room_id]->doBulletsMove();
                 push_evt_queue(MOVE_PLAYER_BULLET, 100, ev.room_id); // .5초에 한개씩 발사
-                roomInfo[ev.room_id]->deletebullet();
+                roomInfo[ev.room_id]->deletebullet(ev.room_id); // 총알 충돌체크
             }
             break;
 
