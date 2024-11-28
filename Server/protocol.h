@@ -80,6 +80,7 @@ struct SC_OBJECT_MOVE_PACKET // 오브젝트 이동
 	unsigned short number; // 개수
 	unsigned short objs_x[MAX_OBJ_NUM];
 	unsigned short objs_y[MAX_OBJ_NUM];
+	unsigned short objs_hp[10]; // 혹시 모르니까..
 	OTYPE objs_type[MAX_OBJ_NUM]; // 이거 다 맞춰서 알아서 확인하세욤
 };
 

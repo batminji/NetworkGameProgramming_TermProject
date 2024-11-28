@@ -68,8 +68,15 @@ constexpr int ID_LEN = 20;
 constexpr int MAX_OBJ_NUM = 100; // todo: 여기 상의
 constexpr int SERVERPORT = 9000;
 constexpr int BUFSIZE = 4096; 
+constexpr unsigned short MOVE_DIST = -10;
+constexpr unsigned short DEFXPOS = 675;
+constexpr unsigned short SKILL_TIME = 5000; // MS단위임
+constexpr unsigned short DAMAGE = 5;
+
 
 void SERVER_err_quit(const char* msg);
 void SERVER_err_display(const char* msg);
 void SERVER_err_display(int errcode);
 void client_info(SOCKET s, std::string str);
+
+
