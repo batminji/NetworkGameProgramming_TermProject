@@ -40,16 +40,7 @@ void Framework::update()
 		break;
 		case ROOM_SCENE:
 		{
-			CS_JOIN_ROOM_PACKET roomPacket;
-			roomPacket.size = sizeof(CS_JOIN_ROOM_PACKET);
-			roomPacket.type = CS_JOIN_ROOM;
-			strcpy(roomPacket.id, DataManager::getInstance().ROOM_ID);
-
-			if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
-				std::cerr << "Send failed." << std::endl;
-				closesocket(*m_sock);
-				WSACleanup();
-			}
+			
 			auto tmp = m_scene;
 			if (DataManager::getInstance().room_master){
 				m_scene = new Room_Scene(m_hwnd, m_hBufferBitmap, m_hBufferDC, m_sock, TRUE);
