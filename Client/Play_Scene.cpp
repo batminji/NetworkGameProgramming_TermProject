@@ -7,7 +7,24 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     m_sock = sock;
 
     //player
-    master_player = p1; join_player = p2;
+    //master_player = p1; join_player = p2;
+    //(master_player->job == 1) ? join_player->job = 2 : join_player->job = 1;
+
+    short mj =1, jj=2;
+    if (&DataManager::getInstance().getInstance().master_is_dealer) {
+        mj = 1;
+        jj = 2;
+    }
+    else {
+
+        mj = 2;
+        jj = 1;
+    }
+    std::cout << mj << "  " << jj << std::endl;
+    master_player = new Player(mj,&DataManager::getInstance().getInstance().room_master);
+    join_player = new Player(jj, !&DataManager::getInstance().getInstance().room_master);
+
+
 
     //ui 이미지 로드
     game_bg = &ResourceManager::getInstance().game_bg;
@@ -190,8 +207,8 @@ int Play_Scene::recv_process()
     recvBuffer.insert(recvBuffer.end(), recvBuf, recvBuf + recvLen);
 
     // 패킷 처리
-    while (recvBuffer.size() >= sizeof(SC_PLAYER_MOVE_PACKET)) { // 패킷 크기만큼 데이터가 도착했는지 확인
-        SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<SC_PLAYER_MOVE_PACKET*>(recvBuffer.data());
+    while (recvBuffer.size() >= sizeof(SC_OBJECT_MOVE_PACKET)) { // 패킷 크기만큼 데이터가 도착했는지 확인
+        SC_OBJECT_MOVE_PACKET* resPacket = reinterpret_cast<SC_OBJECT_MOVE_PACKET*>(recvBuffer.data());
 
         // 패킷 유효성 확인 (예: 패킷의 크기와 타입)
         if (recvBuffer.size() < resPacket->size || resPacket->size == 0) {
@@ -302,7 +319,6 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
        }
    }
    {
-       std::cout << temp_enemys.size() << "도착" << std::endl;
       // std::unique_lock<std::mutex> b_lock(bullets_mutex);
        std::swap(bullets, temp_bullets);
      //  b_lock.unlock();

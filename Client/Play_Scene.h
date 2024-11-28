@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include "Item.h"
 #include "Bullet.h"
+#include "DataManager.h"
 //#include "../Server/protocol.h"
 
 class Play_Scene :

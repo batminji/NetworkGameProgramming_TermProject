@@ -211,9 +211,12 @@ int Room_Scene::room_data_update()
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, user_name[1], sizeof(DataManager::getInstance().my_data.ID));
 
                 if (roomPacket->isDealer) {
+                    DataManager::getInstance().master_is_dealer = true;
+
                     master_player->job = 2; join_player->job = 1;
                 }
                 else {
+                    DataManager::getInstance().master_is_dealer = false;
                     master_player->job = 1; join_player->job = 2;
                 }
             }

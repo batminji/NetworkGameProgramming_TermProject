@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <atomic>
 class DataManager
 {
 public:
@@ -29,6 +30,10 @@ public:
 public:
 	//방 참가 관련
 	char ROOM_ID[20];
-	bool room_master; 
+	std::atomic_bool room_master =0; 
+
+public:
+	//게임 관련 
+	std::atomic_bool master_is_dealer =0;
 };
 

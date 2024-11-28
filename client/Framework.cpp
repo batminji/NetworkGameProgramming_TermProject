@@ -58,6 +58,7 @@ void Framework::update()
 			/*Player master_player()
 			Player join_player = *dynamic_cast<Room_Scene*>(m_scene)->getJoinPlayer();*/
 			if (dynamic_cast<Room_Scene*>(m_scene)->master_player->who_is_me) {
+				//std::cout << "마스터는 저예염: 나:"<< dynamic_cast<Room_Scene*>(m_scene)->master_player->job <<"  니:"<<dynamic_cast<Room_Scene*>(m_scene)->join_player->job << std::endl;
 				Player master_player(dynamic_cast<Room_Scene*>(m_scene)->master_player->job, TRUE);
 				Player join_player(dynamic_cast<Room_Scene*>(m_scene)->join_player->job, FALSE);
 
@@ -68,6 +69,7 @@ void Framework::update()
 				delete tmp;
 			}
 			else if(dynamic_cast<Room_Scene*>(m_scene)->join_player->who_is_me){
+				//std::cout << "전 마스터가 아니에염: 나:" << dynamic_cast<Room_Scene*>(m_scene)->master_player->job << "  니:" << dynamic_cast<Room_Scene*>(m_scene)->join_player->job << std::endl;
 				Player master_player(dynamic_cast<Room_Scene*>(m_scene)->master_player->job, FALSE);
 				Player join_player(dynamic_cast<Room_Scene*>(m_scene)->join_player->job, TRUE);
 
