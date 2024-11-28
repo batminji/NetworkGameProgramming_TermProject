@@ -11,18 +11,21 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     //(master_player->job == 1) ? join_player->job = 2 : join_player->job = 1;
 
     short mj =1, jj=2;
-    if (&DataManager::getInstance().getInstance().master_is_dealer) {
+
+
+    if (DataManager::getInstance().master_is_dealer) {
         mj = 1;
         jj = 2;
     }
-    else {
-
+    else{
         mj = 2;
         jj = 1;
     }
+
+    //if (DataManager::getInstance().room_master == false) swap(mj, jj);
     std::cout << mj << "  " << jj << std::endl;
-    master_player = new Player(mj,&DataManager::getInstance().getInstance().room_master);
-    join_player = new Player(jj, !&DataManager::getInstance().getInstance().room_master);
+    master_player = new Player(mj,DataManager::getInstance().getInstance().room_master);
+    join_player = new Player(jj, !DataManager::getInstance().getInstance().room_master);
 
 
 

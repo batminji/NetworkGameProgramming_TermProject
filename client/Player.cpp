@@ -52,13 +52,11 @@ void Player::render(HDC mdc)
 {
 	switch (job) {
 	case 1: // dealer
-		cout << "Dealer : " << y;
 		if (zombie_cnt == 0) kirby_pink_fly->TransparentBlt(mdc, x - 25, y - 25, 50, 50, Kirby_frame, 0, 25, 25, RGB(0, 255, 0));
 		else if (zombie_cnt < 8) kirby_pink_hit->TransparentBlt(mdc, x - 25, y - 25, 50, 50, (zombie_cnt % 7) * 25, 0, 25, 25, RGB(0, 255, 0));
 		else kirby_pink_zombie->TransparentBlt(mdc, x - 25, y - 25, 50, 50, (zombie_cnt % 9) * 25, 0, 25, 25, RGB(0, 255, 0));
 		break;
 	case 2: // Healer
-		cout << "		Healer : " << y << endl;
 		if (zombie_cnt == 0) kirby_blue_fly->TransparentBlt(mdc, x - 25, y - 25, 50, 50, Kirby_frame, 0, 25, 25, RGB(0, 255, 0));
 		else if (zombie_cnt < 8) kirby_blue_hit->TransparentBlt(mdc, x - 25, y - 25, 50, 50, (zombie_cnt % 7) * 25, 0, 25, 25, RGB(0, 255, 0));
 		else kirby_blue_zombie->TransparentBlt(mdc, x - 25, y - 25, 50, 50, (zombie_cnt % 9) * 25, 0, 25, 25, RGB(0, 255, 0));

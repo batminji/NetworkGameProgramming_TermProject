@@ -135,13 +135,13 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 ssystem->playSound(click_sound, 0, false, &channel);
                 master_player->job = 1;
                 join_player->job = 2;
-                DataManager::getInstance().master_is_dealer = false;
+                DataManager::getInstance().master_is_dealer = true;
             }
             else if (PtInRect(&healer_rt, mypt)) { // 힐러 누르기
                 ssystem->playSound(click_sound, 0, false, &channel);
                 master_player->job = 2;
                 join_player->job = 1;
-                DataManager::getInstance().master_is_dealer = true;
+                DataManager::getInstance().master_is_dealer = false;
             }
             else if (PtInRect(&start_rt, mypt)) { //시작 누르기
                 ssystem->playSound(click_sound, 0, false, &channel);

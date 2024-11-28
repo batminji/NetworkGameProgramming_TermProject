@@ -34,6 +34,6 @@ public:
 
 public:
 	//게임 관련 
-	std::atomic_bool master_is_dealer =false;
+	std::atomic_bool master_is_dealer = true;
 };
 
