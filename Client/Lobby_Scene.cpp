@@ -211,7 +211,8 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			}
 			else {
 				SC_ROOM_CHANGE_PACKET* roomPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
-				if (strcmp(roomPacket->other_pl, "cant_join")) { 
+				std::cout <<"헿: "<< roomPacket->other_pl << std::endl;
+				if (strcmp(roomPacket->other_pl, "cant_join")==0) { 
 					MessageBox(
 						NULL,
 						L"없는 방인데요?",
