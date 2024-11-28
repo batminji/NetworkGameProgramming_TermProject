@@ -694,7 +694,6 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
         std::cout << "undefined packet" << std::endl;
         exit(-1);
     }
-    roomLock.unlock();
     return true;
 }
 
@@ -745,7 +744,9 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             while (true) {
                 process_packet(recv_buf, s, pid);
                 
-                if (true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
+                
+
+                if (roomInfo.find(p->id) != roomInfo.end() && true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
                 ZeroMemory(recv_buf, sizeof(recv_buf));
                 int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), MSG_WAITALL);
                 if (ret == SOCKET_ERROR) { // 에러처리
