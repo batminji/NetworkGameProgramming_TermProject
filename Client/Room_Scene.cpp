@@ -135,11 +135,13 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 ssystem->playSound(click_sound, 0, false, &channel);
                 master_player->job = 1;
                 join_player->job = 2;
+                DataManager::getInstance().master_is_dealer = false;
             }
             else if (PtInRect(&healer_rt, mypt)) { // 힐러 누르기
                 ssystem->playSound(click_sound, 0, false, &channel);
                 master_player->job = 2;
                 join_player->job = 1;
+                DataManager::getInstance().master_is_dealer = true;
             }
             else if (PtInRect(&start_rt, mypt)) { //시작 누르기
                 ssystem->playSound(click_sound, 0, false, &channel);
@@ -206,6 +208,7 @@ int Room_Scene::room_data_update()
     }
     else {
         SC_ROOM_CHANGE_PACKET* roomPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
+       
         if (true == roomPacket->isPlaying) {
             isPlaying = TRUE;
             next_scene = PLAY_SCENE;
@@ -217,6 +220,7 @@ int Room_Scene::room_data_update()
             return 1;
         }
         else {
+      
             if (master_player->who_is_me) {
                 strcpy(DataManager::getInstance().my_data.otherID, roomPacket->other_pl);
 
@@ -232,16 +236,17 @@ int Room_Scene::room_data_update()
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, user_name[1], sizeof(DataManager::getInstance().my_data.ID));
 
                 if (roomPacket->isDealer) {
-                    DataManager::getInstance().master_is_dealer = true;
-
+                    DataManager::getInstance().master_is_dealer = false;
                     master_player->job = 2; join_player->job = 1;
                 }
                 else {
-                    DataManager::getInstance().master_is_dealer = false;
+                    DataManager::getInstance().master_is_dealer = true;
                     master_player->job = 1; join_player->job = 2;
                 }
             }
         }
+
+
     }
 
     return 1;
