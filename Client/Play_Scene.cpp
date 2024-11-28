@@ -31,6 +31,19 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     game_bg2 = &ResourceManager::getInstance().game_bg2;
     number = &ResourceManager::getInstance().number;
     heart = &ResourceManager::getInstance().heart;
+
+    result = System_Create(&ssystem);
+    if (result != FMOD_OK)
+        exit(0);
+    ssystem->init(32, FMOD_INIT_NORMAL, extradriverdata);
+    ssystem->createSound("sound_file/Battle_bgm.OGG", FMOD_LOOP_NORMAL, 0, &battle_bgm);
+    ssystem->createSound("damage.OGG", FMOD_DEFAULT, 0, &damage_sound);
+    ssystem->createSound("gameover.OGG", FMOD_DEFAULT, 0, &gameover_sound);
+    ssystem->createSound("Skill.OGG", FMOD_DEFAULT, 0, &skill_sound);
+    ssystem->createSound("Explosion.OGG", FMOD_DEFAULT, 0, &explosion_sound);
+    ssystem->createSound("warning.OGG", FMOD_DEFAULT, 0, &warning_sound);
+    ssystem->createSound("coin.OGG", FMOD_DEFAULT, 0, &coin_sound);
+    ssystem->playSound(battle_bgm, 0, false, &channel);
 };
 
 Play_Scene::~Play_Scene()
@@ -142,6 +155,7 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             // TODO 스킬 썼다는 패킷 보내야 함.
             skill_key_down = true;
             // 총알의 타입 변경 흠... 근데 흠...
+            ssystem->playSound(skill_sound, 0, false, &channel);
         }
     }
         break;
@@ -248,11 +262,13 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         // 현재 플레이어가 마스터인 경우
         master_player->y = resPacket->this_y;
         join_player->y = resPacket->other_y;
+        cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
     }
     else {
         // 현재 플레이어가 조인한 클라이언트인 경우
         join_player->y = resPacket->this_y;
         master_player->y = resPacket->other_y;
+        cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
     }
 }
 

@@ -16,6 +16,13 @@ private:
     CImage* blue_idle_left;
     CImage* blue_idle_right;
     short frame;
+public:
+    System* ssystem;
+    Sound* room_bgm;
+    Sound* click_sound;
+    Channel* channel = 0;
+    FMOD_RESULT result;
+    void* extradriverdata = 0;
 
 public:
     Player* master_player;

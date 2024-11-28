@@ -24,6 +24,18 @@ private:
     CImage* game_bg2;
     CImage* number;
     CImage* heart;
+public:
+    System* ssystem;
+    Sound* battle_bgm;
+    Sound* damage_sound;
+    Sound* gameover_sound;
+    Sound* skill_sound;
+    Sound* explosion_sound;
+    Sound* warning_sound;
+    Sound* coin_sound;
+    Channel* channel = 0;
+    FMOD_RESULT result;
+    void* extradriverdata = 0;
 private :
     //play inform
     int bg_xPos = 800; // 배경 사진 xPos
