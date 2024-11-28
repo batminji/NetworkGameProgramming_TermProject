@@ -209,6 +209,11 @@ int Room_Scene::room_data_update()
         if (true == roomPacket->isPlaying) {
             isPlaying = TRUE;
             next_scene = PLAY_SCENE;
+            channel->stop();
+            room_bgm->release();
+            click_sound->release();
+            ssystem->close();
+            ssystem->release();
             return 1;
         }
         else {
