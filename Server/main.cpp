@@ -743,15 +743,25 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                 process_packet(recv_buf, s, pid);
 
                 if (roomInfo.find(pid) != roomInfo.end() && true == roomInfo[pid]->getisPlaying()) {
-                    int k = 0;
-                    break; // 게임 시작
+                    break; 
                 }
-                ZeroMemory(recv_buf, sizeof(recv_buf));
-                int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), MSG_WAITALL);
-                if (ret == SOCKET_ERROR) { // 에러처리
-                    int error = WSAGetLastError();
-                    SERVER_err_display("recv() failed");
-                    SERVER_err_display(error);  // 오류 코드 출력
+                else if (roomInfo.find(pid) == roomInfo.end()) {
+                    ZeroMemory(recv_buf, sizeof(recv_buf));
+                    int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), MSG_WAITALL);
+                    if (ret == SOCKET_ERROR) { // 에러처리
+                        int error = WSAGetLastError();
+                        SERVER_err_display("recv() failed");
+                        SERVER_err_display(error);  // 오류 코드 출력
+                    }
+                }
+                else {
+                    ZeroMemory(recv_buf, sizeof(recv_buf));
+                    int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), MSG_WAITALL);
+                    if (ret == SOCKET_ERROR) { // 에러처리
+                        int error = WSAGetLastError();
+                        SERVER_err_display("recv() failed");
+                        SERVER_err_display(error);  // 오류 코드 출력
+                    }
                 }
             }
 

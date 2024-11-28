@@ -144,7 +144,6 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			}
 		}
 		else if (input_cnt < 20) join_room_id[input_cnt++] = wParam;
-
 	}
 	break;
 	case WM_LBUTTONDOWN:
