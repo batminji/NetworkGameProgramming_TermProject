@@ -521,6 +521,26 @@ bool send_room_change_packet(SOCKET& s, std::string& id)
     return true;
 }
 
+bool send_room_join_fail_packet(SOCKET& s, std::string& id)
+{
+    SC_ROOM_CHANGE_PACKET res;
+    res.size = sizeof(SC_ROOM_CHANGE_PACKET);
+    res.type = SC_ROOM_CHANGE;
+    res.isPlaying = false;
+    res.isDealer = false;
+    memcpy(res.other_pl, "cant_join", strlen("cant_join") + 1);
+
+    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_ROOM_CHANGE_PACKET), 0);
+    if (ret == SOCKET_ERROR) { // 에러 처리
+        int error = WSAGetLastError();
+        SERVER_err_display("send failed");
+        SERVER_err_display(error);  // 오류 코드 출력
+        return false;
+    }
+    std::cout << id << "가 없는방에 드가려고 시도함!" << std::endl;
+    return true;
+}
+
 bool send_player_move_packet(SOCKET& s, std::string& id)
 {
     SC_PLAYER_MOVE_PACKET res;
@@ -604,10 +624,16 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
             std::cout << "Player " << id << " joined existing room " << p->id << std::endl;
         }
         else { // roomID가 없다면 새로운 방을 생성하여 초기화
-            roomInfo[id] = new Room(); // roomInfo에 새로운 방 추가
-            roomInfo[id]->setP1(&players[id]);
-            roomInfo[id]->setDealer(id);
-            std::cout << "Player " << id << " created and joined new room " << id << std::endl;
+            if (p->id != id) {
+                if (false == send_room_join_fail_packet(s, id)) return false;
+                break;
+            }
+            else {
+                roomInfo[id] = new Room(); // roomInfo에 새로운 방 추가
+                roomInfo[id]->setP1(&players[id]);
+                roomInfo[id]->setDealer(id);
+                std::cout << "Player " << id << " created and joined new room " << id << std::endl;
+            }
         }
 
         if (false == send_room_change_packet(s, id)) return false; // 전송 실패.
