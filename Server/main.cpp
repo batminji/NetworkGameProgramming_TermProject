@@ -52,27 +52,28 @@ public:
 
 class Enemy
 {
-    OTYPE type; //0 잡몹 1~3 중간보스 4 최종보스
-    unsigned short x;
-    unsigned short y;
-    unsigned short hp;
-    unsigned short bullet_create_cnt;
+    OTYPE type = ENEMY_0; //0 잡몹 1~3 중간보스 4 최종보스
+    unsigned short x = 0;
+    unsigned short y = 0;
+    unsigned short hp = 0;
+    unsigned short bullet_create_cnt = 0;
 
     //유도되는 정보
-    unsigned short width;
-    unsigned short height;
-    POINT goal;
+    unsigned short width = 0;
+    unsigned short height = 0;
+    POINT goal = { 0, 0 };
 public:
-    Enemy(OTYPE a_type, int a_x, int a_y , int a_hp) {
+    Enemy(OTYPE a_type, int a_x, int a_y , int a_hp) 
+    {
         type = a_type;
         x =  static_cast<unsigned short>(a_x);
         y =  static_cast<unsigned short>(a_y); 
         hp = static_cast<unsigned short>(a_hp);
 
         if (type == 0) width = 84, height = 96;
-        else if (type == 1 || type == 2)width = 90, height = 130;
-        else if (type == 3)width = 100, height = 120;
-        else if (type == 4)width = 256, height = 224;
+        else if (type == 1 || type == 2) width = 90, height = 130;
+        else if (type == 3) width = 100, height = 120;
+        else if (type == 4) width = 256, height = 224;
         goal = { rand() % 200 - 30, rand() % 400 + 50 };
     }
     void ai_move()
@@ -177,8 +178,8 @@ private:
     Player* p2 = nullptr;
     std::string dealer_id; // 누가 딜러인가.
     std::atomic_bool isPlaying = false;
-    unsigned int score;
-    unsigned short heart; // 음수가 없..?
+    unsigned int score = 0;
+    unsigned short heart = 3; // 음수가 없..?
 
     std::mutex update_lock; // todo: 락을 분리할지 고민하기
 
@@ -229,7 +230,6 @@ public:
         std::lock_guard<std::mutex> ll{ update_lock }; 
         std::erase_if(p_bullets, [](Player_Bullet pb) { return (pb.getPosition().first < 10); });
         std::erase_if(e_bullets, [](Enemy_Bullet eb) { return (eb.getPosition().first > 800||eb.getPosition().first<10); });
-
     }
 
     void Create_enemy() {
@@ -303,6 +303,8 @@ public:
     }
     void setP1(Player* p) { p1 = p; }
     void setP2(Player* p) { p2 = p; }
+    Player* getP1() { return p1; }
+    Player* getP2() { return p2; }
     void setisPlaying(bool a) { isPlaying = a; }
     bool getisPlaying() { return isPlaying; }
     bool getisDealer(std::string myid) { return myid == dealer_id; }
@@ -614,18 +616,22 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     {
     case CS_JOIN_ROOM:
     {
+        roomLock.lock();
         CS_JOIN_ROOM_PACKET* p = reinterpret_cast<CS_JOIN_ROOM_PACKET*>(packet);
         // 만약 roomInfo에 p.id로 된 room이 있을때 조인
         // 아닐때 새로 만들어서 초기화
-        std::lock_guard<std::mutex> ll{ roomLock };
-        if (roomInfo.find(p->id) != roomInfo.end()) {  // roomID가 이미 존재하면
+        if ((roomInfo.find(p->id) != roomInfo.end()) && (true == roomInfo[p->id]->getisPlaying())
+            && roomInfo[p->id]->getP2() == nullptr) {  // roomID가 이미 존재하면
             roomInfo[p->id]->setP2(&players[id]);       // 플레이어를 해당 방에 추가
             roomInfo[id] = roomInfo[p->id];
             std::cout << "Player " << id << " joined existing room " << p->id << std::endl;
         }
         else { // roomID가 없다면 새로운 방을 생성하여 초기화
             if (p->id != id) {
-                if (false == send_room_join_fail_packet(s, id)) return false;
+                if (false == send_room_join_fail_packet(s, id)) {
+                    roomLock.unlock();
+                    return false;
+                }
                 break;
             }
             else {
@@ -636,8 +642,10 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
             }
         }
 
-        if (false == send_room_change_packet(s, id)) return false; // 전송 실패.
-
+        roomLock.unlock();
+        if (false == send_room_change_packet(s, id)) {
+            return false; // 전송 실패.
+        }
         break;
     }
     case CS_MOVE: // 플레이어 캐릭터의 이동 -> 나와 동료의 업데이트된 위치 정보 반환.
@@ -650,7 +658,6 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
         }
 
         if (false == send_player_move_packet(s, id)) return false;
-
         break;
     }
     case CS_ROOM_STATE: // 방 정보 변경
@@ -687,6 +694,7 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
         std::cout << "undefined packet" << std::endl;
         exit(-1);
     }
+    roomLock.unlock();
     return true;
 }
 
@@ -756,7 +764,6 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         roomInfo[pid]->Create_enemy();
         push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
         push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
-        push_evt_queue(BULLET_DELETE, 0, pid); // 총알삭제
        // push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
         push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
         send_player_move_packet(s, pid);
@@ -782,7 +789,6 @@ void timer_thread()
     while (true)
     {
         EVENT ev;
-
         if (! evt_queue.empty() && evt_queue.try_pop(ev))
         {
             if (ev.getTime() <= std::chrono::system_clock::now())
@@ -824,12 +830,8 @@ void ai_thread()
                 // std::cout << ev.room_id << ": 총알움직" << std::endl;
                 roomInfo[ev.room_id]->doBulletsMove();
                 push_evt_queue(MOVE_PLAYER_BULLET, 100, ev.room_id); // .5초에 한개씩 발사
+                roomInfo[ev.room_id]->deletebullet();
             }
-            break;
-
-        case BULLET_DELETE:
-            roomInfo[ev.room_id]->deletebullet();
-            push_evt_queue(BULLET_DELETE, 100, ev.room_id);
             break;
 
         case FIRE_ENEMY_BULLET:
@@ -852,7 +854,6 @@ void ai_thread()
                 if (roomInfo[ev.room_id]->clear_set % 4 == 0 && roomInfo[ev.room_id]->clear_set != 0) roomInfo[ev.room_id]->clear_stage++;
                 roomInfo[ev.room_id]->Create_enemy();
             }
-
             push_evt_queue(CREATE_SET, 1000, ev.room_id);
             break;
       
