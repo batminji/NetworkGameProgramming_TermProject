@@ -270,7 +270,6 @@ public:
             p.objs_y[i] = p_bullets[i].getPosition().second;
         }
 
-        i += p_bullets.size();
         int m = 0;
         for (int j = i; j < i + enemies.size(); ++j) {
             p.objs_type[j] = enemies[m].getType();
@@ -616,33 +615,30 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     {
     case CS_JOIN_ROOM:
     {
-        roomLock.lock();
-        CS_JOIN_ROOM_PACKET* p = reinterpret_cast<CS_JOIN_ROOM_PACKET*>(packet);
-        // 만약 roomInfo에 p.id로 된 room이 있을때 조인
-        // 아닐때 새로 만들어서 초기화
-        if ((roomInfo.find(p->id) != roomInfo.end()) && (true == roomInfo[p->id]->getisPlaying())
-            && roomInfo[p->id]->getP2() == nullptr) {  // roomID가 이미 존재하면
-            roomInfo[p->id]->setP2(&players[id]);       // 플레이어를 해당 방에 추가
-            roomInfo[id] = roomInfo[p->id];
-            std::cout << "Player " << id << " joined existing room " << p->id << std::endl;
-        }
-        else { // roomID가 없다면 새로운 방을 생성하여 초기화
-            if (p->id != id) {
-                if (false == send_room_join_fail_packet(s, id)) {
-                    roomLock.unlock();
-                    return false;
-                }
-                break;
+        {
+            std::lock_guard<std::mutex> ll{ roomLock };
+            CS_JOIN_ROOM_PACKET* p = reinterpret_cast<CS_JOIN_ROOM_PACKET*>(packet);
+            // 만약 roomInfo에 p.id로 된 room이 있을때 조인
+            // 아닐때 새로 만들어서 초기화
+            if ((roomInfo.find(p->id) != roomInfo.end()) && (false == roomInfo[p->id]->getisPlaying())) {  // roomID가 이미 존재하면
+                roomInfo[p->id]->setP2(&players[id]);       // 플레이어를 해당 방에 추가
+                roomInfo[id] = roomInfo[p->id];
+                std::cout << "Player " << id << " joined existing room " << p->id << std::endl;
             }
-            else {
-                roomInfo[id] = new Room(); // roomInfo에 새로운 방 추가
-                roomInfo[id]->setP1(&players[id]);
-                roomInfo[id]->setDealer(id);
-                std::cout << "Player " << id << " created and joined new room " << id << std::endl;
+            else { // roomID가 없다면 새로운 방을 생성하여 초기화
+                if (p->id != id) {
+                    send_room_join_fail_packet(s, id);
+                    break;
+                }
+                else {
+                    roomInfo[id] = new Room(); // roomInfo에 새로운 방 추가
+                    roomInfo[id]->setP1(&players[id]);
+                    roomInfo[id]->setDealer(id);
+                    std::cout << "Player " << id << " created and joined new room " << id << std::endl;
+                }
             }
         }
 
-        roomLock.unlock();
         if (false == send_room_change_packet(s, id)) {
             return false; // 전송 실패.
         }
@@ -673,18 +669,20 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
         }
         if (!p->isDealer)
             int k = 0;
-        std::lock_guard<std::mutex> ll{ roomLock };
-        if (p->isQuit) { // 나가기
-            if (t_room->getP1ID() == id)
-                t_room->setP1(&players[t_room->getP2ID()]); // 2를 1로 바꾸기.
-            t_room->setP2(nullptr);
-        }
+        {
+            std::lock_guard<std::mutex> ll{ roomLock };
+            if (p->isQuit) { // 나가기
+                if (t_room->getP1ID() == id)
+                    t_room->setP1(&players[t_room->getP2ID()]); // 2를 1로 바꾸기.
+                t_room->setP2(nullptr);
+            }
 
 
-        if (id == t_room->getP1ID()) { // 1p만 동작
-            if (p->isDealer) t_room->setDealer(id);
-            else t_room->setDealer(t_room->getP2ID());
-            if (p->isPlaying) t_room->setisPlaying(true);
+            if (id == t_room->getP1ID()) { // 1p만 동작
+                if (p->isDealer) t_room->setDealer(id);
+                else t_room->setDealer(t_room->getP2ID());
+                if (p->isPlaying) t_room->setisPlaying(true);
+            }
         }
 
         if (false == send_room_change_packet(s, id)) return false; // 전송 실패.
@@ -743,10 +741,11 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             }
             while (true) {
                 process_packet(recv_buf, s, pid);
-                
-                
 
-                if (roomInfo.find(p->id) != roomInfo.end() && true == roomInfo[pid]->getisPlaying()) break; // 게임 시작
+                if (roomInfo.find(pid) != roomInfo.end() && true == roomInfo[pid]->getisPlaying()) {
+                    int k = 0;
+                    break; // 게임 시작
+                }
                 ZeroMemory(recv_buf, sizeof(recv_buf));
                 int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), MSG_WAITALL);
                 if (ret == SOCKET_ERROR) { // 에러처리
@@ -757,16 +756,20 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             }
 
             if (true == roomInfo[pid]->getisPlaying()) {
-                // std::cout << pid << " 플레이씬 넘어가기" << std::endl;
+                std::cout << pid << " 플레이씬 넘어가기" << std::endl;
                 break; // 게임 시작
             }
 
         }
-        roomInfo[pid]->Create_enemy();
+
+        if (roomInfo[pid]->getP1ID() == pid) {// 호스트이면
+            // 그 방의 적 생성, 총알 이동도 호스트 혼자 처리
+            roomInfo[pid]->Create_enemy();
+            push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
+            // push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
+            // push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
+        }
         push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
-        push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
-       // push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
-        push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
         send_player_move_packet(s, pid);
         while (true) {
             send_object_move_packet(s, pid); // todo: 왜?

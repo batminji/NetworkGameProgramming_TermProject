@@ -188,6 +188,8 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			ssystem->playSound(click_sound, 0, false, &channel);
 			printf("방참가하귀\n");
 			//방 참가하기를 눌렀을때 처리
+			DataManager::getInstance().room_master = false;
+			WideCharToMultiByte(CP_ACP, 0, join_room_id, -1, DataManager::getInstance().ROOM_ID, sizeof(DataManager::getInstance().ROOM_ID), NULL, NULL);
 			//참가할게~보내기
 			CS_JOIN_ROOM_PACKET roomPacket;
 			roomPacket.size = sizeof(CS_JOIN_ROOM_PACKET);
@@ -223,8 +225,7 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 				}
 			}
 
-			DataManager::getInstance().room_master = false;
-			WideCharToMultiByte(CP_ACP, 0, join_room_id, -1, DataManager::getInstance().ROOM_ID, sizeof(DataManager::getInstance().ROOM_ID), NULL, NULL);
+			
 			next_scene = ROOM_SCENE;
 		}
 	}
