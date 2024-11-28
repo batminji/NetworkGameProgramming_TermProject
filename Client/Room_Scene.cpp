@@ -29,6 +29,14 @@ Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     pink_idle_right = &ResourceManager::getInstance().Kirby_pink_idle_right;
     blue_idle_left = &ResourceManager::getInstance().Kirby_blue_idle_left;
     blue_idle_right = &ResourceManager::getInstance().Kirby_blue_idle_right;
+
+    result = System_Create(&ssystem);
+    if (result != FMOD_OK)
+        exit(0);
+    ssystem->init(32, FMOD_INIT_NORMAL, extradriverdata);
+    ssystem->createSound("sound_file/room_bgm.OGG", FMOD_LOOP_NORMAL, 0, &room_bgm);
+    ssystem->createSound("sound_file/click.OGG", FMOD_DEFAULT, 0, &click_sound);
+    ssystem->playSound(room_bgm, 0, false, &channel);
 }
 void Room_Scene::render(LPVOID param)
 {
@@ -124,15 +132,23 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         // printf("x : %d y : %d\n", mx, my);
         if (master_player->who_is_me) {
             if (PtInRect(&dealer_rt, mypt)) { // 딜러 누르기
+                ssystem->playSound(click_sound, 0, false, &channel);
                 master_player->job = 1;
                 join_player->job = 2;
             }
             else if (PtInRect(&healer_rt, mypt)) { // 힐러 누르기
+                ssystem->playSound(click_sound, 0, false, &channel);
                 master_player->job = 2;
                 join_player->job = 1;
             }
             else if (PtInRect(&start_rt, mypt)) { //시작 누르기
+                ssystem->playSound(click_sound, 0, false, &channel);
                 isPlaying = TRUE;
+                channel->stop();
+                room_bgm->release();
+                click_sound->release();
+                ssystem->close();
+                ssystem->release();
             }
         }
     }
@@ -154,10 +170,10 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 int Room_Scene::room_data_update()
 {
     //�۽�
-    if (true == isPlaying and next_scene == PLAY_SCENE) {
+    /*if (true == isPlaying and next_scene == PLAY_SCENE) {
         std::cout << "저는 send를 한번 더하고싶어하는 바보에요." << std::endl;
         return 1;
-    }
+    }*/
     CS_ROOM_STATE_PACKET roomPacket;
     roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
     roomPacket.type = CS_ROOM_STATE;

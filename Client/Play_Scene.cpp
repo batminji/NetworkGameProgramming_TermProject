@@ -231,11 +231,13 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         // 현재 플레이어가 마스터인 경우
         master_player->y = resPacket->this_y;
         join_player->y = resPacket->other_y;
+        cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
     }
     else {
         // 현재 플레이어가 조인한 클라이언트인 경우
         join_player->y = resPacket->this_y;
         master_player->y = resPacket->other_y;
+        cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
     }
 }
 
@@ -302,7 +304,7 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
        }
    }
    {
-       std::cout << temp_enemys.size() << "도착" << std::endl;
+       // std::cout << temp_enemys.size() << "도착" << std::endl;
       // std::unique_lock<std::mutex> b_lock(bullets_mutex);
        std::swap(bullets, temp_bullets);
      //  b_lock.unlock();
