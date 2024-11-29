@@ -23,7 +23,7 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     }
 
     //if (DataManager::getInstance().room_master == false) swap(mj, jj);
-    std::cout << mj << "  " << jj << std::endl;
+    // std::cout << mj << "  " << jj << std::endl;
     master_player = new Player(mj,DataManager::getInstance().getInstance().room_master);
     join_player = new Player(jj, !DataManager::getInstance().getInstance().room_master);
 
@@ -91,14 +91,14 @@ void Play_Scene::ui_render()
    
   //  //점수
     int num;
-    wsprintf(number_text, L"%d", play_score);
+    // wsprintf(number_text, L"%d", play_score);
     if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 10, 12, 24, 28, 0, 0, 12, 14, RGB(255, 0, 255));
     for (int i = 0; i < lstrlen(number_text); i++) {
         num = number_text[i] - 48;
         number->TransparentBlt(m_hBufferDC, i * 24 + 10, 12, 24, 28, num * 12, 0, 12, 14, RGB(255, 0, 255));
     }
    // 코인 수
-    wsprintf(number_text, L"%d", play_gold);
+    // wsprintf(number_text, L"%d", play_gold);
     if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 10, 12, 24, 28, 0, 0, 12, 14, RGB(255, 0, 255));
     for (int i = 0; i < lstrlen(number_text); i++) {
         num = number_text[i] - 48;
@@ -345,6 +345,6 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
        std::swap(enemys, temp_enemys);
      //  e_lock.unlock();
        
-       std::cout <<enemys.size()<< "마리 받았어염" << std::endl;
+       // std::cout <<enemys.size()<< "마리 받았어염" << std::endl;
    }
 }
