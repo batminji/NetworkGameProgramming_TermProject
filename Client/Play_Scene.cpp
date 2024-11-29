@@ -35,7 +35,7 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     number = &ResourceManager::getInstance().number;
     heart = &ResourceManager::getInstance().heart;
 
-    /*result = System_Create(&ssystem);
+    result = System_Create(&ssystem);
     if (result != FMOD_OK)
         exit(0);
     ssystem->init(32, FMOD_INIT_NORMAL, extradriverdata);
@@ -46,7 +46,7 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     ssystem->createSound("sound_file/Explosion.OGG", FMOD_DEFAULT, 0, &explosion_sound);
     ssystem->createSound("sound_file/warning.OGG", FMOD_DEFAULT, 0, &warning_sound);
     ssystem->createSound("sound_file/coin.OGG", FMOD_DEFAULT, 0, &coin_sound);
-    ssystem->playSound(battle_bgm, 0, false, &channel);*/
+    ssystem->playSound(battle_bgm, 0, false, &channel);
 };
 
 Play_Scene::~Play_Scene()
@@ -158,7 +158,7 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             // TODO 스킬 썼다는 패킷 보내야 함.
             skill_key_down = true;
             // 총알의 타입 변경 흠... 근데 흠...
-            ssystem->playSound(skill_sound, 0, false, &channel);
+            //ssystem->playSound(skill_sound, 0, false, &channel);
         }
     }
         break;
