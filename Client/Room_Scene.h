@@ -17,9 +17,9 @@ private:
     CImage* blue_idle_right;
     short frame;
 public:
-    System* ssystem;
-    Sound* room_bgm;
-    Sound* click_sound;
+    System* ssystem = nullptr;
+    Sound* room_bgm = nullptr;
+    Sound* click_sound = nullptr;
     Channel* channel = 0;
     FMOD_RESULT result;
     void* extradriverdata = 0;

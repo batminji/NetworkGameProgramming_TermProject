@@ -13,9 +13,9 @@ public:
     CImage* cartoon[6] ;
     CImage* click_cursor = &ResourceManager::getInstance().click_cursor;
 public:
-    System* ssystem;
-    Sound* click_sound;
-    Sound* cartoon_bgm;
+    System* ssystem = nullptr;
+    Sound* click_sound = nullptr;
+    Sound* cartoon_bgm = nullptr;
     Channel* channel = 0;
     FMOD_RESULT result;
     void* extradriverdata = 0;

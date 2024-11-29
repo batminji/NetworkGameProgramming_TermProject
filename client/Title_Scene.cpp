@@ -17,6 +17,7 @@ Title_Scene::Title_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
     ssystem->createSound("sound_file/title_bgm.OGG", FMOD_LOOP_NORMAL, 0, &title_bgm);
     ssystem->createSound("sound_file/click.OGG", FMOD_DEFAULT, 0, &click_sound);
     ssystem->playSound(title_bgm, 0, false, &channel);
+
 }
 
 void Title_Scene::render(LPVOID param)
@@ -103,10 +104,10 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                            strcpy(DataManager::getInstance().my_data.ID, loginPacket.id);
                            DataManager::getInstance().my_data.high_score = 0;
                            DataManager::getInstance().my_data.coin = 0;
-                           channel->stop();
-                           title_bgm->release();
-                           ssystem->close();
-                           ssystem->release();
+                           if(title_bgm)title_bgm->release();
+                           if (ssystem) {
+                               ssystem->close(); ssystem->release();
+                           }
                        }
                        else {
                            std::cout << "기존유저!" << std::endl;
@@ -114,10 +115,10 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                            strcpy(DataManager::getInstance().my_data.ID, loginPacket.id);
                            DataManager::getInstance().my_data.high_score = resPacket->high_score;
                            DataManager::getInstance().my_data.coin = resPacket->coin;
-                           channel->stop();
-                           title_bgm->release();
-                           ssystem->close();
-                           ssystem->release();
+                           if (title_bgm)title_bgm->release();
+                           if (ssystem) {
+                               ssystem->close(); ssystem->release();
+                           }
                        }
                    }
                    else {

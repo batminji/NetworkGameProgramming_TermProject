@@ -146,11 +146,6 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             else if (PtInRect(&start_rt, mypt)) { //시작 누르기
                 ssystem->playSound(click_sound, 0, false, &channel);
                 isPlaying = TRUE;
-                channel->stop();
-                room_bgm->release();
-                click_sound->release();
-                ssystem->close();
-                ssystem->release();
             }
         }
     }
@@ -212,11 +207,12 @@ int Room_Scene::room_data_update()
         if (true == roomPacket->isPlaying) {
             isPlaying = TRUE;
             next_scene = PLAY_SCENE;
-            channel->stop();
-            room_bgm->release();
-            click_sound->release();
-            ssystem->close();
-            ssystem->release();
+            if (room_bgm)room_bgm->release();
+            if (click_sound)click_sound->release();
+            if (ssystem) {
+                ssystem->close();
+                ssystem->release();
+            }
             return 1;
         }
         else {

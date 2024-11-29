@@ -168,20 +168,16 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 				closesocket(*m_sock);
 				WSACleanup();
 			}
-
-
-
 			next_scene = ROOM_SCENE;
-			channel->stop();
-			main_bgm->release();
-			click_sound->release();
-			shop_sound->release();
-			cant_shop_sound->release();
-			shop_cancle_sound->release();
-			ssystem->close();
-			ssystem->release();
-
-
+			if(main_bgm)main_bgm->release();
+			if (click_sound)click_sound->release();
+			if (shop_sound)shop_sound->release();
+			if (cant_shop_sound)cant_shop_sound->release();
+			if (shop_cancle_sound)shop_cancle_sound->release();
+			if (ssystem) {
+				ssystem->close();
+				ssystem->release();
+			}
 		}
 		if (PtInRect(&join_room_button, mypt)) { //join room
 			ssystem->playSound(click_sound, 0, false, &channel);
@@ -227,14 +223,15 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			
 			next_scene = ROOM_SCENE;
 
-			channel->stop();
-			main_bgm->release();
-			click_sound->release();
-			shop_sound->release();
-			cant_shop_sound->release();
-			shop_cancle_sound->release();
-			ssystem->close();
-			ssystem->release();
+			if (main_bgm)main_bgm->release();
+			if (click_sound)click_sound->release();
+			if (shop_sound)shop_sound->release();
+			if (cant_shop_sound)cant_shop_sound->release();
+			if (shop_cancle_sound)shop_cancle_sound->release();
+			if (ssystem) {
+				ssystem->close();
+				ssystem->release();
+			}
 		}
 	}
 		break;

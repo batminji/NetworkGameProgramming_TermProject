@@ -18,12 +18,12 @@ public:
     TCHAR join_room_id[20] = {'\0'};
     short input_cnt = 0;
 public:
-    System* ssystem;
-    Sound* main_bgm;
-    Sound* click_sound;
-    Sound* shop_sound;
-    Sound* cant_shop_sound;
-    Sound* shop_cancle_sound;
+    System* ssystem = nullptr;
+    Sound* main_bgm = nullptr;
+    Sound* click_sound = nullptr;
+    Sound* shop_sound = nullptr;
+    Sound* cant_shop_sound = nullptr;
+    Sound* shop_cancle_sound = nullptr;
     Channel* channel = 0;
     FMOD_RESULT result;
     void* extradriverdata = 0;
