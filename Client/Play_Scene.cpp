@@ -158,7 +158,7 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             // TODO 스킬 썼다는 패킷 보내야 함.
             skill_key_down = true;
             // 총알의 타입 변경 흠... 근데 흠...
-            ssystem->playSound(skill_sound, 0, false, &channel);
+            //ssystem->playSound(skill_sound, 0, false, &channel);
         }
     }
         break;

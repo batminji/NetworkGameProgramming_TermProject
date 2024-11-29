@@ -25,14 +25,14 @@ private:
     CImage* number;
     CImage* heart;
 public:
-    System* ssystem = nullptr;
-    Sound* battle_bgm = nullptr;
-    Sound* damage_sound = nullptr;
-    Sound* gameover_sound = nullptr;
-    Sound* skill_sound = nullptr;
-    Sound* explosion_sound = nullptr;
-    Sound* warning_sound = nullptr;
-    Sound* coin_sound= nullptr;
+    System* ssystem;
+    Sound* battle_bgm;
+    Sound* damage_sound;
+    Sound* gameover_sound;
+    Sound* skill_sound;
+    Sound* explosion_sound;
+    Sound* warning_sound;
+    Sound* coin_sound;
     Channel* channel = 0;
     FMOD_RESULT result;
     void* extradriverdata = 0;
