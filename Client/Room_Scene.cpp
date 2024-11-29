@@ -30,13 +30,13 @@ Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     blue_idle_left = &ResourceManager::getInstance().Kirby_blue_idle_left;
     blue_idle_right = &ResourceManager::getInstance().Kirby_blue_idle_right;
 
-    /*result = System_Create(&ssystem);
+    result = System_Create(&ssystem);
     if (result != FMOD_OK)
         exit(0);
     ssystem->init(32, FMOD_INIT_NORMAL, extradriverdata);
     ssystem->createSound("sound_file/room_bgm.OGG", FMOD_LOOP_NORMAL, 0, &room_bgm);
     ssystem->createSound("sound_file/click.OGG", FMOD_DEFAULT, 0, &click_sound);
-    ssystem->playSound(room_bgm, 0, false, &channel);*/
+    ssystem->playSound(room_bgm, 0, false, &channel);
 }
 void Room_Scene::render(LPVOID param)
 {
@@ -132,25 +132,20 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         // printf("x : %d y : %d\n", mx, my);
         if (master_player->who_is_me) {
             if (PtInRect(&dealer_rt, mypt)) { // 딜러 누르기
-                //ssystem->playSound(click_sound, 0, false, &channel);
+                ssystem->playSound(click_sound, 0, false, &channel);
                 master_player->job = 1;
                 join_player->job = 2;
                 DataManager::getInstance().master_is_dealer = true;
             }
             else if (PtInRect(&healer_rt, mypt)) { // 힐러 누르기
-                //ssystem->playSound(click_sound, 0, false, &channel);
+                ssystem->playSound(click_sound, 0, false, &channel);
                 master_player->job = 2;
                 join_player->job = 1;
                 DataManager::getInstance().master_is_dealer = false;
             }
             else if (PtInRect(&start_rt, mypt)) { //시작 누르기
-                //ssystem->playSound(click_sound, 0, false, &channel);
+                ssystem->playSound(click_sound, 0, false, &channel);
                 isPlaying = TRUE;
-                /*channel->stop();
-                room_bgm->release();
-                click_sound->release();
-                ssystem->close();
-                ssystem->release();*/
             }
         }
     }
@@ -212,11 +207,12 @@ int Room_Scene::room_data_update()
         if (true == roomPacket->isPlaying) {
             isPlaying = TRUE;
             next_scene = PLAY_SCENE;
-            /*channel->stop();
-            room_bgm->release();
-            click_sound->release();
-            ssystem->close();
-            ssystem->release();*/
+            if (room_bgm)room_bgm->release();
+            if (click_sound)click_sound->release();
+            if (ssystem) {
+                ssystem->close();
+                ssystem->release();
+            }
             return 1;
         }
         else {
