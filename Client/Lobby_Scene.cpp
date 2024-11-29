@@ -34,7 +34,7 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 
 	}
 
-	/*result = System_Create(&ssystem);
+	result = System_Create(&ssystem);
 	if (result != FMOD_OK)
 		exit(0);
 	ssystem->init(32, FMOD_INIT_NORMAL, extradriverdata);
@@ -43,7 +43,7 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 	ssystem->createSound("sound_file/Shop.OGG", FMOD_DEFAULT, 0, &shop_sound);
 	ssystem->createSound("sound_file/buzzer.OGG", FMOD_DEFAULT, 0, &cant_shop_sound);
 	ssystem->createSound("sound_file/cancle.OGG", FMOD_DEFAULT, 0, &shop_cancle_sound);
-	ssystem->playSound(main_bgm, 0, false, &channel);*/
+	ssystem->playSound(main_bgm, 0, false, &channel);
 }
 
 void Lobby_Scene::render(LPVOID param)
@@ -152,7 +152,7 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		int my = HIWORD(lParam);
 		POINT mypt = { mx,my };
 		if (PtInRect(&create_room_button, mypt)) { //create room
-			// ssystem->playSound(click_sound, 0, false, &channel);
+			ssystem->playSound(click_sound, 0, false, &channel);
 			printf("방만들귀\n");
 			//방만들기를 눌렀을때 처리
 			DataManager::getInstance().room_master = true;
@@ -172,19 +172,19 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 
 			next_scene = ROOM_SCENE;
-			/*channel->stop();
+			channel->stop();
 			main_bgm->release();
 			click_sound->release();
 			shop_sound->release();
 			cant_shop_sound->release();
 			shop_cancle_sound->release();
 			ssystem->close();
-			ssystem->release();*/
+			ssystem->release();
 
 
 		}
 		if (PtInRect(&join_room_button, mypt)) { //join room
-			// ssystem->playSound(click_sound, 0, false, &channel);
+			ssystem->playSound(click_sound, 0, false, &channel);
 			printf("방참가하귀\n");
 			//방 참가하기를 눌렀을때 처리
 			DataManager::getInstance().room_master = false;
@@ -227,14 +227,14 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			
 			next_scene = ROOM_SCENE;
 
-			/*channel->stop();
+			channel->stop();
 			main_bgm->release();
 			click_sound->release();
 			shop_sound->release();
 			cant_shop_sound->release();
 			shop_cancle_sound->release();
 			ssystem->close();
-			ssystem->release();*/
+			ssystem->release();
 		}
 	}
 		break;

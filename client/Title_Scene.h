@@ -17,12 +17,12 @@ private:
     short count = 0;
 
 public:
-    /*System* ssystem;
+    System* ssystem;
     Sound* title_bgm;
     Sound* click_sound;
     Channel* channel = 0;
     FMOD_RESULT result;
-    void* extradriverdata = 0;*/
+    void* extradriverdata = 0;
 
 public:
     Title_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock);
