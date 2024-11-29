@@ -265,13 +265,13 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         // 현재 플레이어가 마스터인 경우
         master_player->y = resPacket->this_y;
         join_player->y = resPacket->other_y;
-        cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
+       // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
     }
     else {
         // 현재 플레이어가 조인한 클라이언트인 경우
         join_player->y = resPacket->this_y;
         master_player->y = resPacket->other_y;
-        cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
+       // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
     }
 }
 
@@ -288,19 +288,19 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
    for (int i = 0; i < resPacket->number; ++i) {
        switch (resPacket->objs_type[i]) {
        case ENEMY_0:
-           temp_enemys.push_back({ 0,resPacket->objs_x[i] ,resPacket->objs_y[i] ,100 });
+           temp_enemys.push_back({ 0,resPacket->objs_x[i] ,resPacket->objs_y[i] ,resPacket->objs_hp[i]});
            break;
        case ENEMY_1:
-           temp_enemys.push_back({ 1,resPacket->objs_x[i] ,resPacket->objs_y[i] ,100 });
+           temp_enemys.push_back({ 1,resPacket->objs_x[i] ,resPacket->objs_y[i] ,resPacket->objs_hp[i] });
            break;
        case ENEMY_2:
-           temp_enemys.push_back({ 2,resPacket->objs_x[i] ,resPacket->objs_y[i] ,100 });
+           temp_enemys.push_back({ 2,resPacket->objs_x[i] ,resPacket->objs_y[i] ,resPacket->objs_hp[i] });
            break;
        case ENEMY_3:
-           temp_enemys.push_back({ 3,resPacket->objs_x[i] ,resPacket->objs_y[i] ,100 });
+           temp_enemys.push_back({ 3,resPacket->objs_x[i] ,resPacket->objs_y[i] ,resPacket->objs_hp[i] });
            break;
        case ENEMY_4:
-           temp_enemys.push_back({4,resPacket->objs_x[i] ,resPacket->objs_y[i] ,100});
+           temp_enemys.push_back({ 4,resPacket->objs_x[i] ,resPacket->objs_y[i] ,resPacket->objs_hp[i] });
            break;
     
            //cout << resPacket->objs_type[i] << " " << resPacket->objs_x[i] << " " << resPacket->objs_y[i] << endl;
@@ -344,7 +344,7 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
      //std::unique_lock<std::mutex> e_lock(enemys_mutex);
        std::swap(enemys, temp_enemys);
      //  e_lock.unlock();
-
-       //std::cout <<enemys.size()<< "마리 받았어염" << std::endl;
+       
+       std::cout <<enemys.size()<< "마리 받았어염" << std::endl;
    }
 }
