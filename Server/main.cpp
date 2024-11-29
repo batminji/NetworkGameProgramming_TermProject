@@ -220,7 +220,7 @@ public:
         std::lock_guard<std::mutex> ll{ update_lock };
         int i = 0;
         // enemies
-        for (i = 0; i < enemies.size(); ++i) {
+        for (i = 0; i < p_bullets.size(); ++i) {
             p.objs_type[i] = enemies[i].getType();
             p.objs_x[i] = enemies[i].getPosition().first;
             p.objs_y[i] = enemies[i].getPosition().second;
@@ -229,7 +229,7 @@ public:
 
         int m = 0;
         // player bullet
-        for (int j = i; j < i + p_bullets.size(); ++j) {
+        for (int j = i; j < i + enemies.size(); ++j) {
             p.objs_type[j] = p_bullets[m].getType();
             p.objs_x[j] = p_bullets[m].getPosition().first;
             p.objs_y[j] = p_bullets[m].getPosition().second;
@@ -239,7 +239,7 @@ public:
            // std::cout << p.objs_type[j] << " " << p.objs_x[j] << " " << p.objs_y[j] << std::endl;
         }
 
-        i += p_bullets.size();
+        i += enemies.size();
 
         for (int j = i; j < i + e_bullets.size(); ++j) {
             p.objs_type[j] = ENEMY_BULLETS;
