@@ -35,7 +35,7 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     number = &ResourceManager::getInstance().number;
     heart = &ResourceManager::getInstance().heart;
 
-    /*result = System_Create(&ssystem);
+    result = System_Create(&ssystem);
     if (result != FMOD_OK)
         exit(0);
     ssystem->init(32, FMOD_INIT_NORMAL, extradriverdata);
@@ -46,7 +46,7 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     ssystem->createSound("sound_file/Explosion.OGG", FMOD_DEFAULT, 0, &explosion_sound);
     ssystem->createSound("sound_file/warning.OGG", FMOD_DEFAULT, 0, &warning_sound);
     ssystem->createSound("sound_file/coin.OGG", FMOD_DEFAULT, 0, &coin_sound);
-    ssystem->playSound(battle_bgm, 0, false, &channel);*/
+    ssystem->playSound(battle_bgm, 0, false, &channel);
 };
 
 Play_Scene::~Play_Scene()
