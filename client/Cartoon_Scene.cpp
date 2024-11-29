@@ -52,11 +52,12 @@ LRESULT Cartoon_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
         ssystem->playSound(click_sound, 0, false, &channel);
         if (cartoon_cnt == 6) {
             next_scene = LOBBY_SCENE;
-            channel->stop();
-            cartoon_bgm->release();
-            click_sound->release();
-            ssystem->close();
-            ssystem->release();
+            if(cartoon_bgm)cartoon_bgm->release();
+            if (click_sound)click_sound->release();
+            if (ssystem) {
+                ssystem->close();
+                ssystem->release();
+            }
         }
         break;
     case WM_KEYDOWN:
