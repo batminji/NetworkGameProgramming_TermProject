@@ -59,7 +59,7 @@ class Enemy
     //유도되는 정보
     unsigned short width = 0;
     unsigned short height = 0;
-    POINT goal = { 0, 0 };
+    POINT goal = {0,0};
 public:
     Enemy(OTYPE a_type, int a_x, int a_y, int a_hp)
     {
@@ -72,26 +72,25 @@ public:
         else if (type == 1 || type == 2) width = 90, height = 130;
         else if (type == 3) width = 100, height = 120;
         else if (type == 4) width = 256, height = 224;
-        goal = { rand() % 200 - 30, rand() % 400 + 50 };
+        goal = { rand() % 200 + 30, rand() % 400 + 50 };
     }
     void ai_move()
     {
         // todo: 여기 ai 로직 넣어줘
-        float dx = goal.x - x;
-        float dy = goal.y - y;
-        float distance = sqrt(dx * dx + dy * dy);
-        if (type == 0) distance = sqrt(dy);
+     
+        if (type == ENEMY_0) {
 
-        if (distance < 1.0f) {
-            x = goal.x;
-            y = goal.y;
-            goal = { rand() % 200 - 30, rand() % 400 + 50 };
+            y += rand() % 40 - 20;
+            if (y < 146)y =146;
+            if (y > 504)y = 504;
+
         }
-
-        // 목표로 향하는 단위 벡터를 따라 이동
-        float speed = 10.0f;
-        if (type != 0) x += dx / distance * speed;
-        y += dy / distance * speed;
+        else {
+            x += ((goal.x -x) / sqrt(pow(goal.x - x, 2) + pow(goal.y - y, 2)))*5;
+            y += ((goal.y -y) / sqrt(pow(goal.x -y, 2) + pow(goal.y -y, 2)))*5;
+            if ((x <= goal.x + 10 && x >= goal.x - 10 &&y <= goal.y + 10 && y >= goal.y - 10)) goal = { rand() % 200 + 30, rand() % 400 + 50 };
+        }
+        
     }
     bool collsion_player_bullet(Player_Bullet& bullet, std::string& id) {
         //적과 총알 충돌 검사
@@ -730,7 +729,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             roomInfo[pid]->Create_enemy();
             push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
             // push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
-            // push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
+             push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
         }
         push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
         send_player_move_packet(s, pid);
