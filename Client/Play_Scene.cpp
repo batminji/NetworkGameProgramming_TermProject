@@ -62,8 +62,11 @@ void Play_Scene::render(LPVOID param)
 	RECT rect;
 	GetClientRect(m_hwnd, &rect);
 
-    //ui
-    ui_render();
+    //배경
+    game_bg->StretchBlt(m_hBufferDC, 0, 50, 800, 600 - 50, bg_xPos, 0, 800, 500, SRCCOPY);
+    if (bg_xPos >= 800)game_bg->StretchBlt(m_hBufferDC, 1600 - bg_xPos, 50, bg_xPos - 800, 600 - 50, 0, 0, bg_xPos - 800, 500, SRCCOPY);
+    game_bg2->StretchBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, SRCCOPY);
+   
     // 캐릭터 그리기 (단순한 사각형으로 표현)
     master_player->render(m_hBufferDC);
     join_player->render(m_hBufferDC);
@@ -74,14 +77,13 @@ void Play_Scene::render(LPVOID param)
     //총알 
     for (bullet b : bullets) b.render(m_hBufferDC);
     
-    
+    //ui
+    ui_render();
 }
 
 void Play_Scene::ui_render()
 {
-    game_bg->StretchBlt(m_hBufferDC, 0, 50, 800, 600 - 50, bg_xPos, 0, 800, 500, SRCCOPY);
-    if (bg_xPos >= 800)game_bg->StretchBlt(m_hBufferDC, 1600 - bg_xPos, 50, bg_xPos - 800, 600 - 50, 0, 0, bg_xPos - 800, 500, SRCCOPY);
-    game_bg2->StretchBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, SRCCOPY);
+    
   //  // 아이템
   //  for (int i = 0; i < 4; ++i)
   //      if (item[i].buy)item[i].img.TransparentBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, RGB(255, 0, 255));
@@ -345,6 +347,5 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
        std::swap(enemys, temp_enemys);
      //  e_lock.unlock();
        
-       // std::cout <<enemys.size()<< "마리 받았어염" << std::endl;
    }
 }

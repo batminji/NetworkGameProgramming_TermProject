@@ -15,13 +15,18 @@ private:
 
     POINT dir;
 public:
-
+    Enemy_Bullet(unsigned short x, unsigned short y, POINT dir) : x{ x }, y{ y }, dir{ dir } {}
+    Enemy_Bullet(int x, int y, POINT dir) : x{ static_cast<unsigned short>(x) }, y{ static_cast<unsigned short>(y) }, dir{ dir } {}
     std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
     void updatePosition()
     {
-        x += MOVE_DIST * dir.x;
-        y += MOVE_DIST * dir.y;
+        x += -MOVE_DIST * dir.x;
+        y += -MOVE_DIST * dir.y;
     }
+    unsigned short GetX() { return x; }
+    unsigned short GetY() { return y; }
+    POINT GetDir() { return dir; }
+    void SetDir(POINT new_dir) { dir = new_dir; }
 };
 
 class Player_Bullet // 무조건 왼쪽으로 이동하기만 함.
@@ -54,11 +59,14 @@ class Enemy
     unsigned short x = 0;
     unsigned short y = 0;
     unsigned short hp = 0;
-    unsigned short bullet_create_cnt = 0;
 
+public:
+    short attack_type;
+    short bullet_create_cnt = -2;
     //유도되는 정보
     unsigned short width = 0;
     unsigned short height = 0;
+private:
     POINT goal = {0,0};
 public:
     Enemy(OTYPE a_type, int a_x, int a_y, int a_hp)
@@ -73,6 +81,9 @@ public:
         else if (type == 3) width = 100, height = 120;
         else if (type == 4) width = 256, height = 224;
         goal = { rand() % 200 + 30, rand() % 400 + 50 };
+
+        attack_type = rand() % 4;
+
     }
     void ai_move()
     {
@@ -92,6 +103,8 @@ public:
         }
         
     }
+
+  
     bool collsion_player_bullet(Player_Bullet& bullet, std::string& id) {
         //적과 총알 충돌 검사
 
@@ -172,12 +185,95 @@ public:
         }
     }
 
+    void createEbullet(std::string& s) {
+        std::lock_guard<std::mutex> ll{ update_lock };
+        for (auto& e : enemies) {
+            e.bullet_create_cnt++;
+            if (e.bullet_create_cnt > (10.0 - ((double)clear_stage / 2))) {
+
+                switch (e.getType())
+                {
+                case ENEMY_0://작은몬스터 총알생성
+                    e_bullets.push_back({ e.getPosition().first + 96, e.getPosition().second + 10, POINT{ 1, (rand() % 6 - 3)} });
+                    e.bullet_create_cnt = 0;
+                    break;
+                case ENEMY_4://큰몬스터 총알생성
+                    switch (e.attack_type)
+                    {
+                    case 0://원발사
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{ 0, 3 } });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{ 1, 2 } });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{ 1,-2 } });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{  2, 1 } });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{  2,-1 } });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{ -3,0 } });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{ 3,0 } });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{ -2, 1} });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{ -2,-1 } });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{ -1, 2 } });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{ -1,-2 } });
+                        e_bullets.push_back({ e.getPosition().first + 122,e.getPosition().second + 148,{0,-3 } });
+                        break;
+                    case 1: //일직선발사
+                        for (int i = 0; i < 5; i++) e_bullets.push_back({e.getPosition().first+ e.width - 112,e.getPosition().second + 44 * i,{ 3, 0}});
+                        break;
+                    case 2: //랜덤발사
+                        for (int i = 0; i < 7; i++) {
+                            e_bullets.push_back({e.getPosition().first + e.width - 122,e.getPosition().second + 118,{ (rand() % 6 - 3),(rand() % 6 - 3 )}});
+                            while (e_bullets.back().GetDir().x == 0 && e_bullets.back().GetDir().y == 0)e_bullets.back().SetDir({ rand() % 6 - 3, rand() % 6 - 3 });
+                        }
+                        break;
+                    case 3: //회오리발사
+                        e_bullets.push_back({ e.getPosition().first + e.width - 122,e.getPosition().second + 118 ,{(short)((cos(((e.bullet_create_cnt - 10) * 15) * M_PI / 180))*3), (short)((sin((e.bullet_create_cnt - 10) * 15 * M_PI / 180))*3)}});
+                        break;
+                    default:
+                        break;
+                    }
+                    if ((e.attack_type != 3 && e.bullet_create_cnt > 10 + 5) || (e.attack_type == 3 && e.bullet_create_cnt > 10 + 200))e.bullet_create_cnt = 0, e.attack_type = rand()%4;
+                    break;
+                default://중간몬스터 총알생성
+                    switch (e.attack_type)
+                    {
+                    case 0://원발사
+                        e_bullets.push_back( {e.getPosition().first + 45,e.getPosition().second + 65,{ 0, 4} });
+                        e_bullets.push_back( {e.getPosition().first + 45,e.getPosition().second + 65,{ 2, 2} });
+                        e_bullets.push_back( {e.getPosition().first + 45,e.getPosition().second + 65,{ 2,-2} });
+                        e_bullets.push_back( {e.getPosition().first + 45,e.getPosition().second + 65,{-4,0 } });
+                        e_bullets.push_back( {e.getPosition().first + 45,e.getPosition().second + 65,{ 4,0 } });
+                        e_bullets.push_back({ e.getPosition().first + 45,e.getPosition().second + 65,{ -2, 2 } });
+                        e_bullets.push_back({ e.getPosition().first + 45,e.getPosition().second + 65,{ -2,-2 } });
+                        e_bullets.push_back( {e.getPosition().first + 45,e.getPosition().second + 65,{ 0,-4} });
+                        break;
+                    case 1: //일직선발사
+                        for (int i = 0; i < 3; i++) e_bullets.push_back({ e.getPosition().first + e.width - 45,e.getPosition().second + 40 * i + 20 , { 3,0 }  });
+                        break;
+                    case 2: //랜덤발사
+                        for (int i = 0; i < 5; i++) {
+                            e_bullets.push_back({ e.getPosition().first + e.width - 122,e.getPosition().second + 118,{ (rand() % 6 - 3),(rand() % 6 - 3)} });
+                            while (e_bullets.back().GetDir().x == 0 && e_bullets.back().GetDir().y == 0)e_bullets.back().SetDir({ rand() % 6 - 3, rand() % 6 - 3 });
+                        }
+                        break;
+                    case 3: //회오리발사
+                        e_bullets.push_back({ e.getPosition().first + e.width - 122,e.getPosition().second + 118 ,{(short)((cos(((e.bullet_create_cnt - 10) * 15) * M_PI / 180)) * 3), (short)((sin((e.bullet_create_cnt - 10) * 15 * M_PI / 180)) * 3)} });
+                        break;
+                    default:
+                        break;
+                    }
+                    if ((e.attack_type != 3 && e.bullet_create_cnt > 10 + 5) || (e.attack_type == 3 && e.bullet_create_cnt > 10 + 200))e.bullet_create_cnt = 0, e.attack_type = rand()%4;
+                    break;
+                }
+
+            }
+        }
+
+    }
+
     void deletebullet(std::string& id)
     {
         std::lock_guard<std::mutex> ll{ update_lock };
         // 1. 나간 총알 지우기
         std::erase_if(p_bullets, [](Player_Bullet& pb) { return (pb.getPosition().first < 10); });
-        std::erase_if(e_bullets, [](Enemy_Bullet& eb) { return (eb.getPosition().first > 800 || eb.getPosition().first < 10); });
+        std::erase_if(e_bullets, [](Enemy_Bullet& eb) { return (eb.getPosition().first > 800 || eb.getPosition().first < 10|| eb.getPosition().second > 600 || eb.getPosition().second < 10); });
 
         // 2. 충돌체크 총알
         for (auto& e : enemies) {
@@ -214,6 +310,8 @@ public:
         }
     }
 
+
+
     void sendSetup(SC_OBJECT_MOVE_PACKET& p)
     {
         std::lock_guard<std::mutex> ll{ update_lock };
@@ -240,7 +338,7 @@ public:
 
         i += p_bullets.size();
 
-        for (int j = i; j < i + e_bullets.size(); ++j) {
+        for (int j = i; j < i + e_bullets.size()&& j< 100; ++j) {
             p.objs_type[j] = ENEMY_BULLETS;
             p.objs_x[j] = e_bullets[j].getPosition().first;
             p.objs_y[j] = e_bullets[j].getPosition().second;
@@ -732,6 +830,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
              push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
         }
         push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
+        push_evt_queue(FIRE_ENEMY_BULLET, 0, pid); // 적총알발사
         send_player_move_packet(s, pid);
         while (true) {
             send_object_move_packet(s, pid); // todo: 왜?
@@ -817,7 +916,7 @@ void ai_thread()
             break;
 
         case FIRE_ENEMY_BULLET:
-            roomInfo[ev.room_id]->createPbullet(ev.room_id);
+            roomInfo[ev.room_id]->createEbullet(ev.room_id);
             push_evt_queue(FIRE_ENEMY_BULLET, 1000, ev.room_id); // 1초에 한개씩 발사
             break;
 
