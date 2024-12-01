@@ -93,7 +93,7 @@ void Play_Scene::ui_render()
    
   //  //점수
     int num;
-    // wsprintf(number_text, L"%d", play_score);
+    wsprintf(number_text, L"%d", play_score);
     if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 10, 12, 24, 28, 0, 0, 12, 14, RGB(255, 0, 255));
     for (int i = 0; i < lstrlen(number_text); i++) {
         num = number_text[i] - 48;
@@ -263,6 +263,10 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
     const SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<const SC_PLAYER_MOVE_PACKET*>(packetData);
     // cout << "현재 실행중인 함수 : recv_player(7)    받은 패킷타입 :" << resPacket->type << endl;
     // 데이터 갱신
+    heart_cnt = resPacket->hp;
+    play_score = resPacket->score;
+    std::cout << play_score << "점" << std::endl;
+
     if (master_player->who_is_me) {
         // 현재 플레이어가 마스터인 경우
         master_player->y = resPacket->this_y;

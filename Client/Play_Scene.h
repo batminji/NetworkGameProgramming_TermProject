@@ -42,9 +42,9 @@ private :
     TCHAR number_text[99] = { '\0' };//점수, 골드 출력용
 
     POINT heart_pt[4] = { {765,25},{730,25},{695,25},{660,25} }; // 하트 찍는 위치
-    int heart_cnt = 3; // 하트 갯수
+    unsigned short heart_cnt = 3; // 하트 갯수
 
-    int play_score = 0;//이번판의 점수
+    unsigned int play_score = 0;//이번판의 점수
     int play_gold = 0;//이번판의 돈
 
     //스킬키 눌럿더염?

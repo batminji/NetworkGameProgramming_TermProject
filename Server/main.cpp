@@ -189,8 +189,7 @@ public:
         std::lock_guard<std::mutex> ll{ update_lock };
         for (auto& e : enemies) {
             e.bullet_create_cnt++;
-            if (e.bullet_create_cnt > (10.0 - ((double)clear_stage / 2))) {
-
+      
                 switch (e.getType())
                 {
                 case ENEMY_0://작은몬스터 총알생성
@@ -263,7 +262,7 @@ public:
                     break;
                 }
 
-            }
+            
         }
 
     }
@@ -618,6 +617,7 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
 
     res.hp = roomInfo[id]->getHeart();
     res.score = roomInfo[id]->getScore();
+    std::cout << res.score << std::endl;
 
     // std::cout << id << "의 y좌표: " << res.this_y << std::endl;
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
