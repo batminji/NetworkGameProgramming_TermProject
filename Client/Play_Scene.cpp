@@ -320,7 +320,7 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
            break;
        }
        case P2_BULLET: {
-           bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 2);
+           bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 1, 2);
            temp_bullets.push_back(temp_bullet);
            break;
        }
@@ -329,9 +329,11 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
            temp_bullets.push_back(temp_bullet);
            break;
        }
-       case P2_SKILLBULLET:
-
+       case P2_SKILLBULLET: {
+           bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 2, 2);
+           temp_bullets.push_back(temp_bullet);
            break;
+       }
        case ITEM:
 
            break;

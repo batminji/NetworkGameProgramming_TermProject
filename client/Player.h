@@ -9,14 +9,14 @@ class Player
 	 
  public :
 	 CImage* kirby_pink_fly;
-	 CImage* kirby_pink_die;
 	 CImage* kirby_pink_hit;
 	 CImage* kirby_pink_zombie;
 
 	 CImage* kirby_blue_fly;
-	 CImage* kirby_blue_die;
 	 CImage* kirby_blue_hit;
 	 CImage* kirby_blue_zombie;
+
+	 CImage* kirby_shield;
 	
 	short job;
 	bool room;

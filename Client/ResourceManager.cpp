@@ -3,6 +3,8 @@
 void ResourceManager::init(HINSTANCE g_hInst)
 {
     // 그래픽 리소스 로드
+    Kirby_shield.LoadFromResource(g_hInst, MAKEINTRESOURCE(SHIELD));
+
     Kirby_pink_idle_left.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_IDLE_LEFT));
     Kirby_blue_idle_left.LoadFromResource(g_hInst, MAKEINTRESOURCE(BLUE_IDLE_LEFT));
     Kirby_pink_idle_right.LoadFromResource(g_hInst, MAKEINTRESOURCE(PINK_IDLE_RIGHT));

@@ -25,7 +25,14 @@ void bullet::render(HDC mdc)
 		}
 		break;
 	case 2: // Healer
-		Kirby_pink_bullet->TransparentBlt(mdc, xy[0] - 20, xy[1] - 10, 40, 20, basic_bullet_frame, 0, 270, 160, RGB(255, 0, 255));
+		switch (type) {
+		case 1:
+			Kirby_pink_bullet->TransparentBlt(mdc, xy[0] - 20, xy[1] - 10, 40, 20, basic_bullet_frame, 0, 270, 160, RGB(255, 0, 255));
+			break;
+		case 2:
+			Kirby_pink_skill_bullet->TransparentBlt(mdc, xy[0] - 20, xy[1] - 15, 40, 30, skill_bullet_frame, 0, 260, 260, RGB(255, 0, 255));
+			break;
+		}
 		break;
 	case 3: // Monster
 		Monster_bullet->TransparentBlt(mdc, xy[0], xy[1], 10, 10, 0, 0, 30, 30, RGB(255, 0, 255));

@@ -185,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Downloads\room_screen_bg.bmp" />
+    <Image Include="..\..\..\..\Downloads\shield.bmp" />
     <Image Include="resource_file\basic_bullets.bmp" />
     <Image Include="resource_file\basic_bullet_2.bmp" />
     <Image Include="resource_file\big.bmp" />
@@ -254,6 +255,7 @@
     <Image Include="resource_file\rezero_bg.bmp" />
     <Image Include="resource_file\room_screen.bmp" />
     <Image Include="resource_file\room_screen_bg.bmp" />
+    <Image Include="resource_file\shield.bmp" />
     <Image Include="resource_file\skill_bullet.bmp" />
     <Image Include="resource_file\skill_color.bmp" />
     <Image Include="resource_file\skill_dark.bmp" />
