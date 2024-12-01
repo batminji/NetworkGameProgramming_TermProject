@@ -10,6 +10,7 @@ private:
     unsigned short y = 300;
     unsigned int high_score = 0;
     unsigned int coin = 0; // 오버플로우 떠서 int로 수정
+    short zombie_cnt = 0; //1 이상이 되면 잠시 무적모드, 1이상이 되면 1프레임에 1씩 점점 올려서 30이 되면 다시 좀비카운트를 0으로,
 
     // 게임을 실행중일 때 
     bool isSkill = false;
@@ -54,4 +55,7 @@ public:
     bool getSkill() { return isSkill; }
     void setSkill(bool b) { isSkill = b; }
     void addSkillCount() { skillCount++; }
+    void setZombieCnt(short new_zombie_cnt) { zombie_cnt = new_zombie_cnt; }
+    short zombieCount() { return zombie_cnt; }
+
 };
