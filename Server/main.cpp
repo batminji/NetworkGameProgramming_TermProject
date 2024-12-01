@@ -344,11 +344,12 @@ public:
         }
 
         i += p_bullets.size();
-
+        int enemy_bullet_cnt = 0;
         for (int j = i; j < i + e_bullets.size()&& j< 100; ++j) {
             p.objs_type[j] = ENEMY_BULLETS;
-            p.objs_x[j] = e_bullets[j].getPosition().first;
-            p.objs_y[j] = e_bullets[j].getPosition().second;
+            p.objs_x[j] = e_bullets[enemy_bullet_cnt].getPosition().first;
+            p.objs_y[j] = e_bullets[enemy_bullet_cnt].getPosition().second;
+            enemy_bullet_cnt++;
         }
     }
 
