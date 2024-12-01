@@ -34,6 +34,7 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     game_bg2 = &ResourceManager::getInstance().game_bg2;
     number = &ResourceManager::getInstance().number;
     heart = &ResourceManager::getInstance().heart;
+    kirby_shield = &ResourceManager::getInstance().Kirby_shield;
 
     result = System_Create(&ssystem);
     if (result != FMOD_OK)
@@ -67,6 +68,16 @@ void Play_Scene::render(LPVOID param)
     if (bg_xPos >= 800)game_bg->StretchBlt(m_hBufferDC, 1600 - bg_xPos, 50, bg_xPos - 800, 600 - 50, 0, 0, bg_xPos - 800, 500, SRCCOPY);
     game_bg2->StretchBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, SRCCOPY);
    
+    // 방어막 (있다면)그리기
+    if (master_player->job == 2 && master_player->skill) {
+        kirby_shield->TransparentBlt(m_hBufferDC, master_player->x - 40, master_player->y - 40, 80, 80, 0, 0, 100, 100, RGB(255, 0, 255));
+        kirby_shield->TransparentBlt(m_hBufferDC, join_player->x - 40, join_player->y - 40, 80, 80, 0, 0, 100, 100, RGB(255, 0, 255));
+    }
+    else if (join_player->job == 2 && join_player->skill) {
+        kirby_shield->TransparentBlt(m_hBufferDC, master_player->x - 40, master_player->y - 40, 80, 80, 0, 0, 100, 100, RGB(255, 0, 255));
+        kirby_shield->TransparentBlt(m_hBufferDC, join_player->x - 40, join_player->y - 40, 80, 80, 0, 0, 100, 100, RGB(255, 0, 255));
+    }
+
     // 캐릭터 그리기 (단순한 사각형으로 표현)
     master_player->render(m_hBufferDC);
     join_player->render(m_hBufferDC);
@@ -267,13 +278,17 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         // 현재 플레이어가 마스터인 경우
         master_player->y = resPacket->this_y;
         join_player->y = resPacket->other_y;
+        if (resPacket->skillEnd)master_player->skill = true;
+        else master_player->skill = false;
        // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
     }
     else {
         // 현재 플레이어가 조인한 클라이언트인 경우
         join_player->y = resPacket->this_y;
         master_player->y = resPacket->other_y;
-       // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
+        // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
+        if (resPacket->skillEnd)join_player->skill = true;
+        else join_player->skill = false;
     }
 }
 

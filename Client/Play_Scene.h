@@ -24,6 +24,7 @@ private:
     CImage* game_bg2;
     CImage* number;
     CImage* heart;
+    CImage* kirby_shield;
 public:
     System* ssystem;
     Sound* battle_bgm;

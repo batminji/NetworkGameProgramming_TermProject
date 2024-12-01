@@ -16,7 +16,7 @@ class Player
 	 CImage* kirby_blue_hit;
 	 CImage* kirby_blue_zombie;
 
-	 CImage* kirby_shield;
+	 
 	
 	short job;
 	bool room;
