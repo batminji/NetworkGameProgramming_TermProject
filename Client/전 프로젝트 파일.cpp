@@ -413,6 +413,7 @@ int zombie_cnt = 0;
 void hit_me() {
 	for (int i = 0; i < eb.size(); i++) {
 		if (PtInRect(&kirby.rt, eb[i].xy) == 1 && zombie_cnt < 1) {
+			
 			if (heart_cnt > 0)heart_cnt--;
 			eb.erase(eb.begin() + i);
 			zombie_cnt = 1;

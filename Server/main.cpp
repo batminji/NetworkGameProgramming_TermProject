@@ -7,6 +7,7 @@ enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_M
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid);
 void addSkillCount(OTYPE type, std::string& id);
 
+
 class Enemy_Bullet
 {
 private:
@@ -27,24 +28,7 @@ public:
     unsigned short GetY() { return y; }
     POINT GetDir() { return dir; }
     void SetDir(POINT new_dir) { dir = new_dir; }
-    bool collision_player(std::string& id) {
-
-        std::string healer_id = id;
-        if (roomInfo[id]->getisDealer((roomInfo[id]->getP1ID()))) healer_id = roomInfo[id]->getP2ID();
-        else  healer_id = roomInfo[id]->getP1ID();
-
-            RECT player_rt = { DEFXPOS - 25,players[id].getY() - 25, DEFXPOS + 25,players[id].getY() + 25};
-            if (PtInRect(&player_rt, { x,y }) == 1 && players[id].zombieCount() < 1) {
-                if (!(players[healer_id].getSkill())) {//힐러의 보호막이 켜져있지않을때??
-                    //커비 하트 깎기
-                    
-                    // 커비 잠시 무적모드 활성화 zombie_cnt를 1로
-                    players[id].setZombieCnt(1);
-                    return true;
-                }  
-            }
-            else false;
-    }
+   
 };
 
 class Player_Bullet // 무조건 왼쪽으로 이동하기만 함.
@@ -294,13 +278,35 @@ public:
 
         // 2. 충돌체크 총알
         for (auto& e : enemies) {
-            std::erase_if(p_bullets, [&e, &id](Player_Bullet& pb) { return e.collsion_player_bullet(pb, id); });
+            std::erase_if(p_bullets, [&e, &id](Player_Bullet& pb) { 
+                return e.collsion_player_bullet(pb, id); });
             // 죽었는지 확인해야하는데..
         }
 
-
         // todo: 3. players[id]와 적 총알 충돌체크
-        std::erase_if(e_bullets, [&id](Enemy_Bullet& eb) {return eb.collision_player(id); });
+        std::erase_if(e_bullets, [this,&id](Enemy_Bullet& eb) {
+            
+            Player* me = nullptr;
+            if (p1->getID() == id) me = p1;
+            else me = p2;
+
+            Player* healer = nullptr;
+            if (getisDealer(p1->getID())) healer = p2;
+            else  healer = p1;
+
+            RECT player_rt = { DEFXPOS - 25, me->getY() - 25, DEFXPOS + 25, me->getY() + 25 };
+            if (PtInRect(&player_rt, { eb.GetX(),eb.GetY()}) == 1 && me->zombieCount() < 1) {
+                if ((healer) && (!(healer->getSkill()))) {//힐러의 보호막이 켜져있지않을때??
+                    //커비 하트 깎기
+
+                    // 커비 잠시 무적모드 활성화 zombie_cnt를 1로
+                    me->setZombieCnt(1);
+                    return true;
+                }
+                else return true; // 보호막 맞아도 그냥 트루해서 총알없어지게.
+            }
+            else return false;
+            });
     }
 
     

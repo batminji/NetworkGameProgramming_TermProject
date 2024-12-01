@@ -66,7 +66,7 @@ void Play_Scene::render(LPVOID param)
     //배경
     game_bg->StretchBlt(m_hBufferDC, 0, 50, 800, 600 - 50, bg_xPos, 0, 800, 500, SRCCOPY);
     if (bg_xPos >= 800)game_bg->StretchBlt(m_hBufferDC, 1600 - bg_xPos, 50, bg_xPos - 800, 600 - 50, 0, 0, bg_xPos - 800, 500, SRCCOPY);
-    game_bg2->StretchBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, SRCCOPY);
+   
    
     // 방어막 (있다면)그리기
     if (master_player->job == 2 && master_player->skill) {
@@ -94,7 +94,7 @@ void Play_Scene::render(LPVOID param)
 
 void Play_Scene::ui_render()
 {
-    
+    game_bg2->StretchBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, SRCCOPY);
   //  // 아이템
   //  for (int i = 0; i < 4; ++i)
   //      if (item[i].buy)item[i].img.TransparentBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, RGB(255, 0, 255));
@@ -276,7 +276,6 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
     // 데이터 갱신
     heart_cnt = resPacket->hp;
     play_score = resPacket->score;
-    std::cout << play_score << "점" << std::endl;
 
     if (master_player->who_is_me) {
         // 현재 플레이어가 마스터인 경우
