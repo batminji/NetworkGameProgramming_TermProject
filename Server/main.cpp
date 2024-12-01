@@ -28,9 +28,14 @@ public:
     POINT GetDir() { return dir; }
     void SetDir(POINT new_dir) { dir = new_dir; }
     bool collision_player(std::string& id) {
+
+        std::string healer_id = id;
+        if (roomInfo[id]->getisDealer((roomInfo[id]->getP1ID()))) healer_id = roomInfo[id]->getP2ID();
+        else  healer_id = roomInfo[id]->getP1ID();
+
             RECT player_rt = { DEFXPOS - 25,players[id].getY() - 25, DEFXPOS + 25,players[id].getY() + 25};
             if (PtInRect(&player_rt, { x,y }) == 1 && players[id].zombieCount() < 1) {
-                if (!((!roomInfo[id]->getisDealer(id)) && players[id].getSkill())) {//힐러의 보호막이 켜져있지않을때??
+                if (!(players[healer_id].getSkill())) {//힐러의 보호막이 켜져있지않을때??
                     //커비 하트 깎기
                     
                     // 커비 잠시 무적모드 활성화 zombie_cnt를 1로
