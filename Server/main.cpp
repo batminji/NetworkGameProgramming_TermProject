@@ -280,6 +280,16 @@ public:
             std::erase_if(p_bullets, [&e, &id](Player_Bullet& pb) { return e.collsion_player_bullet(pb, id); });
             // 죽었는지 확인해야하는데..
         }
+        
+        // todo: 3. p1과 적 총알 충돌체크
+        //std::erase_if(e_bullets, [](Enemy_Bullet& eb) {return eb.collision})
+    }
+
+
+    void deleteEnemy() // 몬스터 삭제
+    {
+        std::lock_guard<std::mutex> ll{ update_lock };
+        std::erase_if(enemies, [](Enemy& e) {return e.getHP() == 0; });
     }
 
     void Create_enemy()
@@ -309,8 +319,6 @@ public:
             enemies.push_back({ ENEMY_0,210,450,10 + (clear_stage * 5) });
         }
     }
-
-
 
     void sendSetup(SC_OBJECT_MOVE_PACKET& p)
     {
@@ -372,6 +380,8 @@ public:
         if (p2 != nullptr) ret = ret && p2->broadcast(res, size);
         return ret;
     }
+    unsigned short getHeart() { return heart; }
+    unsigned int getScore() { return score; }
 };
 
 class EVENT
@@ -606,6 +616,9 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
         res.other_y = roomInfo[id]->getP1Y();
     }
 
+    res.hp = roomInfo[id]->getHeart();
+    res.score = roomInfo[id]->getScore();
+
     // std::cout << id << "의 y좌표: " << res.this_y << std::endl;
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
@@ -717,8 +730,6 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
             send_player_move_packet(s, id);
             break;
         }
-        if (!p->isDealer)
-            int k = 0;
         {
             std::lock_guard<std::mutex> ll{ roomLock };
             if (p->isQuit) { // 나가기
@@ -833,7 +844,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         push_evt_queue(FIRE_ENEMY_BULLET, 0, pid); // 적총알발사
         send_player_move_packet(s, pid);
         while (true) {
-            send_object_move_packet(s, pid); // todo: 왜?
+            send_object_move_packet(s, pid); 
 
             // recv.CS_MOVE_PACKET
             ZeroMemory(recv_buf, sizeof(recv_buf));
@@ -912,6 +923,7 @@ void ai_thread()
                 roomInfo[ev.room_id]->doBulletsMove();
                 push_evt_queue(MOVE_PLAYER_BULLET, 100, ev.room_id); // .5초에 한개씩 발사
                 roomInfo[ev.room_id]->deletebullet(ev.room_id); // 총알 충돌체크
+                roomInfo[ev.room_id]->deleteEnemy();
             }
             break;
 
