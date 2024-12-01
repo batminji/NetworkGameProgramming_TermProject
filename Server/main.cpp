@@ -617,7 +617,12 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
 
     res.hp = roomInfo[id]->getHeart();
     res.score = roomInfo[id]->getScore();
-    std::cout << res.score << std::endl;
+    if (roomInfo[id]->getP1ID() == id) { // 내가 p1이군
+        res.skillEnd = roomInfo[id]->getP1()->getSkill();
+    }
+    else {
+        res.skillEnd = roomInfo[id]->getP2()->getSkill();
+    }
 
     // std::cout << id << "의 y좌표: " << res.this_y << std::endl;
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);

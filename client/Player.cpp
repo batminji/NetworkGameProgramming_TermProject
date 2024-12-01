@@ -10,7 +10,7 @@ Player::Player()
 	kirby_blue_hit = &ResourceManager::getInstance().Kirby_blue_hit;
 	kirby_blue_zombie = &ResourceManager::getInstance().Kirby_blue_zombie;
 
-	kirby_shield = &ResourceManager::getInstance().Kirby_shield;
+	
 
 	job = 1;
 }
@@ -25,7 +25,7 @@ Player::Player(short j, bool w)
 	kirby_blue_hit = &ResourceManager::getInstance().Kirby_blue_hit;
 	kirby_blue_zombie = &ResourceManager::getInstance().Kirby_blue_zombie;
 
-	kirby_shield = &ResourceManager::getInstance().Kirby_shield;
+	
 	job = j;
 	who_is_me = w;
 	room = FALSE;
@@ -41,7 +41,7 @@ Player::Player(const Player& other)
 	kirby_blue_hit = &ResourceManager::getInstance().Kirby_blue_hit;
 	kirby_blue_zombie = &ResourceManager::getInstance().Kirby_blue_zombie;
 
-	kirby_shield = &ResourceManager::getInstance().Kirby_shield;
+	
 
 	job = other.job;
 	who_is_me = other.who_is_me;
