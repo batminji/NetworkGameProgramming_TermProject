@@ -35,6 +35,8 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     number = &ResourceManager::getInstance().number;
     heart = &ResourceManager::getInstance().heart;
     kirby_shield = &ResourceManager::getInstance().Kirby_shield;
+    skill_black = &ResourceManager::getInstance().skill;
+    skill_color = &ResourceManager::getInstance().skill_color;
 
     result = System_Create(&ssystem);
     if (result != FMOD_OK)
@@ -116,6 +118,19 @@ void Play_Scene::ui_render()
     for (int i = 0; i < lstrlen(number_text); i++) {
         num = number_text[i] - 48;
         number->TransparentBlt(m_hBufferDC, i * 24 + 520, 12, 24, 28, num * 12, 0, 12, 14, RGB(255, 0, 255));
+    }
+    // 스킬 게이지
+    skill_black->StretchBlt(m_hBufferDC, 725, 470, 70, 85, 0, 0, 70, 85, SRCCOPY);
+    int skill_up = 0;
+    if (master_player->who_is_me) {
+        if (master_player->skill_cnt == 10) skill_up = 85;
+        else skill_up = (85 / master_player->skill_cnt) * 9;
+        skill_color->StretchBlt(m_hBufferDC, 700, 555 - skill_up, 70, skill_up, 0, 85 - skill_up, 70, skill_up, SRCCOPY);
+    }
+    else {
+        if (join_player->skill_cnt == 10) skill_up = 85;
+        else skill_up = (85 / join_player->skill_cnt) * 9;
+        skill_color->StretchBlt(m_hBufferDC, 700, 555 - skill_up, 70, skill_up, 0, 85 - skill_up, 70, skill_up, SRCCOPY);
     }
 }
 
