@@ -16,6 +16,9 @@ private:
     bool isSkill = false;
     unsigned short skillCount = 0; // 몇마리를 잡았는지.
 
+    bool magnet_eat = false;
+    bool dual_eat = false;
+
 
 public:
 
@@ -57,5 +60,8 @@ public:
     void addSkillCount() { skillCount++; }
     void setZombieCnt(short new_zombie_cnt) { zombie_cnt = new_zombie_cnt; }
     short zombieCount() { return zombie_cnt; }
+
+    bool isMagnet() {return magnet_eat; }
+    bool isDual() {return magnet_eat; }
 
 };

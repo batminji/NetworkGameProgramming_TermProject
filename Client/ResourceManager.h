@@ -74,6 +74,8 @@ public:
 	CImage hit_effect;
 	CImage rezero_bg;
 	CImage item[4];
+	CImage dual_bmp;
+	CImage magnet_bmp;
 
 	// 사운드 리소스들 선언
  // &ResourceManager::getinstance().ssystem -> 이런식으로 사용해야함

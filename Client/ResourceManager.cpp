@@ -67,7 +67,9 @@ void ResourceManager::init(HINSTANCE g_hInst)
     monster_create.LoadFromResource(g_hInst, MAKEINTRESOURCE(MONSTER_CREATE));
     hit_effect.LoadFromResource(g_hInst, MAKEINTRESOURCE(HIT_EFFECT));
     monster_die.LoadFromResource(g_hInst, MAKEINTRESOURCE(MONSTER_DIE));
-
+    dual_bmp.LoadFromResource(g_hInst, MAKEINTRESOURCE(STAR));
+    magnet_bmp.LoadFromResource(g_hInst, MAKEINTRESOURCE(MAGNET));
+    
 
     // 사운드 리소스 로드
     result = System_Create(&ssystem);

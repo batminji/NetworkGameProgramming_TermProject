@@ -95,7 +95,7 @@ void Play_Scene::render(LPVOID param)
 void Play_Scene::ui_render()
 {
     game_bg2->StretchBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, SRCCOPY);
-  //  // 아이템
+  //  // 장비
   //  for (int i = 0; i < 4; ++i)
   //      if (item[i].buy)item[i].img.TransparentBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, RGB(255, 0, 255));
   //  // 하트
@@ -355,6 +355,15 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
        case ITEM:
 
            break;
+       case ITEM_COIN:
+           temp_items.push_back(coin(resPacket->objs_x[i],resPacket->objs_y[i]));
+           break;
+       case ITEM_DUAL:
+           temp_items.push_back(dual(resPacket->objs_x[i], resPacket->objs_y[i]));
+           break;
+       case ITEM_MAGNET:
+           temp_items.push_back(margnet(resPacket->objs_x[i], resPacket->objs_y[i]));
+           break;
        default:
            break;
        }
@@ -365,6 +374,8 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
      //  b_lock.unlock();
      //std::unique_lock<std::mutex> e_lock(enemys_mutex);
        std::swap(enemys, temp_enemys);
+
+       std::swap(Items, temp_items);
      //  e_lock.unlock();
        
    }
