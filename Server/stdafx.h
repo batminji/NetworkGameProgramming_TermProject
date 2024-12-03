@@ -60,7 +60,10 @@ enum OTYPE // 오브젝트 타입 정의.
 	P2_BULLET,
 	P1_SKILLBULLET,
 	P2_SKILLBULLET,
-	ITEM 
+	ITEM, 
+	ITEM_COIN,
+	ITEM_MAGNET,
+	ITEM_DUAL
 };
 
 // 상수

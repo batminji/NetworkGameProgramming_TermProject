@@ -35,6 +35,8 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     number = &ResourceManager::getInstance().number;
     heart = &ResourceManager::getInstance().heart;
     kirby_shield = &ResourceManager::getInstance().Kirby_shield;
+    skill_black = &ResourceManager::getInstance().skill;
+    skill_color = &ResourceManager::getInstance().skill_color;
 
     result = System_Create(&ssystem);
     if (result != FMOD_OK)
@@ -95,7 +97,7 @@ void Play_Scene::render(LPVOID param)
 void Play_Scene::ui_render()
 {
     game_bg2->StretchBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, SRCCOPY);
-  //  // 아이템
+  //  // 장비
   //  for (int i = 0; i < 4; ++i)
   //      if (item[i].buy)item[i].img.TransparentBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, RGB(255, 0, 255));
   //  // 하트
@@ -116,6 +118,19 @@ void Play_Scene::ui_render()
     for (int i = 0; i < lstrlen(number_text); i++) {
         num = number_text[i] - 48;
         number->TransparentBlt(m_hBufferDC, i * 24 + 520, 12, 24, 28, num * 12, 0, 12, 14, RGB(255, 0, 255));
+    }
+    // 스킬 게이지
+    skill_black->StretchBlt(m_hBufferDC, 725, 470, 70, 85, 0, 0, 70, 85, SRCCOPY);
+    int skill_up = 0;
+    if (master_player->who_is_me) {
+        if (master_player->skill_cnt == 10) skill_up = 85;
+        else skill_up = (85 / master_player->skill_cnt) * 9;
+        skill_color->StretchBlt(m_hBufferDC, 700, 555 - skill_up, 70, skill_up, 0, 85 - skill_up, 70, skill_up, SRCCOPY);
+    }
+    else {
+        if (join_player->skill_cnt == 10) skill_up = 85;
+        else skill_up = (85 / join_player->skill_cnt) * 9;
+        skill_color->StretchBlt(m_hBufferDC, 700, 555 - skill_up, 70, skill_up, 0, 85 - skill_up, 70, skill_up, SRCCOPY);
     }
 }
 
@@ -355,6 +370,15 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
        case ITEM:
 
            break;
+       case ITEM_COIN:
+           temp_items.push_back(coin(resPacket->objs_x[i],resPacket->objs_y[i]));
+           break;
+       case ITEM_DUAL:
+           temp_items.push_back(dual(resPacket->objs_x[i], resPacket->objs_y[i]));
+           break;
+       case ITEM_MAGNET:
+           temp_items.push_back(margnet(resPacket->objs_x[i], resPacket->objs_y[i]));
+           break;
        default:
            break;
        }
@@ -365,6 +389,8 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
      //  b_lock.unlock();
      //std::unique_lock<std::mutex> e_lock(enemys_mutex);
        std::swap(enemys, temp_enemys);
+
+       std::swap(Items, temp_items);
      //  e_lock.unlock();
        
    }

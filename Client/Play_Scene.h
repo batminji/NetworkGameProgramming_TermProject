@@ -25,6 +25,8 @@ private:
     CImage* number;
     CImage* heart;
     CImage* kirby_shield;
+    CImage* skill_black;
+    CImage* skill_color;
 public:
     System* ssystem;
     Sound* battle_bgm;

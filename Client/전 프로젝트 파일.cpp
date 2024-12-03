@@ -757,6 +757,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			// 하트
 			for (int i = 0; i < heart_cnt; ++i)
 				heart.TransparentBlt(mdc, heart_pt[i].x - 15, heart_pt[i].y - 15, 30, 30, 0, 0, 18, 16, RGB(0, 255, 0));
+			// 스킬
 			skill.StretchBlt(mdc, rt.right - 75, 470, 70, 85, 0, 0, 70, 85, SRCCOPY);
 			skill_color.StretchBlt(mdc, rt.right - 75, 555 - skill_dy, 70, skill_dy, 0, 85 - skill_dy, 70, skill_dy, SRCCOPY);
 			//점수

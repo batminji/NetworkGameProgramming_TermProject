@@ -8,25 +8,28 @@ public:
 	CImage* dual_bmp;
 	CImage* magnet_bmp;
 public:
-	short x;
-	short y;
+	unsigned short x;
+	unsigned short y;
 public :
-	Item(short ax, short ay);
+	Item(const unsigned short ax, const unsigned short ay);
 	Item();
 public:
 	virtual void render(HDC mdc) = 0 ;
 
 };
 
-class coin :
-	public Item {
-
+class coin :public Item 
+{
+public:
+	coin(const unsigned short ax, const unsigned short ay) : Item(ax, ay) {} 
 	void render(HDC mdc) override;
 
 };
 
 class margnet : 
 	public Item {
+public:
+		margnet(const unsigned short ax, const unsigned short ay) : Item(ax, ay) {}
 
 	void render(HDC mdc) override;
 
@@ -34,7 +37,8 @@ class margnet :
 
 class dual : // 공격력 두배 아이템
 	public Item {
-
+public:
+	dual(const unsigned short ax, const unsigned short ay) : Item(ax, ay) {}
 	void render(HDC mdc) override;
 
 };

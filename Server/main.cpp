@@ -131,6 +131,30 @@ public:
     bool isDie() { return (hp <= 0); }
 };
 
+class Item {
+private:
+    OTYPE type; // 0: 코인 1:듀얼 2:자석
+    unsigned short x;
+    unsigned short y;
+public:
+    Item(OTYPE type, unsigned short x, unsigned short y) : type{type}, x { x }, y{ y } {}
+    Item(OTYPE type, int x, int y) : x{ static_cast<unsigned short>(x) }, y{ static_cast<unsigned short>(y) }, type{type} {}
+    std::pair<unsigned short, unsigned short> getPosition() { return { x, y }; }
+    void updatePosition(bool m,unsigned py )
+    {
+        //자석이 켜져있는지 아닌지
+        if (m) {
+            x += -MOVE_DIST;
+            if (py > y) y += 10;
+            else if (py < y) y -= 10;
+        }
+        else x += -MOVE_DIST ;
+    }
+    unsigned short GetX() { return x; }
+    unsigned short GetY() { return y; }
+    OTYPE getType() { return type; }
+};
+
 class Room
 {
 private:
@@ -146,6 +170,8 @@ private:
     std::vector<Player_Bullet> p_bullets;
     std::vector<Enemy> enemies;
     std::vector<Enemy_Bullet> e_bullets;
+    std::vector<Item> drop_Items;
+    
 public:
     int clear_set = 0; //몇세트 클리어?
     int clear_stage = 0; //1스테이지에 4세트, 이걸로 난이도 점점 오르게
@@ -170,18 +196,45 @@ public:
             b.updatePosition();
         for (auto& b : e_bullets)
             b.updatePosition();
+        if (p1->isMagnet()) {
+            for (auto& i : drop_Items) {
+                i.updatePosition(true, p1->getY());
+            }
+        }
+        else if(p2->isMagnet()) {
+            for (auto& i : drop_Items) {
+                i.updatePosition(true, p2->getY());
+            }
+        }
+        else {
+            for (auto& i : drop_Items) {
+                i.updatePosition(false, 0);
+            }
+        }
     }
 
     void createPbullet(std::string& s) // 두 플레이어한테서 동시에 생성되게 해도 괜찮을까?
     {
         std::lock_guard<std::mutex> ll{ update_lock };
         if (s == p1->getID()) { // p1만 생성하기
-            if (p1->getSkill()) p_bullets.push_back({ p1->getY(), P1_SKILLBULLET });
-            else p_bullets.push_back({ p1->getY(),P1_BULLET });
+            if (p1->getSkill() && getisDealer(p1->getID())) {
+                if(p1->isDual())p_bullets.push_back({ p1->getY()+2, P1_SKILLBULLET }), p_bullets.push_back({ p1->getY() - 2, P1_SKILLBULLET });
+                else p_bullets.push_back({ p1->getY(), P1_SKILLBULLET }); }
+            else {
+                
+                if (p1->isDual())p_bullets.push_back({ p1->getY() + 2, P1_BULLET }), p_bullets.push_back({ p1->getY() - 2, P1_SKILLBULLET });
+                else p_bullets.push_back({ p1->getY(), P1_BULLET });
+            }
         }
         else { // p2만 생성하기
-            if (p2->getSkill()) p_bullets.push_back({ p2->getY(), P2_SKILLBULLET });
-            else p_bullets.push_back({ p2->getY(), P2_BULLET });
+               if (p2->getSkill()&& getisDealer(p2->getID())) {
+                if(p2->isDual())p_bullets.push_back({ p2->getY()+2, P2_SKILLBULLET }), p_bullets.push_back({ p2->getY() - 2, P2_SKILLBULLET });
+                else p_bullets.push_back({ p2->getY(), P2_SKILLBULLET }); }
+            else {
+                
+                if (p2->isDual())p_bullets.push_back({ p2->getY() + 2, P2_BULLET }), p_bullets.push_back({ p2->getY() - 2, P2_SKILLBULLET });
+                else p_bullets.push_back({ p2->getY(), P2_BULLET });
+            }
         }
     }
 
@@ -270,9 +323,10 @@ public:
     void deletebullet(std::string& id)
     {
         std::lock_guard<std::mutex> ll{ update_lock };
-        // 1. 나간 총알 지우기
+        // 1. 나간 총알,아이템 지우기
         std::erase_if(p_bullets, [](Player_Bullet& pb) { return (pb.getPosition().first < 10); });
         std::erase_if(e_bullets, [](Enemy_Bullet& eb) { return (eb.getPosition().first > 800 || eb.getPosition().first < 10|| eb.getPosition().second > 600 || eb.getPosition().second < 10); });
+        std::erase_if(drop_Items, [](Item& eb) { return (eb.getPosition().first > 800 || eb.getPosition().first < 10|| eb.getPosition().second > 600 || eb.getPosition().second < 10); });
 
         // 2. 충돌체크 총알
         for (auto& e : enemies) {
@@ -325,7 +379,24 @@ public:
     void deleteEnemy() // 몬스터 삭제
     {
         std::lock_guard<std::mutex> ll{ update_lock };
-        std::erase_if(enemies, [](Enemy& e) {return e.getHP() == 0; });
+        std::erase_if(enemies, [this](Enemy& e) {
+            if (e.getHP() == 0) {
+            
+                int create_item = rand() % 10;
+                if (create_item > 1) {
+                    drop_Items.push_back({ ITEM_COIN,e.getPosition().first,e.getPosition().second });
+                }
+                else if (create_item == 0) {
+                    drop_Items.push_back({ ITEM_DUAL,e.getPosition().first,e.getPosition().second });
+                }
+                else {
+                    drop_Items.push_back({ ITEM_MAGNET,e.getPosition().first,e.getPosition().second });
+                }
+
+            }
+            return e.getHP() == 0;
+        });
+       
     }
 
     void Create_enemy()
@@ -367,7 +438,15 @@ public:
             p.objs_y[i] = enemies[i].getPosition().second;
             p.objs_hp[i] = enemies[i].getHP();
         }
-
+        //Items
+        int item_cnt = 0;
+        for (int j = i; j < i + drop_Items.size(); ++j) {
+            p.objs_type[j] = drop_Items[item_cnt].getType();
+            p.objs_x[j] = drop_Items[item_cnt].getPosition().first;
+            p.objs_y[j] = drop_Items[item_cnt].getPosition().second;
+            item_cnt++;
+        }
+        i + drop_Items.size();
         int m = 0;
         // player bullet
         for (int j = i; j < i + p_bullets.size(); ++j) {
@@ -376,10 +455,7 @@ public:
             p.objs_y[j] = p_bullets[m].getPosition().second;
 
             m++;
-            //std::cout << j - p_bullets.size() << "번째 몬스터" << enemies[j - p_bullets.size()].getType() <<" "<< enemies[j - p_bullets.size()].getPosition().first<< ","<< enemies[j - p_bullets.size()].getPosition().second << std::endl;
-           // std::cout << p.objs_type[j] << " " << p.objs_x[j] << " " << p.objs_y[j] << std::endl;
         }
-
         i += p_bullets.size();
         int enemy_bullet_cnt = 0;
         for (int j = i; j < i + e_bullets.size()&& j< 100; ++j) {
