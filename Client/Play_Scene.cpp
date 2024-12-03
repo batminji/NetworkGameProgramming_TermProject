@@ -89,6 +89,8 @@ void Play_Scene::render(LPVOID param)
 
     //총알 
     for (bullet b : bullets) b.render(m_hBufferDC);
+
+    item_draw();
     
     //ui
     ui_render();
