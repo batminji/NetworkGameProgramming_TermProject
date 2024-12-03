@@ -57,5 +57,6 @@ public:
     void addSkillCount() { skillCount++; }
     void setZombieCnt(short new_zombie_cnt) { zombie_cnt = new_zombie_cnt; }
     short zombieCount() { return zombie_cnt; }
-
+    unsigned short getSkillCount() { return skillCount; }
+    void resetSkillCount() { skillCount -= SKILL_CNT; }
 };
