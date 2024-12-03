@@ -325,7 +325,7 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
    for (int i = 0; i < resPacket->number; ++i) {
        switch (resPacket->objs_type[i]) {
        case ENEMY_0:
-           temp_enemys.push_back({ 0,resPacket->objs_x[i] ,resPacket->objs_y[i] ,resPacket->objs_hp[i]});
+           temp_enemys.push_back({ 0,resPacket->objs_x[i] ,resPacket->objs_y[i] ,resPacket->objs_hp[i] });
            break;
        case ENEMY_1:
            temp_enemys.push_back({ 1,resPacket->objs_x[i] ,resPacket->objs_y[i] ,resPacket->objs_hp[i] });
@@ -339,7 +339,7 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
        case ENEMY_4:
            temp_enemys.push_back({ 4,resPacket->objs_x[i] ,resPacket->objs_y[i] ,resPacket->objs_hp[i] });
            break;
-    
+
            //cout << resPacket->objs_type[i] << " " << resPacket->objs_x[i] << " " << resPacket->objs_y[i] << endl;
        case ENEMY_BULLETS: {
            bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 3);
@@ -373,13 +373,13 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
 
            break;
        case ITEM_COIN:
-           temp_items.push_back(coin(resPacket->objs_x[i],resPacket->objs_y[i]));
+           temp_items.push_back({ ITEM_COIN, resPacket->objs_x[i],resPacket->objs_y[i] });
            break;
        case ITEM_DUAL:
-           temp_items.push_back(dual(resPacket->objs_x[i], resPacket->objs_y[i]));
+           temp_items.push_back({ITEM_DUAL, resPacket->objs_x[i], resPacket->objs_y[i] });
            break;
        case ITEM_MAGNET:
-           temp_items.push_back(margnet(resPacket->objs_x[i], resPacket->objs_y[i]));
+           temp_items.push_back({ITEM_MAGNET, resPacket->objs_x[i], resPacket->objs_y[i]});
            break;
        default:
            break;
