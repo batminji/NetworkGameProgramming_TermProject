@@ -298,6 +298,7 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         join_player->y = resPacket->other_y;
         if (resPacket->skillEnd)master_player->skill = true;
         else master_player->skill = false;
+        master_player->skill_cnt = resPacket->skillCnt;
        // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
     }
     else {
@@ -307,6 +308,7 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
         if (resPacket->skillEnd)join_player->skill = true;
         else join_player->skill = false;
+        join_player->skill_cnt = resPacket->skillCnt;
     }
 }
 
