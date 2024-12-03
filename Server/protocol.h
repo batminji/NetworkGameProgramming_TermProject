@@ -65,6 +65,7 @@ struct SC_PLAYER_MOVE_PACKET { // todo: 여기 수정
 	unsigned short hp;
 	unsigned int score;
 	bool skillEnd;
+	unsigned short skillCnt;
 };
 
 struct SC_PLAYER_STATE_CHANGE_PACKET

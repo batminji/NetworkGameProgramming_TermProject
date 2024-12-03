@@ -64,4 +64,6 @@ public:
     bool isMagnet() {return magnet_eat; }
     bool isDual() {return magnet_eat; }
 
+    unsigned short getSkillCount() { return skillCount; }
+    void resetSkillCount() { skillCount -= SKILL_CNT; }
 };

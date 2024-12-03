@@ -3,7 +3,7 @@
 #include "Player.h"
 
 // 전방선언 라인
-enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END , BULLET_DELETE,CREATE_SET}; // 뭐가 있을까?
+enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END , BULLET_DELETE, CREATE_SET, ENABLE_COLLISION}; // 뭐가 있을까?
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid);
 void addSkillCount(OTYPE type, std::string& id);
 
@@ -113,12 +113,10 @@ public:
         RECT rect = { x, y, x + width, y + height };
         POINT bullet_pos = { bullet.getPosition().first,bullet.getPosition().second };
         if (PtInRect(&rect, bullet_pos)) { // bullet이 사각형 내부에 있을 때 실행할 코드
-            if (hp - bullet.damage() < 0) hp = 0; // 이게 머여
+            if (hp - bullet.damage() < 0) hp = 0; 
             else hp -= bullet.damage();
 
-            // todo: 이펙트 생성 어디서?
             addSkillCount(bullet.getType(), id);
-
 
             return true; //인수로 들어온 총알과 충돌시 true리턴
         }
@@ -334,33 +332,47 @@ public:
         for (auto& e : enemies) {
             std::erase_if(p_bullets, [&e, &id](Player_Bullet& pb) { 
                 return e.collsion_player_bullet(pb, id); });
-            // 죽었는지 확인해야하는데..
         }
 
-        // todo: 3. players[id]와 적 총알 충돌체크
+        // 3. players[id]와 적 총알 충돌체크
         std::erase_if(e_bullets, [this,&id](Enemy_Bullet& eb) {
             
-            Player* me = nullptr;
-            if (p1->getID() == id) me = p1;
-            else me = p2;
+            bool flag = false;
 
             Player* healer = nullptr;
             if (getisDealer(p1->getID())) healer = p2;
             else  healer = p1;
 
-            RECT player_rt = { DEFXPOS - 25, me->getY() - 25, DEFXPOS + 25, me->getY() + 25 };
-            if (PtInRect(&player_rt, { eb.GetX(),eb.GetY()}) == 1 && me->zombieCount() < 1) {
+            // p1의 충돌체크
+            RECT player_rt = { DEFXPOS - 25, p1->getY() - 25, DEFXPOS + 25, p1->getY() + 25 };
+            if (PtInRect(&player_rt, { eb.GetX(),eb.GetY()}) == 1 && p1->zombieCount() < 1) {
                 if ((healer) && (!(healer->getSkill()))) {//힐러의 보호막이 켜져있지않을때??
                     //커비 하트 깎기
+                    heart = max(heart - 1, 0);
 
                     // 커비 잠시 무적모드 활성화 zombie_cnt를 1로
-                    me->setZombieCnt(1);
-                    return true;
+                    p1->setZombieCnt(1);
+                    push_evt_queue(ENABLE_COLLISION, ZOMBIE_TIME, p1->getID());
                 }
-                else return true; // 보호막 맞아도 그냥 트루해서 총알없어지게.
+                flag = true;
             }
-            else return false;
-            });
+            
+            // p2의 충돌체크
+            player_rt = { DEFXPOS - 25, p2->getY() - 25, DEFXPOS + 25, p2->getY() + 25 };
+            if (PtInRect(&player_rt, { eb.GetX(),eb.GetY() }) == 1 && p2->zombieCount() < 1) {
+                if ((healer) && (!(healer->getSkill()))) {//힐러의 보호막이 켜져있지않을때??
+                    //커비 하트 깎기
+                    heart = max(heart - 1, 0);
+
+                    // 커비 잠시 무적모드 활성화 zombie_cnt를 1로
+                    p2->setZombieCnt(1);
+                    push_evt_queue(ENABLE_COLLISION, ZOMBIE_TIME, p2->getID());
+                }
+                flag = true;
+            }
+
+            return flag;
+        });
     }
 
     
@@ -818,7 +830,9 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     {
         CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
         players[id].setY(p->y);
-        if ((true == p->keyDown) && (false == players[id].getSkill())) {// 스킬사용시.
+        if (true == p->keyDown)
+            std::cout << "발싸: " << players[id].getSkillCount() << std::endl;
+        if ((true == p->keyDown) && (false == players[id].getSkill()) && (players[id].getSkillCount() >= SKILL_CNT)) {// 스킬사용시.
             players[id].setSkill(true);
             push_evt_queue(SKILL_END, SKILL_TIME, id);
         }
@@ -1046,6 +1060,7 @@ void ai_thread()
 
         case SKILL_END:
             players[ev.room_id].setSkill(false);
+            players[ev.room_id].resetSkillCount();
             break;
 
         case CREATE_SET:
@@ -1057,6 +1072,9 @@ void ai_thread()
             push_evt_queue(CREATE_SET, 1000, ev.room_id);
             break;
       
+        case ENABLE_COLLISION:
+            players[ev.room_id].setZombieCnt(0);
+            break;
 
         default:
             std::cout << "unknown event" << std::endl;

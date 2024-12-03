@@ -73,8 +73,10 @@ constexpr int SERVERPORT = 9000;
 constexpr int BUFSIZE = 4096; 
 constexpr unsigned short MOVE_DIST = -10;
 constexpr unsigned short DEFXPOS = 675;
-constexpr unsigned short SKILL_TIME = 5000; // MS단위임
+constexpr unsigned short SKILL_TIME = 3000; // MS단위임
 constexpr unsigned short DAMAGE = 5;
+constexpr unsigned short ZOMBIE_TIME = 3000;
+constexpr unsigned short SKILL_CNT = 10;
 
 
 void SERVER_err_quit(const char* msg);
