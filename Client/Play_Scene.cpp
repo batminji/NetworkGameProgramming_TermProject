@@ -115,7 +115,7 @@ void Play_Scene::ui_render()
         number->TransparentBlt(m_hBufferDC, i * 24 + 10, 12, 24, 28, num * 12, 0, 12, 14, RGB(255, 0, 255));
     }
    // 코인 수
-    // wsprintf(number_text, L"%d", play_gold);
+     wsprintf(number_text, L"%d", play_gold);
     if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 10, 12, 24, 28, 0, 0, 12, 14, RGB(255, 0, 255));
     for (int i = 0; i < lstrlen(number_text); i++) {
         num = number_text[i] - 48;
@@ -159,7 +159,7 @@ void Play_Scene::update()
     if (bg_xPos == 0) bg_xPos = 1600;
     else bg_xPos--;
 
-
+    DataManager::getInstance().coin_ani_frame = (DataManager::getInstance().coin_ani_frame + 1) % 8;
 
 }
 
@@ -302,13 +302,12 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         join_player->y = resPacket->other_y;
         if (resPacket->skillEnd)master_player->skill = true;
         else master_player->skill = false;
-       // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
+     
     }
     else {
         // 현재 플레이어가 조인한 클라이언트인 경우
         join_player->y = resPacket->this_y;
         master_player->y = resPacket->other_y;
-        // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
         if (resPacket->skillEnd)join_player->skill = true;
         else join_player->skill = false;
     }
@@ -375,7 +374,7 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
 
            break;
        case ITEM_COIN:
-           temp_items.push_back({ ITEM_COIN, resPacket->objs_x[i],resPacket->objs_y[i] });
+           temp_items.push_back({ITEM_COIN, resPacket->objs_x[i],resPacket->objs_y[i] });
            break;
        case ITEM_DUAL:
            temp_items.push_back({ITEM_DUAL, resPacket->objs_x[i], resPacket->objs_y[i] });
@@ -393,8 +392,9 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
      //  b_lock.unlock();
      //std::unique_lock<std::mutex> e_lock(enemys_mutex);
        std::swap(enemys, temp_enemys);
-
+    
        std::swap(Items, temp_items);
+
      //  e_lock.unlock();
        
    }

@@ -3,7 +3,9 @@
 #include "Player.h"
 
 // 전방선언 라인
-enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, AI_MOVE, SKILL_END , BULLET_DELETE, CREATE_SET, ENABLE_COLLISION}; // 뭐가 있을까?
+enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, 
+    AI_MOVE, SKILL_END , BULLET_DELETE, CREATE_SET, ENABLE_COLLISION,
+    CANCEL_MAGNET , CANCEL_DUAL }; // 뭐가 있을까?
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid);
 void addSkillCount(OTYPE type, std::string& id);
 
@@ -164,6 +166,7 @@ private:
     std::atomic_bool isPlaying = false;
     unsigned int score = 0;
     unsigned short heart = 3; // 음수가 없..?
+    unsigned short get_coin = 0; //게임에서 획득한 코인의 양
 
     std::mutex update_lock; // todo: 락을 분리할지 고민하기
 
@@ -373,6 +376,47 @@ public:
 
             return flag;
         });
+
+
+
+        //아이템과의 충돌체크
+        std::erase_if(drop_Items, [this, &id](Item& eb) {
+
+            bool flag = false;
+
+
+            // p1의 충돌체크
+            RECT player_rt = { DEFXPOS - 25, p1->getY() - 25, DEFXPOS + 25, p1->getY() + 25 };
+            if (PtInRect(&player_rt, { eb.GetX(),eb.GetY() }) == 1 && p1->zombieCount() < 1) {
+                if (eb.getType() == ITEM_COIN) get_coin += 10;
+                if(eb.getType() == ITEM_DUAL&&!p1->isDual()) {
+                    p1->setDual(true);
+                    push_evt_queue(CANCEL_DUAL, 5000, p1->getID());
+                }
+                if(eb.getType() == ITEM_MAGNET&&p1->isMagnet()){
+                    p1->setMagnet(true);
+                    push_evt_queue(CANCEL_MAGNET, 5000, p1->getID());
+                }
+                flag = true;
+            }
+
+            // p2의 충돌체크
+            player_rt = { DEFXPOS - 25, p2->getY() - 25, DEFXPOS + 25, p2->getY() + 25 };
+            if (PtInRect(&player_rt, { eb.GetX(),eb.GetY() }) == 1 && p2->zombieCount() < 1) {
+                if (eb.getType() == ITEM_COIN) get_coin += 10;
+                if (eb.getType() == ITEM_DUAL && !p2->isDual()) {
+                    p2->setDual(true);
+                    push_evt_queue(CANCEL_DUAL, 5000, p2->getID());
+                }
+                if (eb.getType() == ITEM_MAGNET && p2->isMagnet()) {
+                    p2->setMagnet(true);
+                    push_evt_queue(CANCEL_MAGNET, 5000, p2->getID());
+                }
+                flag = true;
+            }
+
+            return flag;
+        });
     }
 
     
@@ -446,7 +490,7 @@ public:
             p.objs_y[j] = drop_Items[item_cnt].getPosition().second;
             item_cnt++;
         }
-        i + drop_Items.size();
+        i += drop_Items.size();
         int m = 0;
         // player bullet
         for (int j = i; j < i + p_bullets.size(); ++j) {
@@ -1075,7 +1119,12 @@ void ai_thread()
         case ENABLE_COLLISION:
             players[ev.room_id].setZombieCnt(0);
             break;
-
+        case CANCEL_DUAL:
+            players[ev.room_id].setDual(0);
+            break;
+        case CANCEL_MAGNET:
+            players[ev.room_id].setMagnet(0);
+            break;
         default:
             std::cout << "unknown event" << std::endl;
             exit(-1);

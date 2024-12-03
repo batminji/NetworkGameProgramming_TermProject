@@ -62,7 +62,9 @@ public:
     short zombieCount() { return zombie_cnt; }
 
     bool isMagnet() {return magnet_eat; }
-    bool isDual() {return magnet_eat; }
+    bool isDual() {return dual_eat; }
+    void setMagnet(bool c) { magnet_eat = c; }
+    void setDual(bool c) { dual_eat = c; }
 
     unsigned short getSkillCount() { return skillCount; }
     void resetSkillCount() { skillCount -= SKILL_CNT; }

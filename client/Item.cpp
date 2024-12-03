@@ -22,7 +22,7 @@ void Item::render(HDC mdc)
 	switch (type)
 	{
 	case ITEM_COIN:
-		coin_bmp->TransparentBlt(mdc, x, y, 30, 30, 0, 0, 53, 53, RGB(0, 255, 0));
+		coin_bmp->TransparentBlt(mdc, x, y, 52, 40,230*DataManager::getInstance().coin_ani_frame, 0,230, 130, RGB(0, 255, 0));
 		break;
 	case ITEM_MAGNET:
 		magnet_bmp->TransparentBlt(mdc, x, y, 30, 30, 0, 0, 53, 53, RGB(0, 255, 0));

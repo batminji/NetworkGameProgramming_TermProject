@@ -35,5 +35,9 @@ public:
 public:
 	//게임 관련 
 	std::atomic_bool master_is_dealer = true;
+
+public:
+	//애니메이션 프레임 관련 
+	int coin_ani_frame = 0;
 };
 

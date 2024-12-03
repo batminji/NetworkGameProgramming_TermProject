@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "ResourceManager.h"
+#include "DataManager.h"
 class Item
 {
 public:

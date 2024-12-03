@@ -53,6 +53,7 @@ private :
     //½ºÅ³Å° ´­·µ´õ¿°?
     bool skill_key_down = false;
 
+    
 public:
 
     Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock, Player* p1, Player* p2);
