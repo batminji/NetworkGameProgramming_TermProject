@@ -220,21 +220,21 @@ public:
         std::lock_guard<std::mutex> ll{ update_lock };
         if (s == p1->getID()) { // p1만 생성하기
             if (p1->getSkill() && getisDealer(p1->getID())) {
-                if(p1->isDual())p_bullets.push_back({ p1->getY()+2, P1_SKILLBULLET }), p_bullets.push_back({ p1->getY() - 2, P1_SKILLBULLET });
+                if(p1->isDual())p_bullets.push_back({ static_cast<unsigned short>(p1->getY()+2 ), P1_SKILLBULLET }), p_bullets.push_back({ static_cast<unsigned short>(p1->getY() - 2), P1_SKILLBULLET });
                 else p_bullets.push_back({ p1->getY(), P1_SKILLBULLET }); }
             else {
                 
-                if (p1->isDual())p_bullets.push_back({ p1->getY() + 2, P1_BULLET }), p_bullets.push_back({ p1->getY() - 2, P1_SKILLBULLET });
+                if (p1->isDual())p_bullets.push_back({ static_cast<unsigned short>(p1->getY() + 2), P1_BULLET }), p_bullets.push_back({ static_cast<unsigned short>(p1->getY() - 2), P1_SKILLBULLET });
                 else p_bullets.push_back({ p1->getY(), P1_BULLET });
             }
         }
         else { // p2만 생성하기
                if (p2->getSkill()&& getisDealer(p2->getID())) {
-                if(p2->isDual())p_bullets.push_back({ p2->getY()+2, P2_SKILLBULLET }), p_bullets.push_back({ p2->getY() - 2, P2_SKILLBULLET });
+                if(p2->isDual())p_bullets.push_back({ static_cast<unsigned short>(p2->getY()+2), P2_SKILLBULLET }), p_bullets.push_back({ static_cast<unsigned short>(p2->getY() - 2), P2_SKILLBULLET });
                 else p_bullets.push_back({ p2->getY(), P2_SKILLBULLET }); }
             else {
                 
-                if (p2->isDual())p_bullets.push_back({ p2->getY() + 2, P2_BULLET }), p_bullets.push_back({ p2->getY() - 2, P2_SKILLBULLET });
+                if (p2->isDual())p_bullets.push_back({ static_cast<unsigned short>(p2->getY() + 2), P2_BULLET }), p_bullets.push_back({ static_cast<unsigned short>(p2->getY() - 2), P2_SKILLBULLET });
                 else p_bullets.push_back({ p2->getY(), P2_BULLET });
             }
         }
