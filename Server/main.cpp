@@ -539,6 +539,10 @@ public:
     }
     unsigned short getHeart() { return heart; }
     unsigned int getScore() { return score; }
+    void addScore(unsigned short i)
+    {
+        score += i; // 무조건 싱글로 실행될듯 락 필요없음
+    }
 };
 
 class EVENT
@@ -775,6 +779,7 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
 
     res.hp = roomInfo[id]->getHeart();
     res.score = roomInfo[id]->getScore();
+    res.skillCnt = players[id].getSkillCount();
     if (roomInfo[id]->getP1ID() == id) { // 내가 p1이군
         res.skillEnd = roomInfo[id]->getP1()->getSkill();
     }
@@ -1052,13 +1057,19 @@ void addSkillCount(OTYPE type, std::string& id)
     switch (type) // 점수증가
     {
     case P1_BULLET:
+        roomInfo[id]->getP1()->addSkillCount();
+        roomInfo[id]->addScore(DAMAGE);
     case P1_SKILLBULLET:
         roomInfo[id]->getP1()->addSkillCount();
+        roomInfo[id]->addScore(DAMAGE * 2);
         break;
 
     case P2_BULLET:
+        roomInfo[id]->getP1()->addSkillCount();
+        roomInfo[id]->addScore(DAMAGE);
     case P2_SKILLBULLET:
         roomInfo[id]->getP2()->addSkillCount();
+        roomInfo[id]->addScore(DAMAGE * 2);
         break;
     }
 }
