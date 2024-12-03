@@ -126,12 +126,14 @@ void Play_Scene::ui_render()
     int skill_up = 0;
     if (master_player->who_is_me) {
         if (master_player->skill_cnt == 10) skill_up = 85;
-        else skill_up = (85 / master_player->skill_cnt) * 9;
+        else if (master_player->skill_cnt > 0)skill_up = (85 / master_player->skill_cnt) * 9;
+        else  skill_up = 0;
         skill_color->StretchBlt(m_hBufferDC, 700, 555 - skill_up, 70, skill_up, 0, 85 - skill_up, 70, skill_up, SRCCOPY);
     }
     else {
         if (join_player->skill_cnt == 10) skill_up = 85;
-        else skill_up = (85 / join_player->skill_cnt) * 9;
+        else if (join_player->skill_cnt > 0) skill_up = (85 / join_player->skill_cnt) * 9;
+        else skill_up = 0;
         skill_color->StretchBlt(m_hBufferDC, 700, 555 - skill_up, 70, skill_up, 0, 85 - skill_up, 70, skill_up, SRCCOPY);
     }
 }
@@ -300,7 +302,6 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         join_player->y = resPacket->other_y;
         if (resPacket->skillEnd)master_player->skill = true;
         else master_player->skill = false;
-        master_player->skill_cnt = resPacket->skillCnt;
        // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
     }
     else {
@@ -310,7 +311,6 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         // cout << resPacket->this_y << " " << resPacket->other_y << " " << endl;
         if (resPacket->skillEnd)join_player->skill = true;
         else join_player->skill = false;
-        join_player->skill_cnt = resPacket->skillCnt;
     }
 }
 
