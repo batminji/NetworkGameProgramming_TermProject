@@ -174,6 +174,8 @@ private:
     std::vector<Enemy> enemies;
     std::vector<Enemy_Bullet> e_bullets;
     std::vector<Item> drop_Items;
+public:
+    bool equipment[3] = { false,false,false };
     
 public:
     int clear_set = 0; //몇세트 클리어?
@@ -391,7 +393,7 @@ public:
             RECT intersection;
             if (IntersectRect(&intersection, &player_rt, &item_rt) && p1->zombieCount() < 1) {
 
-                if (eb.getType() == ITEM_COIN) get_coin += 10;
+                if (eb.getType() == ITEM_COIN) get_coin += 10 * ((int)equipment[1]+1);
                 if(eb.getType() == ITEM_DUAL&&!p1->isDual()) {
                     p1->setDual(true);
                     push_evt_queue(CANCEL_DUAL, 5000, p1->getID());
@@ -406,7 +408,7 @@ public:
             // p2의 충돌체크
             player_rt = { DEFXPOS - 25, p2->getY() - 25, DEFXPOS + 25, p2->getY() + 25 };
             if (PtInRect(&player_rt, { eb.GetX(),eb.GetY() }) == 1 && p2->zombieCount() < 1) {
-                if (eb.getType() == ITEM_COIN) get_coin += 10;
+                if (eb.getType() == ITEM_COIN) get_coin += 10 * ((int)equipment[1] + 1);
                 if (eb.getType() == ITEM_DUAL && !p2->isDual()) {
                     p2->setDual(true);
                     push_evt_queue(CANCEL_DUAL, 5000, p2->getID());
@@ -541,6 +543,7 @@ public:
         return ret;
     }
     unsigned short getHeart() { return heart; }
+    void setHeart(unsigned short h) { heart = h; }
     unsigned int getScore() { return score; }
     void addScore(unsigned short i)
     {
@@ -870,6 +873,10 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
                     roomInfo[id] = new Room(); // roomInfo에 새로운 방 추가
                     roomInfo[id]->setP1(&players[id]);
                     roomInfo[id]->setDealer(id);
+                    for (int i = 0; i < 3; ++i)roomInfo[id]->equipment[i] = p->item[i];
+                    if (p->item[0])players[id].setCoin(players[id].getCoin() - 500);
+                    if (p->item[1])players[id].setCoin(players[id].getCoin()-1000);
+                    if (p->item[2])players[id].setCoin(players[id].getCoin()-500);
                     std::cout << "Player " << id << " created and joined new room " << id << std::endl;
                 }
             }
@@ -1003,6 +1010,9 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
 
                 if (true == roomInfo[pid]->getisPlaying()) {
                     std::cout << pid << " 플레이씬 넘어가기" << std::endl;
+                    //구매 장비에 따른 초기세팅
+                    if (roomInfo[pid]->equipment[0]) roomInfo[pid]->setHeart(static_cast<unsigned short>(4));
+                    if (roomInfo[pid]->equipment[2]) players[pid].setSkillCount(10);
                     break; // 게임 시작
                 }
             }
@@ -1080,6 +1090,7 @@ void addSkillCount(OTYPE type, std::string& id)
     case P1_BULLET:
         roomInfo[id]->getP1()->addSkillCount();
         roomInfo[id]->addScore(DAMAGE);
+        break;
     case P1_SKILLBULLET:
         roomInfo[id]->getP1()->addSkillCount();
         roomInfo[id]->addScore(DAMAGE * 2);
@@ -1088,6 +1099,8 @@ void addSkillCount(OTYPE type, std::string& id)
     case P2_BULLET:
         roomInfo[id]->getP1()->addSkillCount();
         roomInfo[id]->addScore(DAMAGE);
+        break;
+
     case P2_SKILLBULLET:
         roomInfo[id]->getP2()->addSkillCount();
         roomInfo[id]->addScore(DAMAGE * 2);
