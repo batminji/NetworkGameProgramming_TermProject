@@ -803,22 +803,6 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     return true;
 }
 
-bool send_player_state_change_packet(SOCKET& s, std::string& id)
-{
-    SC_PLAYER_STATE_CHANGE_PACKET res;
-    res.size = sizeof(SC_PLAYER_STATE_CHANGE_PACKET);
-    res.type = SC_PLAYER_STATE_CHANGE;
-
-    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_STATE_CHANGE_PACKET), 0);
-    if (ret == SOCKET_ERROR) { // 에러 처리
-        int error = WSAGetLastError();
-        SERVER_err_display("send failed");
-        SERVER_err_display(error);  // 오류 코드 출력
-        return false;
-    }
-    return true;
-}
-
 bool send_object_move_packet(SOCKET& s, std::string& id)
 {
     auto t_room = roomInfo[id];
@@ -838,12 +822,6 @@ bool send_object_move_packet(SOCKET& s, std::string& id)
     }
     return true;
 }
-
-bool send_object_change_packet()
-{
-    return true;
-}
-
 
 bool process_packet(char* packet, SOCKET& s, std::string& id)
 {
@@ -1097,11 +1075,6 @@ void addSkillCount(OTYPE type, std::string& id)
         roomInfo[id]->addScore(DAMAGE * 2);
         break;
     }
-}
-
-void push_evt_queue(EVENT& evt)
-{
-    evt_queue.push(evt);
 }
 
 // task 처리하는 스레드 -> 룸 당 하나였으면 좋겠는데 어떻게 하면 좋을지 모르겠음.
