@@ -58,7 +58,7 @@ struct SC_ROOM_CHANGE_PACKET // 방 설정이 변경되면
 	bool isDealer; // 내가 딜러인가?
 };
 
-struct SC_PLAYER_MOVE_PACKET { // todo: 여기 수정
+struct SC_PLAYER_MOVE_PACKET { 
 	unsigned short size;
 	PACKET type;
 	unsigned short this_y; // 나의위치
@@ -68,15 +68,6 @@ struct SC_PLAYER_MOVE_PACKET { // todo: 여기 수정
 	bool skillEnd;
 	unsigned short skillCnt;
 	unsigned int coin;
-};
-
-struct SC_PLAYER_STATE_CHANGE_PACKET
-{
-	unsigned short size;
-	PACKET type;
-	unsigned short hp; // 이걸로 죽음까지 판단하도록
-	bool isHit; // 맞았는가?
-	bool skillEnd; // 스킬 끝났을떄 true
 };
 
 struct SC_OBJECT_MOVE_PACKET // 오브젝트 이동
