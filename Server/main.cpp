@@ -221,21 +221,21 @@ public:
         std::lock_guard<std::mutex> ll{ update_lock };
         if (s == p1->getID()) { // p1만 생성하기
             if (p1->getSkill() && getisDealer(p1->getID())) {
-                if(p1->isDual())p_bullets.push_back({ static_cast<unsigned short>(p1->getY()+2 ), P1_SKILLBULLET }), p_bullets.push_back({ static_cast<unsigned short>(p1->getY() - 2), P1_SKILLBULLET });
+                if(p1->isDual())p_bullets.push_back({ static_cast<unsigned short>(p1->getY()+5 ), P1_SKILLBULLET }), p_bullets.push_back({ static_cast<unsigned short>(p1->getY() - 5), P1_SKILLBULLET });
                 else p_bullets.push_back({ p1->getY(), P1_SKILLBULLET }); }
             else {
                 
-                if (p1->isDual())p_bullets.push_back({ static_cast<unsigned short>(p1->getY() + 2), P1_BULLET }), p_bullets.push_back({ static_cast<unsigned short>(p1->getY() - 2), P1_BULLET });
+                if (p1->isDual())p_bullets.push_back({ static_cast<unsigned short>(p1->getY() + 5), P1_BULLET }), p_bullets.push_back({ static_cast<unsigned short>(p1->getY() - 5), P1_BULLET });
                 else p_bullets.push_back({ p1->getY(), P1_BULLET });
             }
         }
         else { // p2만 생성하기
                if (p2->getSkill()&& getisDealer(p2->getID())) {
-                if(p2->isDual())p_bullets.push_back({ static_cast<unsigned short>(p2->getY()+2), P2_SKILLBULLET }), p_bullets.push_back({ static_cast<unsigned short>(p2->getY() - 2), P2_SKILLBULLET });
+                if(p2->isDual())p_bullets.push_back({ static_cast<unsigned short>(p2->getY()+5), P2_SKILLBULLET }), p_bullets.push_back({ static_cast<unsigned short>(p2->getY() - 5), P2_SKILLBULLET });
                 else p_bullets.push_back({ p2->getY(), P2_SKILLBULLET }); }
             else {
                 
-                if (p2->isDual())p_bullets.push_back({ static_cast<unsigned short>(p2->getY() + 2), P2_BULLET }), p_bullets.push_back({ static_cast<unsigned short>(p2->getY() - 2), P2_BULLET });
+                if (p2->isDual())p_bullets.push_back({ static_cast<unsigned short>(p2->getY() + 5), P2_BULLET }), p_bullets.push_back({ static_cast<unsigned short>(p2->getY() - 5), P2_BULLET });
                 else p_bullets.push_back({ p2->getY(), P2_BULLET });
             }
         }
@@ -1012,7 +1012,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                 // 그 방의 적 생성, 총알 이동도 호스트 혼자 처리
                 roomInfo[pid]->Create_enemy();
                 push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
-                // push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
+                push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
                 push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
             }
             push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
