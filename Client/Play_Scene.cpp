@@ -29,6 +29,9 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     kirby_shield = &ResourceManager::getInstance().Kirby_shield;
     skill_black = &ResourceManager::getInstance().skill;
     skill_color = &ResourceManager::getInstance().skill_color;
+    game_over = &ResourceManager::getInstance().game_over;
+    over_number = &ResourceManager::getInstance().over_number;
+
 
     result = System_Create(&ssystem);
     if (result != FMOD_OK)
@@ -86,6 +89,9 @@ void Play_Scene::render(LPVOID param)
     
     //ui
     ui_render();
+
+    //게임오버
+    if (heart_cnt < 1)GameOver_draw();
 }
 
 void Play_Scene::ui_render()
@@ -140,6 +146,23 @@ void Play_Scene::item_draw()
     for (Item& i : Items) i.render(m_hBufferDC);
 }
 
+void Play_Scene::GameOver_draw()
+{
+    game_over->TransparentBlt(m_hBufferDC, 0, 0,800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
+    wsprintf(number_text, L"%d", play_score);
+    if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 470, 180, 95, 135, 0, 0, 100, 135, RGB(255, 0, 255));
+    for (int i = lstrlen(number_text) - 1; i >= 0; --i) {
+        num = number_text[i] - 48;
+        over_number->TransparentBlt(m_hBufferDC, ((lstrlen(number_text) - i - 1) * -100) + 470, 180, 95, 135, num * 100, 0, 100, 135, RGB(255, 0, 255));
+    }
+    wsprintf(number_text, L"%d", play_gold);
+    if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 315, 360, 50, 80, 0, 0, 100, 135, RGB(255, 0, 255));
+    for (int i = 0; i < lstrlen(number_text); i++) {
+        num = number_text[i] - 48;
+        over_number->TransparentBlt(m_hBufferDC, ((lstrlen(number_text) - i - 1) * -55) + 315, 360, 50, 80, num * 100, 0, 100, 135, RGB(255, 0, 255));
+    }
+}
+
 void Play_Scene::update()
 {
     master_player->update();
@@ -157,10 +180,12 @@ void Play_Scene::update()
 
 void Play_Scene::network()
 {
-    recv_process();
-    // 플레이어인풋 전송
-    send_player_input(send_y);
 
+    if (heart_cnt > 0) {
+        recv_process();
+        // 플레이어인풋 전송
+        send_player_input(send_y);
+    }
 
 }
 
@@ -176,6 +201,29 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         EndPaint(hwnd, &ps);
         return 0;
     }
+    case WM_LBUTTONDOWN:
+    {
+        if (heart_cnt < 1) {
+
+            int mx = LOWORD(lParam);
+            int my = HIWORD(lParam);
+            POINT mypt = { mx,my };
+            RECT game_over_rt = { 486,392,677,479 };
+            if (PtInRect(&game_over_rt, mypt)) {
+                channel->stop();
+                gameover_sound->release();
+                //  ssystem->createSound("main_bgm.OGG", FMOD_LOOP_NORMAL, 0, &main_bgm);
+                //  ssystem->playSound(main_bgm, 0, false, &channel);
+
+                next_scene = LOBBY_SCENE;
+            }
+
+
+        }
+     
+       
+    }
+    break;
     case WM_CHAR:
     {
         if (wParam == VK_RETURN) { // 스킬을 썼다.

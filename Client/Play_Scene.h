@@ -27,6 +27,8 @@ private:
     CImage* kirby_shield;
     CImage* skill_black;
     CImage* skill_color;
+    CImage* game_over;
+    CImage* over_number;
 public:
     System* ssystem;
     Sound* battle_bgm;
@@ -64,7 +66,7 @@ public:
     void ui_render();
     void enemy_render();
     void item_draw();
-    void bullet_draw();
+    void GameOver_draw();
     void update() override;
     void network() override;
     LRESULT CALLBACK windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
