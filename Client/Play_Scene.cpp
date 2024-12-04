@@ -122,17 +122,17 @@ void Play_Scene::ui_render()
         number->TransparentBlt(m_hBufferDC, i * 24 + 520, 12, 24, 28, num * 12, 0, 12, 14, RGB(255, 0, 255));
     }
     // 스킬 게이지
-    skill_black->StretchBlt(m_hBufferDC, 725, 470, 70, 85, 0, 0, 70, 85, SRCCOPY);
+    skill_black->StretchBlt(m_hBufferDC, 700, 470, 70, 85, 0, 0, 70, 85, SRCCOPY);
     int skill_up = 0;
     if (master_player->who_is_me) {
         if (master_player->skill_cnt == 10) skill_up = 85;
-        else if (master_player->skill_cnt > 0)skill_up = (85 / master_player->skill_cnt) * 9;
+        else if (master_player->skill_cnt > 0)skill_up = (85 / 10) * master_player->skill_cnt;
         else  skill_up = 0;
         skill_color->StretchBlt(m_hBufferDC, 700, 555 - skill_up, 70, skill_up, 0, 85 - skill_up, 70, skill_up, SRCCOPY);
     }
     else {
         if (join_player->skill_cnt == 10) skill_up = 85;
-        else if (join_player->skill_cnt > 0) skill_up = (85 / join_player->skill_cnt) * 9;
+        else if (join_player->skill_cnt > 0) skill_up = (85 / 10) * join_player->skill_cnt;
         else skill_up = 0;
         skill_color->StretchBlt(m_hBufferDC, 700, 555 - skill_up, 70, skill_up, 0, 85 - skill_up, 70, skill_up, SRCCOPY);
     }
@@ -302,7 +302,7 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         join_player->y = resPacket->other_y;
         if (resPacket->skillEnd)master_player->skill = true;
         else master_player->skill = false;
-     
+        master_player->skill_cnt = resPacket->skillCnt;
     }
     else {
         // 현재 플레이어가 조인한 클라이언트인 경우
@@ -310,6 +310,7 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         master_player->y = resPacket->other_y;
         if (resPacket->skillEnd)join_player->skill = true;
         else join_player->skill = false;
+        join_player->skill_cnt = resPacket->skillCnt;
     }
 }
 
