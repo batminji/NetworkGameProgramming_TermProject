@@ -10,42 +10,17 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 	main_screen = &ResourceManager::getInstance().main_screen;
 	item_check = &ResourceManager::getInstance().item_check;
 
-	// 6. ·©Å· ¹Þ±â
-	char recvBuf[BUFSIZE];
-	int recvLen = recv(*m_sock, recvBuf, sizeof(SC_RANKING_PACKET), 0);
-	if (recvLen <= 0) {
-		std::cerr << "·©Å· ¹Þ±â ½ÇÆÐ" << std::endl;
-	}
-	else {
-		SC_RANKING_PACKET* resPacket = reinterpret_cast<SC_RANKING_PACKET*>(recvBuf);
-		DataManager::getInstance().rank_arr[0].hs = resPacket->hs1;
-		strcpy(DataManager::getInstance().rank_arr[0].id, resPacket->id1);
-
-		DataManager::getInstance().rank_arr[1].hs = resPacket->hs2;
-		strcpy(DataManager::getInstance().rank_arr[1].id, resPacket->id2);
-
-		DataManager::getInstance().rank_arr[2].hs = resPacket->hs3;
-		strcpy(DataManager::getInstance().rank_arr[2].id, resPacket->id3);
-
-		DataManager::getInstance().rank_arr[3].hs = resPacket->hs4;
-		strcpy(DataManager::getInstance().rank_arr[3].id, resPacket->id4);
-
-		DataManager::getInstance().rank_arr[4].hs = resPacket->hs5;
-		strcpy(DataManager::getInstance().rank_arr[4].id, resPacket->id5);
-
-	}
-
-	DataManager::getInstance().my_item[0].rt = { 661, 175, 687, 196 };
+	DataManager::getInstance().my_item[0].rt = { 661, 175, 689, 202 };
 	DataManager::getInstance().my_item[0].buy = false;
 	DataManager::getInstance().my_item[0].buy_cnt = 0;
 	DataManager::getInstance().my_item[0].price = 500;
 
-	DataManager::getInstance().my_item[1].rt = { 663, 224, 687, 249 };
+	DataManager::getInstance().my_item[1].rt = { 661, 224, 689, 251 };
 	DataManager::getInstance().my_item[1].buy = false;
 	DataManager::getInstance().my_item[1].buy_cnt = 0;
 	DataManager::getInstance().my_item[1].price = 1000;
 
-	DataManager::getInstance().my_item[2].rt = { 661, 272, 685, 299 };
+	DataManager::getInstance().my_item[2].rt = { 661, 272, 689, 299 };
 	DataManager::getInstance().my_item[2].buy = false;
 	DataManager::getInstance().my_item[2].buy_cnt = 0;
 	DataManager::getInstance().my_item[2].price = 500;

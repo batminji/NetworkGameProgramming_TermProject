@@ -104,6 +104,9 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                            strcpy(DataManager::getInstance().my_data.ID, loginPacket.id);
                            DataManager::getInstance().my_data.high_score = 0;
                            DataManager::getInstance().my_data.coin = 0;
+
+                           rank_recv();
+
                            if(title_bgm)title_bgm->release();
                            if (ssystem) {
                                ssystem->close(); ssystem->release();
@@ -115,6 +118,8 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                            strcpy(DataManager::getInstance().my_data.ID, loginPacket.id);
                            DataManager::getInstance().my_data.high_score = resPacket->high_score;
                            DataManager::getInstance().my_data.coin = resPacket->coin;
+
+                           rank_recv();
                            if (title_bgm)title_bgm->release();
                            if (ssystem) {
                                ssystem->close(); ssystem->release();
@@ -157,4 +162,32 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         return 0;
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+void Title_Scene::rank_recv()
+{
+    // 6. ·©Å· ¹Þ±â
+    char recvBuf[BUFSIZE];
+    int recvLen = recv(*m_sock, recvBuf, sizeof(SC_RANKING_PACKET), 0);
+    if (recvLen <= 0) {
+        std::cerr << "·©Å· ¹Þ±â ½ÇÆÐ" << std::endl;
+    }
+    else {
+        SC_RANKING_PACKET* resPacket = reinterpret_cast<SC_RANKING_PACKET*>(recvBuf);
+        DataManager::getInstance().rank_arr[0].hs = resPacket->hs1;
+        strcpy(DataManager::getInstance().rank_arr[0].id, resPacket->id1);
+
+        DataManager::getInstance().rank_arr[1].hs = resPacket->hs2;
+        strcpy(DataManager::getInstance().rank_arr[1].id, resPacket->id2);
+
+        DataManager::getInstance().rank_arr[2].hs = resPacket->hs3;
+        strcpy(DataManager::getInstance().rank_arr[2].id, resPacket->id3);
+
+        DataManager::getInstance().rank_arr[3].hs = resPacket->hs4;
+        strcpy(DataManager::getInstance().rank_arr[3].id, resPacket->id4);
+
+        DataManager::getInstance().rank_arr[4].hs = resPacket->hs5;
+        strcpy(DataManager::getInstance().rank_arr[4].id, resPacket->id5);
+
+    }
 }

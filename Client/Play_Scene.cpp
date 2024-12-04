@@ -56,7 +56,7 @@ Play_Scene::~Play_Scene()
 
 void Play_Scene::render(LPVOID param)
 {
-    std::cout << heart_cnt << "개 하트" << std::endl;
+  
 	m_hwnd = (HWND)param;
 	RECT rect;
 	GetClientRect(m_hwnd, &rect);
@@ -98,9 +98,7 @@ void Play_Scene::render(LPVOID param)
 void Play_Scene::ui_render()
 {
     game_bg2->StretchBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, SRCCOPY);
-  //  // 장비
-  //  for (int i = 0; i < 4; ++i)
-  //      if (item[i].buy)item[i].img.TransparentBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, RGB(255, 0, 255));
+
   //  // 하트
     for (int i = 0; i < heart_cnt; ++i)
         heart->TransparentBlt(m_hBufferDC, heart_pt[i].x - 15, heart_pt[i].y - 15, 30, 30, 0, 0, 18, 16, RGB(0, 255, 0));
@@ -214,7 +212,7 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 gameover_sound->release();
                 //  ssystem->createSound("main_bgm.OGG", FMOD_LOOP_NORMAL, 0, &main_bgm);
                 //  ssystem->playSound(main_bgm, 0, false, &channel);
-
+                player_data_update();
                 next_scene = LOBBY_SCENE;
             }
 
@@ -260,7 +258,7 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 int Play_Scene::send_player_input(unsigned short y)
 {
-    std::cout << "플레이어 데이터 송신"  << std::endl;
+  
     CS_MOVE_PACKET movePacket;
     movePacket.size = sizeof(CS_MOVE_PACKET);
     movePacket.type = CS_MOVE;
@@ -308,17 +306,17 @@ int Play_Scene::recv_process()
 
         switch (resPacket->type) {
         case SC_PLAYER_MOVE:
-            std::cout << "플레이어 데이터 수신: " << resPacket->type << std::endl;
+           // std::cout << "플레이어 데이터 수신: " << resPacket->type << std::endl;
             handle_player_data(recvBuffer.data());
             break;
         case SC_OBJECT_MOVE:
-            std::cout << "오브젝트 데이터 수신: " << resPacket->type << std::endl;
+           // std::cout << "오브젝트 데이터 수신: " << resPacket->type << std::endl;
             handle_object_data(recvBuffer.data());
             break;
         case SC_ROOM_CHANGE:
             break;
         default:
-            std::cout << "알 수 없는 패킷 타입: " << resPacket->type << std::endl;
+           // std::cout << "알 수 없는 패킷 타입: " << resPacket->type << std::endl;
             break;
         }
 
@@ -444,4 +442,13 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
      //  e_lock.unlock();
        
    }
+}
+
+void Play_Scene::player_data_update()
+{
+    //게임종료 후 번 코인, 점수 업데이트
+
+    DataManager::getInstance().my_data.coin += play_gold;
+    if (DataManager::getInstance().my_data.high_score < play_score) DataManager::getInstance().my_data.high_score = play_score;
+
 }

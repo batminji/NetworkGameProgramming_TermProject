@@ -1051,6 +1051,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
             
             // 게임 종료 -> 랭킹 등록
             auto score = roomInfo[pid]->getScore();
+            players[pid].setCoin(players[pid].getCoin() + roomInfo[pid]->getCoin());
             if (players[pid].getHigh_score() < score)
                 players[pid].setHighScore(score);
             if (roomInfo[pid]->getP1ID() == pid) { // 방장만
