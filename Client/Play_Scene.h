@@ -55,6 +55,9 @@ private :
     //½ºÅ³Å° ´­·µ´õ¿°?
     bool skill_key_down = false;
 
+    //°ÔÀÓ¿À¹ö µÆ¾î¿°?
+    bool game_over_screen = false;
+
     
 public:
 

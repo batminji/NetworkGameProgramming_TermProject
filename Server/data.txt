@@ -1,7 +1,7 @@
 batminji 8040 17680
-ffff 130 1750
 awewqqt 0 0
 bbb 0 230
+ffff 130 1750
 asdf 0 0
 jongman 50 1335
 ccc 28464 700
@@ -9,11 +9,12 @@ eee 0 300
 ddd 0 140
 aaa 0 100
 youngyun 7020 11060
-asefwg 0 0
 oihuegrhoerjio 0 0
+asefwg 0 0
 aefwedg 0 0
-awefawe 0 0
 happy 0 600
+awefawe 0 0
+jongman\ 0 210
 sdfghj 0 0
 dsfd 0 0
 djafkjlf 0 0
