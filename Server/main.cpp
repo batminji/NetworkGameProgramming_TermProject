@@ -791,7 +791,7 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     else {
         res.skillEnd = roomInfo[id]->getP2()->getSkill();
     }
-    std::cout << "하트 " << res.hp << "개 보냈다" << std::endl;
+    std::cout << id <<" 에게 하트 " << res.hp << "개 보냈다" << std::endl;
     // std::cout << id << "의 y좌표: " << res.this_y << std::endl;
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
@@ -1013,15 +1013,19 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                 push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
                 push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
                 push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
+                push_evt_queue(FIRE_ENEMY_BULLET, 0, pid); // 적총알발사
             }
             push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
-            push_evt_queue(FIRE_ENEMY_BULLET, 0, pid); // 적총알발사
+
+            bool flag = false;
             send_player_move_packet(s, pid);
             while (true) {
-               
-
                 send_object_move_packet(s, pid);
-                if (roomInfo[pid]->getHeart() == 0) break; // 게임 종료
+                if (flag) break;
+                if (roomInfo[pid]->getHeart() == 0 || roomInfo[pid]->getisPlaying() == false) {
+                    flag = true;
+                }
+                
 
                 // recv.CS_MOVE_PACKET
                 ZeroMemory(recv_buf, sizeof(recv_buf));
