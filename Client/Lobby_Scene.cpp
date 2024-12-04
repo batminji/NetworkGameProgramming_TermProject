@@ -8,6 +8,7 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 	m_sock = sock;
 
 	main_screen = &ResourceManager::getInstance().main_screen;
+	item_check = &ResourceManager::getInstance().item_check;
 
 	// 6. 랭킹 받기
 	char recvBuf[BUFSIZE];
@@ -34,6 +35,21 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 
 	}
 
+	DataManager::getInstance().my_item[0].rt = { 661, 175, 687, 196 };
+	DataManager::getInstance().my_item[0].buy = false;
+	DataManager::getInstance().my_item[0].buy_cnt = 0;
+	DataManager::getInstance().my_item[0].price = 500;
+
+	DataManager::getInstance().my_item[1].rt = { 663, 224, 687, 249 };
+	DataManager::getInstance().my_item[1].buy = false;
+	DataManager::getInstance().my_item[1].buy_cnt = 0;
+	DataManager::getInstance().my_item[1].price = 1000;
+
+	DataManager::getInstance().my_item[2].rt = { 661, 272, 685, 299 };
+	DataManager::getInstance().my_item[2].buy = false;
+	DataManager::getInstance().my_item[2].buy_cnt = 0;
+	DataManager::getInstance().my_item[2].price = 500;
+
 	result = System_Create(&ssystem);
 	if (result != FMOD_OK)
 		exit(0);
@@ -56,8 +72,8 @@ void Lobby_Scene::render(LPVOID param)
 	main_screen->StretchBlt(m_hBufferDC, -20, -20, 800, 600, 0, 0, 800, 600, SRCCOPY);
 
 	//아이템구매
-	//for (int i = 0; i < 4; ++i)
-	//    if (item[i].buy) item_check.TransparentBlt(m_hBufferDC, item[i].rt.left, item[i].rt.top - 10, item[i].rt.right - item[i].rt.left, item[i].rt.bottom - item[i].rt.top, 0, 0, 24, 24, RGB(255, 0, 255));
+	for (int i = 0; i < 3; ++i)
+	    if (DataManager::getInstance().my_item[i].buy) item_check->TransparentBlt(m_hBufferDC, DataManager::getInstance().my_item[i].rt.left, DataManager::getInstance().my_item[i].rt.top - 10, DataManager::getInstance().my_item[i].rt.right - DataManager::getInstance().my_item[i].rt.left, DataManager::getInstance().my_item[i].rt.bottom - DataManager::getInstance().my_item[i].rt.top, 0, 0, 24, 24, RGB(255, 0, 255));
 
 	//내정보
 
@@ -150,6 +166,7 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	{
 		int mx = LOWORD(lParam);
 		int my = HIWORD(lParam);
+		std::cout << mx << " " << my << std::endl;
 		POINT mypt = { mx,my };
 		if (PtInRect(&create_room_button, mypt)) { //create room
 			ssystem->playSound(click_sound, 0, false, &channel);
@@ -231,6 +248,23 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			if (ssystem) {
 				ssystem->close();
 				ssystem->release();
+			}
+		}
+		for (int i = 0; i < 3; ++i) {
+			if (PtInRect(&DataManager::getInstance().my_item[i].rt, mypt)) {
+				if (DataManager::getInstance().my_item[i].buy_cnt % 2 == 0) {
+					if (DataManager::getInstance().my_item[i].price <= DataManager::getInstance().my_data.coin) {
+						DataManager::getInstance().my_item[i].buy = TRUE;
+						DataManager::getInstance().my_data.coin -= DataManager::getInstance().my_item[i].price;
+						DataManager::getInstance().my_item[i].buy_cnt++;
+					}
+					else;
+				}
+				else {
+					DataManager::getInstance().my_item[i].buy = FALSE;
+					DataManager::getInstance().my_data.coin += DataManager::getInstance().my_item[i].price;
+					DataManager::getInstance().my_item[i].buy_cnt++;
+				}
 			}
 		}
 	}
