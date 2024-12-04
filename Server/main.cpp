@@ -166,7 +166,7 @@ private:
     std::atomic_bool isPlaying = false;
     unsigned int score = 0;
     unsigned short heart = 3; // 음수가 없..?
-    unsigned short get_coin = 0; //게임에서 획득한 코인의 양
+    unsigned int get_coin = 0; //게임에서 획득한 코인의 양
 
     std::mutex update_lock; // todo: 락을 분리할지 고민하기
 
@@ -543,6 +543,7 @@ public:
     {
         score += i; // 무조건 싱글로 실행될듯 락 필요없음
     }
+    unsigned int getCoin() { return get_coin; }
 };
 
 class EVENT
@@ -780,6 +781,7 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     res.hp = roomInfo[id]->getHeart();
     res.score = roomInfo[id]->getScore();
     res.skillCnt = players[id].getSkillCount();
+    res.coin = roomInfo[id]->getCoin();
     if (roomInfo[id]->getP1ID() == id) { // 내가 p1이군
         res.skillEnd = roomInfo[id]->getP1()->getSkill();
     }
@@ -961,70 +963,85 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         players[pid].setSocket(s);
 
         // 2. 방 관련 send - recv 
-        while (true) {
-            // 2-1. 참여할 방의 플레이어 아이디 recv하기.
-            ZeroMemory(recv_buf, sizeof(recv_buf));
-            int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), MSG_WAITALL);
-            if (ret == SOCKET_ERROR) { // 에러처리
-                int error = WSAGetLastError();
-                SERVER_err_display("recv() failed");
-                SERVER_err_display(error);  // 오류 코드 출력
-            }
+        while(true) {
             while (true) {
+                // 2-1. 참여할 방의 플레이어 아이디 recv하기.
+                ZeroMemory(recv_buf, sizeof(recv_buf));
+                int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), MSG_WAITALL);
+                if (ret == SOCKET_ERROR) { // 에러처리
+                    int error = WSAGetLastError();
+                    SERVER_err_display("recv() failed");
+                    SERVER_err_display(error);  // 오류 코드 출력
+                }
+                while (true) {
+                    process_packet(recv_buf, s, pid);
+
+                    if (roomInfo.find(pid) != roomInfo.end() && true == roomInfo[pid]->getisPlaying()) {
+                        break;
+                    }
+                    else if (roomInfo.find(pid) == roomInfo.end()) {
+                        ZeroMemory(recv_buf, sizeof(recv_buf));
+                        int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), MSG_WAITALL);
+                        if (ret == SOCKET_ERROR) { // 에러처리
+                            int error = WSAGetLastError();
+                            SERVER_err_display("recv() failed");
+                            SERVER_err_display(error);  // 오류 코드 출력
+                        }
+                    }
+                    else {
+                        ZeroMemory(recv_buf, sizeof(recv_buf));
+                        int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), MSG_WAITALL);
+                        if (ret == SOCKET_ERROR) { // 에러처리
+                            int error = WSAGetLastError();
+                            SERVER_err_display("recv() failed");
+                            SERVER_err_display(error);  // 오류 코드 출력
+                        }
+                    }
+                }
+
+                if (true == roomInfo[pid]->getisPlaying()) {
+                    std::cout << pid << " 플레이씬 넘어가기" << std::endl;
+                    break; // 게임 시작
+                }
+            }
+
+            if (roomInfo[pid]->getP1ID() == pid) {// 호스트이면
+                // 그 방의 적 생성, 총알 이동도 호스트 혼자 처리
+                roomInfo[pid]->Create_enemy();
+                push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
+                // push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
+                push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
+            }
+            push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
+            push_evt_queue(FIRE_ENEMY_BULLET, 0, pid); // 적총알발사
+            send_player_move_packet(s, pid);
+            while (true) {
+                if (roomInfo[pid]->getHeart() == 0) break; // 게임 종료
+
+                send_object_move_packet(s, pid);
+
+                // recv.CS_MOVE_PACKET
+                ZeroMemory(recv_buf, sizeof(recv_buf));
+                int ret = recv(s, recv_buf, sizeof(CS_MOVE_PACKET), MSG_WAITALL);
+                if (ret == SOCKET_ERROR) { // 에러처리
+                    int error = WSAGetLastError();
+                    SERVER_err_display("recv() failed");
+                    SERVER_err_display(error);  // 오류 코드 출력
+                }
                 process_packet(recv_buf, s, pid);
-
-                if (roomInfo.find(pid) != roomInfo.end() && true == roomInfo[pid]->getisPlaying()) {
-                    break; 
-                }
-                else if (roomInfo.find(pid) == roomInfo.end()) {
-                    ZeroMemory(recv_buf, sizeof(recv_buf));
-                    int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), MSG_WAITALL);
-                    if (ret == SOCKET_ERROR) { // 에러처리
-                        int error = WSAGetLastError();
-                        SERVER_err_display("recv() failed");
-                        SERVER_err_display(error);  // 오류 코드 출력
-                    }
-                }
-                else {
-                    ZeroMemory(recv_buf, sizeof(recv_buf));
-                    int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), MSG_WAITALL);
-                    if (ret == SOCKET_ERROR) { // 에러처리
-                        int error = WSAGetLastError();
-                        SERVER_err_display("recv() failed");
-                        SERVER_err_display(error);  // 오류 코드 출력
-                    }
-                }
             }
-
-            if (true == roomInfo[pid]->getisPlaying()) {
-                std::cout << pid << " 플레이씬 넘어가기" << std::endl;
-                break; // 게임 시작
+            
+            // 게임 종료 -> 랭킹 등록
+            auto score = roomInfo[pid]->getScore();
+            if (players[pid].getHigh_score() < score)
+                players[pid].setHighScore(score);
+            if (roomInfo[pid]->getP1ID() == pid) { // 방장만
+                save_all_player_info();
+                auto p = roomInfo[pid];
+                roomInfo.erase(pid);
+                roomInfo.erase(p->getP2ID());
+                delete p;
             }
-
-        }
-
-        if (roomInfo[pid]->getP1ID() == pid) {// 호스트이면
-            // 그 방의 적 생성, 총알 이동도 호스트 혼자 처리
-            roomInfo[pid]->Create_enemy();
-            push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
-            // push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
-             push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
-        }
-        push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
-        push_evt_queue(FIRE_ENEMY_BULLET, 0, pid); // 적총알발사
-        send_player_move_packet(s, pid);
-        while (true) {
-            send_object_move_packet(s, pid); 
-
-            // recv.CS_MOVE_PACKET
-            ZeroMemory(recv_buf, sizeof(recv_buf));
-            int ret = recv(s, recv_buf, sizeof(CS_MOVE_PACKET), MSG_WAITALL);
-            if (ret == SOCKET_ERROR) { // 에러처리
-                int error = WSAGetLastError();
-                SERVER_err_display("recv() failed");
-                SERVER_err_display(error);  // 오류 코드 출력
-            }
-            process_packet(recv_buf, s, pid);
         }
     }
 }

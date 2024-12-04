@@ -68,4 +68,5 @@ public:
 
     unsigned short getSkillCount() { return skillCount; }
     void resetSkillCount() { skillCount -= SKILL_CNT; }
+    void setHighScore(unsigned int h) { high_score = h; }
 };
