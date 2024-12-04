@@ -54,10 +54,12 @@ public:
     void setID(char* str) { id = std::string(str); }
     void setSocket(SOCKET& s) { this->s = s; }
     unsigned short getCoin() { return coin; }
+    void setCoin(unsigned int new_coin) { coin = new_coin; }
     unsigned int getHigh_score() { return high_score; }
     bool getSkill() { return isSkill; }
     void setSkill(bool b) { isSkill = b; }
     void addSkillCount() { skillCount++; }
+    void setSkillCount(unsigned short new_skill_cnt) { skillCount = new_skill_cnt; }
     void setZombieCnt(short new_zombie_cnt) { zombie_cnt = new_zombie_cnt; }
     short zombieCount() { return zombie_cnt; }
 

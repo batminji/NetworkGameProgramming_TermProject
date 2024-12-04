@@ -83,4 +83,5 @@ public:
     void handle_player_data(const uint8_t* packetData);
     void handle_object_data(const uint8_t* packetData);
 
+    void player_data_update();
 };

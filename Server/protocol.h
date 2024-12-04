@@ -24,6 +24,7 @@ struct CS_JOIN_ROOM_PACKET
 	unsigned short size;
 	PACKET type;
 	char id[ID_LEN];
+	bool item[3];
 };
 
 struct CS_ROOM_STATE_PACKET // 방 설정을 변경하는 패킷
