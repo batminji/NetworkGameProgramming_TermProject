@@ -4,7 +4,7 @@ awewqqt 0 0
 bbb 0 230
 ffff 130 1750
 asdf 0 0
-jongman 50 1335
+jongman 150 1335
 ccc 28464 700
 eee 0 300
 ddd 0 140

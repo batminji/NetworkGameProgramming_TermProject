@@ -353,7 +353,7 @@ public:
             if (PtInRect(&player_rt, { eb.GetX(),eb.GetY()}) == 1 && p1->zombieCount() < 1) {
                 if ((healer) && (!(healer->getSkill()))) {//힐러의 보호막이 켜져있지않을때??
                     //커비 하트 깎기
-                    heart = max(heart - 1, 0);
+                   heart = max(heart - 1, 0);
 
                     // 커비 잠시 무적모드 활성화 zombie_cnt를 1로
                     p1->setZombieCnt(1);
@@ -398,7 +398,7 @@ public:
                     p1->setDual(true);
                     push_evt_queue(CANCEL_DUAL, 5000, p1->getID());
                 }
-                if(eb.getType() == ITEM_MAGNET&&p1->isMagnet()){
+                if(eb.getType() == ITEM_MAGNET&& !p1->isMagnet()){
                     p1->setMagnet(true);
                     push_evt_queue(CANCEL_MAGNET, 5000, p1->getID());
                 }
@@ -413,7 +413,7 @@ public:
                     p2->setDual(true);
                     push_evt_queue(CANCEL_DUAL, 5000, p2->getID());
                 }
-                if (eb.getType() == ITEM_MAGNET && p2->isMagnet()) {
+                if (eb.getType() == ITEM_MAGNET && !p2->isMagnet()) {
                     p2->setMagnet(true);
                     push_evt_queue(CANCEL_MAGNET, 5000, p2->getID());
                 }
@@ -798,7 +798,7 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     else {
         res.skillEnd = roomInfo[id]->getP2()->getSkill();
     }
-    std::cout << id <<" 에게 하트 " << res.hp << "개 보냈다" << std::endl;
+    //std::cout << id <<" 에게 하트 " << res.hp << "개 보냈다" << std::endl;
     // std::cout << id << "의 y좌표: " << res.this_y << std::endl;
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
@@ -1076,20 +1076,25 @@ void addSkillCount(OTYPE type, std::string& id)
     {
     case P1_BULLET:
         roomInfo[id]->getP1()->addSkillCount();
+        roomInfo[id]->getP1()->setSkillCount(min(roomInfo[id]->getP1()->getSkillCount(), SKILL_CNT));
         roomInfo[id]->addScore(DAMAGE);
         break;
     case P1_SKILLBULLET:
         roomInfo[id]->getP1()->addSkillCount();
+        roomInfo[id]->getP1()->setSkillCount(min(roomInfo[id]->getP1()->getSkillCount(),SKILL_CNT));
         roomInfo[id]->addScore(DAMAGE * 2);
+        
         break;
 
     case P2_BULLET:
-        roomInfo[id]->getP1()->addSkillCount();
+        roomInfo[id]->getP2()->addSkillCount();
+        roomInfo[id]->getP2()->setSkillCount(min(roomInfo[id]->getP2()->getSkillCount(), SKILL_CNT));
         roomInfo[id]->addScore(DAMAGE);
         break;
 
     case P2_SKILLBULLET:
         roomInfo[id]->getP2()->addSkillCount();
+        roomInfo[id]->getP2()->setSkillCount(min(roomInfo[id]->getP2()->getSkillCount(), SKILL_CNT));
         roomInfo[id]->addScore(DAMAGE * 2);
         break;
     }
@@ -1134,6 +1139,7 @@ void ai_thread()
             break;
 
         case CREATE_SET:
+           // std::cout << "자석여부:" << players[ev.room_id].isMagnet() <<std::endl;
             if (roomInfo[ev.room_id]->getEnemy_cnt() < 1) { 
                 roomInfo[ev.room_id]->clear_set++;
                 if (roomInfo[ev.room_id]->clear_set % 4 == 0 && roomInfo[ev.room_id]->clear_set != 0) roomInfo[ev.room_id]->clear_stage++;

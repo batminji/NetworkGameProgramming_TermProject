@@ -33,28 +33,18 @@ Enemy::Enemy(int arg_type,const unsigned short arg_x, const unsigned short arg_y
 
 void Enemy::render(HDC mdc)
 {
-	/*if (cnt < 0) {
-		monster_create->TransparentBlt(mdc, x, y, (rt.right - rt.left), (rt.bottom - rt.top), 33 * (6 + (cnt / 3)), 0, 33, 33, RGB(255, 0, 255));
-	}
-	else {
-		monster[type]->TransparentBlt(mdc, x,y, (rt.right - rt.left), (rt.bottom - rt.top), ((rt.right - rt.left) / 2) * (ani % (frame)), 0, (rt.right - rt.left) / 2, (rt.bottom - rt.top) / 2, RGB(255, 0, 255));
-		if (type > 0) {
-			num = rt.right - rt.left;
-			hp_empty->TransparentBlt(mdc, rt.left - 30, rt.top - 22, 224 * ((double)num / 160), 22, 0, 0, 224, 22, RGB(0, 255, 0));
-			hp_bar->TransparentBlt(mdc, rt.left - 30, rt.top - 22, (((double)hp / (double)50 * 224) * ((double)num / 160) + 1), 22, 0, 0, ((double)hp / (double)50) * 224, 22, RGB(0, 255, 0)); 
-		}
-	}*/
-
-	// 일단 생성 되는 부분을 안 넣는다고 했을 때
+	
 
 	monster[type]->TransparentBlt(mdc, x, y, width, height, (width/2)*ani, 0, (width) / 2, (height) / 2, RGB(255, 0, 255));
 	if (type > 0) {
 		num = width;
 		hp_empty->TransparentBlt(mdc, x - 30, y - 22, 224 * ((double)num / 160), 22, 0, 0, 224, 22, RGB(0, 255, 0));
-		hp_bar->TransparentBlt(mdc, x - 30, y - 22, (((double)hp / (double)50 * 224) * ((double)num / 160) + 1), 22, 0, 0, ((double)hp / (double)50) * 224, 22, RGB(0, 255, 0));
+		int hp_copy = min(((double)hp / (double)50 * 224) * ((double)num / 160) + 1, 224 * ((double)num / 160));
+		int hp_socrce = min(224, ((double)hp / (double)50) * 224);
+		hp_bar->TransparentBlt(mdc, x - 30, y - 22, hp_copy, 22, 0, 0,hp_socrce, 22, RGB(0, 255, 0));
 	}
 
-	// 이펙트를 여기에 넣나요?
+	
 }
 
 void Enemy::update()
