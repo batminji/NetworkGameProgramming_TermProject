@@ -225,7 +225,7 @@ public:
                 else p_bullets.push_back({ p1->getY(), P1_SKILLBULLET }); }
             else {
                 
-                if (p1->isDual())p_bullets.push_back({ static_cast<unsigned short>(p1->getY() + 2), P1_BULLET }), p_bullets.push_back({ static_cast<unsigned short>(p1->getY() - 2), P1_SKILLBULLET });
+                if (p1->isDual())p_bullets.push_back({ static_cast<unsigned short>(p1->getY() + 2), P1_BULLET }), p_bullets.push_back({ static_cast<unsigned short>(p1->getY() - 2), P1_BULLET });
                 else p_bullets.push_back({ p1->getY(), P1_BULLET });
             }
         }
@@ -235,7 +235,7 @@ public:
                 else p_bullets.push_back({ p2->getY(), P2_SKILLBULLET }); }
             else {
                 
-                if (p2->isDual())p_bullets.push_back({ static_cast<unsigned short>(p2->getY() + 2), P2_BULLET }), p_bullets.push_back({ static_cast<unsigned short>(p2->getY() - 2), P2_SKILLBULLET });
+                if (p2->isDual())p_bullets.push_back({ static_cast<unsigned short>(p2->getY() + 2), P2_BULLET }), p_bullets.push_back({ static_cast<unsigned short>(p2->getY() - 2), P2_BULLET });
                 else p_bullets.push_back({ p2->getY(), P2_BULLET });
             }
         }
