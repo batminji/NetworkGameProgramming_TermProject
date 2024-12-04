@@ -387,7 +387,10 @@ public:
 
             // p1의 충돌체크
             RECT player_rt = { DEFXPOS - 25, p1->getY() - 25, DEFXPOS + 25, p1->getY() + 25 };
-            if (PtInRect(&player_rt, { eb.GetX(),eb.GetY() }) == 1 && p1->zombieCount() < 1) {
+            RECT item_rt = {eb.GetX(),eb.GetY(),eb.GetX()+50,eb.GetY() + 50 };
+            RECT intersection;
+            if (IntersectRect(&intersection, &player_rt, &item_rt) && p1->zombieCount() < 1) {
+
                 if (eb.getType() == ITEM_COIN) get_coin += 10;
                 if(eb.getType() == ITEM_DUAL&&!p1->isDual()) {
                     p1->setDual(true);

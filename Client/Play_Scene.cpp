@@ -6,12 +6,7 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
     m_hBufferDC = hBufferDC;
     m_sock = sock;
 
-    //player
-    //master_player = p1; join_player = p2;
-    //(master_player->job == 1) ? join_player->job = 2 : join_player->job = 1;
-
     short mj =1, jj=2;
-
 
     if (DataManager::getInstance().master_is_dealer) {
         mj = 1;
@@ -22,11 +17,8 @@ Play_Scene::Play_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* 
         jj = 1;
     }
 
-    //if (DataManager::getInstance().room_master == false) swap(mj, jj);
-    // std::cout << mj << "  " << jj << std::endl;
     master_player = new Player(mj,DataManager::getInstance().getInstance().room_master);
     join_player = new Player(jj, !DataManager::getInstance().getInstance().room_master);
-
 
 
     //ui 이미지 로드
@@ -295,6 +287,7 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
     // 데이터 갱신
     heart_cnt = resPacket->hp;
     play_score = resPacket->score;
+    play_gold = resPacket->coin;
 
     if (master_player->who_is_me) {
         // 현재 플레이어가 마스터인 경우
