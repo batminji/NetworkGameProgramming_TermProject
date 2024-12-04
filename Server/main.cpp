@@ -456,7 +456,11 @@ public:
             int mid3 = 0;
             if (clear_set % 4 == 2) mid3 = 1;
             //중간몬스터생성
-            enemies.push_back({ ENEMY_1,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10) });
+            if(clear_set % 4 == 0 )enemies.push_back({ ENEMY_1,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10) });
+            else if(clear_set % 4 == 1 )enemies.push_back({ ENEMY_2,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10) });
+            else enemies.push_back({ ENEMY_3,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10) });
+
+            
             //작은 몬스터 생성
             enemies.push_back({ ENEMY_0,220,100,10 + (clear_stage * 5) });
             enemies.push_back({ ENEMY_0,280,265,10 + (clear_stage * 5) });
