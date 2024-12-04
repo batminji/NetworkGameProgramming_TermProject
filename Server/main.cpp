@@ -960,14 +960,13 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
         client_info(s, p->id);
         if (send_login_packet(s, p)) {
             pid = p->id;
-            send_top_high_scores(s);
+            players[pid].setSocket(s);
         }
-
-        players[pid].setSocket(s);
 
         // 2. 방 관련 send - recv 
         while(true) {
             while (true) {
+                send_top_high_scores(s);
                 // 2-1. 참여할 방의 플레이어 아이디 recv하기.
                 ZeroMemory(recv_buf, sizeof(recv_buf));
                 int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), MSG_WAITALL);
@@ -1105,19 +1104,18 @@ void ai_thread()
     while (true) {
         EVENT ev;
         if (task_queue.empty() || !task_queue.try_pop(ev)) continue;
-       
+        if (roomInfo[ev.room_id] == nullptr)continue;
+
         switch (ev.evt_type) {
         case FIRE_PLAYER_BULLET:
             roomInfo[ev.room_id]->createPbullet(ev.room_id);
-            // std::cout << ev.room_id << ": 히히 발싸아~" << std::endl;
             push_evt_queue(FIRE_PLAYER_BULLET, 500, ev.room_id); // .5초에 한개씩 발사
             break;
 
         case MOVE_PLAYER_BULLET:
             if (ev.room_id == roomInfo[ev.room_id]->getP1ID()) {
-                // std::cout << ev.room_id << ": 총알움직" << std::endl;
                 roomInfo[ev.room_id]->doBulletsMove();
-                push_evt_queue(MOVE_PLAYER_BULLET, 100, ev.room_id); // .5초에 한개씩 발사
+                push_evt_queue(MOVE_PLAYER_BULLET, 100, ev.room_id); // 총알이동
                 roomInfo[ev.room_id]->deletebullet(ev.room_id); // 총알 충돌체크
                 roomInfo[ev.room_id]->deleteEnemy();
             }
@@ -1150,12 +1148,15 @@ void ai_thread()
         case ENABLE_COLLISION:
             players[ev.room_id].setZombieCnt(0);
             break;
+
         case CANCEL_DUAL:
             players[ev.room_id].setDual(0);
             break;
+
         case CANCEL_MAGNET:
             players[ev.room_id].setMagnet(0);
             break;
+
         default:
             std::cout << "unknown event" << std::endl;
             exit(-1);
