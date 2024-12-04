@@ -204,7 +204,6 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_LBUTTONDOWN:
     {
         if (heart_cnt < 1) {
-
             int mx = LOWORD(lParam);
             int my = HIWORD(lParam);
             POINT mypt = { mx,my };
