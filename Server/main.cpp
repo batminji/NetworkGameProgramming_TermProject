@@ -1010,16 +1010,7 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                                 closesocket(s);
                             }
                             else { // 방에 누가 있을때 -> 방장바꾸고 나지우고 종료
-                                if (p->getP1ID() == pid) { // 내가방장
-                                    roomInfo[pid]->setP1(nullptr); // change admin
-                                    players[pid].setPlaying(false);
-                                    closesocket(s);
-                                }
-                                else {
-                                    roomInfo[pid]->setP2(nullptr);
-                                    players[pid].setPlaying(false);
-                                    closesocket(s);
-                                }
+                                exit(-1);
                             }
                             
                             return 0;
@@ -1067,30 +1058,8 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                     SERVER_err_display(error);  // 오류 코드 출력
                     std::cout << "클라이언트 연결 해제" << std::endl;
 
-                    auto p = roomInfo[pid];
 
-                    // 방에 아무도 없을 때 -> 방지우고 나지우고 종료
-                    if (p->getP2() == nullptr || p->getP1() == nullptr) {
-                        roomLock.lock();
-                        roomInfo.erase(pid);
-                        roomLock.unlock();
-                        players[pid].setPlaying(false); //접속하지 않은 아이디
-                        delete p;
-                        closesocket(s);
-                    }
-                    else { // 방에 누가 있을때 
-                        if (p->getP1ID() == pid) { // 내가방장
-                            roomInfo[pid]->setP1(nullptr); 
-                            players[pid].setPlaying(false);
-                            closesocket(s);
-                        }
-                        else {
-                            roomInfo[pid]->setP2(nullptr);
-                            players[pid].setPlaying(false);
-                            closesocket(s);
-                        }
-                    }
-                    return 0;
+                    exit(-1);
                 }
                 process_packet(recv_buf, s, pid);
               
