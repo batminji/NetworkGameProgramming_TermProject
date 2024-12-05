@@ -1,7 +1,5 @@
 ﻿#include "Room_Scene.h"
-//#include "../Server/protocol.h"
 
-// source\repos\NetworkGameProgramming_TermProject\client\x64\Release\Client.exe
 Room_Scene::Room_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET* sock, bool is_master) {
     m_hwnd = hwnd;
     m_hBufferBitmap = hBufferBitmap;
@@ -129,7 +127,6 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         int mx = LOWORD(lParam);
         int my = HIWORD(lParam);
         POINT mypt = { mx,my };
-        // printf("x : %d y : %d\n", mx, my);
         if (master_player->who_is_me) {
             if (PtInRect(&dealer_rt, mypt)) { // 딜러 누르기
                 ssystem->playSound(click_sound, 0, false, &channel);
@@ -166,11 +163,7 @@ LRESULT Room_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 int Room_Scene::room_data_update()
 {
-    //�۽�
-    /*if (true == isPlaying and next_scene == PLAY_SCENE) {
-        std::cout << "저는 send를 한번 더하고싶어하는 바보에요." << std::endl;
-        return 1;
-    }*/
+   
     CS_ROOM_STATE_PACKET roomPacket;
     roomPacket.size = sizeof(CS_ROOM_STATE_PACKET);
     roomPacket.type = CS_ROOM_STATE;

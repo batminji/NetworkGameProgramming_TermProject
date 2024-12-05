@@ -223,9 +223,7 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_CHAR:
     {
         if (wParam == VK_RETURN) { // 스킬을 썼다.
-            // TODO 스킬 썼다는 패킷 보내야 함.
             skill_key_down = true;
-            // 총알의 타입 변경 흠... 근데 흠...
         }
     }
         break;

@@ -3,7 +3,6 @@
 #include "Framework.h"
 #include "ResourceManager.h"
 
-//#include "../Server/protocol.h"
 
 #pragma comment(lib, "ws2_32.lib")
 

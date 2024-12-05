@@ -14,7 +14,8 @@ bullet::bullet(short x, short y, short t, short j)
 void bullet::render(HDC mdc)
 {
 	switch (job) {
-	case 1: // Dealer
+	case 1: 
+		//Dealer
 		switch (type) {
 		case 1:
 			Kirby_blue_bullet->TransparentBlt(mdc, xy[0] - 20, xy[1] - 10, 40, 20, basic_bullet_frame, 0, 270, 160, RGB(255, 0, 255));

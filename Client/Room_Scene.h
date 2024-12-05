@@ -49,6 +49,6 @@ public:
     std::atomic_bool isPlaying = false;
 
 public:
-    int room_data_update(); //서버와의 송수신함수 , 방정보를 바꿨을때만 부르거나 업데이트에서 계속 부르거나,,,
+    int room_data_update(); 
 };
 

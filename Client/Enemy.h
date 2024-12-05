@@ -9,7 +9,8 @@ static int num;
 class Enemy
 {
 public :
-	int type; //0:½º¸ô 1~3:¹Ìµå 4:ºò
+	int type; 
+	//0:½º¸ô 1~3:¹Ìµå 4:ºò
 	short x, y;
 	short width, height;
 	short hp;

@@ -4,7 +4,6 @@
 #include "Lobby_Scene.h"
 #include "Room_Scene.h"
 #include "Play_Scene.h"
-#include "test_scene.h"
 #include "Cartoon_Scene.h"
 
 class Framework

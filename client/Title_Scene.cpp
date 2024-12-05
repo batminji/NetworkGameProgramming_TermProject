@@ -84,7 +84,7 @@ LRESULT Title_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                    std::cerr << "로그인 Send failed." << std::endl;
                    closesocket(*m_sock);
                    WSACleanup();
-                   //return -1;
+                   
                }
                
                // 6. 로그인 결과 받기

@@ -154,12 +154,7 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Room_Scene.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="test_scene.cpp" />
     <ClCompile Include="Title_Scene.cpp" />
-    <ClCompile Include="전 프로젝트 파일.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
@@ -177,7 +172,6 @@
     <ClInclude Include="Room_Scene.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="test_scene.h" />
     <ClInclude Include="Title_Scene.h" />
   </ItemGroup>
   <ItemGroup>

@@ -48,13 +48,7 @@
     <ClCompile Include="Scene.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="test_scene.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Title_Scene.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="전 프로젝트 파일.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Cartoon_Scene.cpp">
@@ -99,9 +93,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="test_scene.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Title_Scene.h">

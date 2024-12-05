@@ -52,9 +52,10 @@ void Framework::update()
 		case PLAY_SCENE:
 		{
 			std::cout << "room to play 전환" << std::endl;
-			// Room_Scene에서 플레이어 데이터를 가져옴
+			
+			
+			//Room_Scene에서 플레이어 데이터를 가져옴
 			if (dynamic_cast<Room_Scene*>(m_scene)->master_player->who_is_me) {
-				//std::cout << "마스터는 저예염: 나:"<< dynamic_cast<Room_Scene*>(m_scene)->master_player->job <<"  니:"<<dynamic_cast<Room_Scene*>(m_scene)->join_player->job << std::endl;
 				Player master_player(dynamic_cast<Room_Scene*>(m_scene)->master_player->job, TRUE);
 				Player join_player(dynamic_cast<Room_Scene*>(m_scene)->join_player->job, FALSE);
 
