@@ -56,6 +56,7 @@ Play_Scene::~Play_Scene()
 
 void Play_Scene::render(LPVOID param)
 {
+  
 	m_hwnd = (HWND)param;
 	RECT rect;
 	GetClientRect(m_hwnd, &rect);
@@ -91,15 +92,13 @@ void Play_Scene::render(LPVOID param)
     ui_render();
 
     //게임오버
-    if (heart_cnt < 1)GameOver_draw();
+    if (game_over_screen)GameOver_draw();
 }
 
 void Play_Scene::ui_render()
 {
     game_bg2->StretchBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, SRCCOPY);
-  //  // 장비
-  //  for (int i = 0; i < 4; ++i)
-  //      if (item[i].buy)item[i].img.TransparentBlt(m_hBufferDC, 0, 0, 800, 50, 0, 0, 800, 50, RGB(255, 0, 255));
+
   //  // 하트
     for (int i = 0; i < heart_cnt; ++i)
         heart->TransparentBlt(m_hBufferDC, heart_pt[i].x - 15, heart_pt[i].y - 15, 30, 30, 0, 0, 18, 16, RGB(0, 255, 0));
@@ -150,16 +149,16 @@ void Play_Scene::GameOver_draw()
 {
     game_over->TransparentBlt(m_hBufferDC, 0, 0,800, 600, 0, 0, 800, 600, RGB(255, 0, 255));
     wsprintf(number_text, L"%d", play_score);
-    if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 470, 180, 95, 135, 0, 0, 100, 135, RGB(255, 0, 255));
+    if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 470, 200, 95, 135, 0, 0, 100, 135, RGB(255, 0, 255));
     for (int i = lstrlen(number_text) - 1; i >= 0; --i) {
         num = number_text[i] - 48;
-        over_number->TransparentBlt(m_hBufferDC, ((lstrlen(number_text) - i - 1) * -100) + 470, 180, 95, 135, num * 100, 0, 100, 135, RGB(255, 0, 255));
+        over_number->TransparentBlt(m_hBufferDC, ((lstrlen(number_text) - i - 1) * -100) + 470, 200, 95, 135, num * 100, 0, 100, 135, RGB(255, 0, 255));
     }
     wsprintf(number_text, L"%d", play_gold);
-    if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 315, 360, 50, 80, 0, 0, 100, 135, RGB(255, 0, 255));
+    if (lstrlen(number_text) == 0)number->TransparentBlt(m_hBufferDC, 315, 380, 50, 80, 0, 0, 100, 135, RGB(255, 0, 255));
     for (int i = 0; i < lstrlen(number_text); i++) {
         num = number_text[i] - 48;
-        over_number->TransparentBlt(m_hBufferDC, ((lstrlen(number_text) - i - 1) * -55) + 315, 360, 50, 80, num * 100, 0, 100, 135, RGB(255, 0, 255));
+        over_number->TransparentBlt(m_hBufferDC, ((lstrlen(number_text) - i - 1) * -55) + 315, 380, 50, 80, num * 100, 0, 100, 135, RGB(255, 0, 255));
     }
 }
 
@@ -181,10 +180,10 @@ void Play_Scene::update()
 void Play_Scene::network()
 {
 
-    if (heart_cnt > 0) {
+    if (!game_over_screen) {
         recv_process();
         // 플레이어인풋 전송
-        send_player_input(send_y);
+        if(!game_over_screen)send_player_input(send_y);
     }
 
 }
@@ -203,7 +202,7 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     }
     case WM_LBUTTONDOWN:
     {
-        if (heart_cnt < 1) {
+        if (game_over_screen) {
             int mx = LOWORD(lParam);
             int my = HIWORD(lParam);
             POINT mypt = { mx,my };
@@ -213,7 +212,7 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 gameover_sound->release();
                 //  ssystem->createSound("main_bgm.OGG", FMOD_LOOP_NORMAL, 0, &main_bgm);
                 //  ssystem->playSound(main_bgm, 0, false, &channel);
-
+                player_data_update();
                 next_scene = LOBBY_SCENE;
             }
 
@@ -259,7 +258,7 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 int Play_Scene::send_player_input(unsigned short y)
 {
-
+  
     CS_MOVE_PACKET movePacket;
     movePacket.size = sizeof(CS_MOVE_PACKET);
     movePacket.type = CS_MOVE;
@@ -307,15 +306,17 @@ int Play_Scene::recv_process()
 
         switch (resPacket->type) {
         case SC_PLAYER_MOVE:
+           // std::cout << "플레이어 데이터 수신: " << resPacket->type << std::endl;
             handle_player_data(recvBuffer.data());
             break;
         case SC_OBJECT_MOVE:
+           // std::cout << "오브젝트 데이터 수신: " << resPacket->type << std::endl;
             handle_object_data(recvBuffer.data());
             break;
         case SC_ROOM_CHANGE:
             break;
         default:
-            std::cerr << "알 수 없는 패킷 타입: " << resPacket->type << std::endl;
+           // std::cout << "알 수 없는 패킷 타입: " << resPacket->type << std::endl;
             break;
         }
 
@@ -356,6 +357,8 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         else master_player->skill = false;
         join_player->skill_cnt = resPacket->skillCnt;
     }
+
+    if (!(resPacket->hp == 1 || resPacket->hp == 2 || resPacket->hp == 3 || resPacket->hp == 4)) game_over_screen = true;
 }
 
 std::mutex bullets_mutex;
@@ -443,4 +446,13 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
      //  e_lock.unlock();
        
    }
+}
+
+void Play_Scene::player_data_update()
+{
+    //게임종료 후 번 코인, 점수 업데이트
+
+    DataManager::getInstance().my_data.coin += play_gold;
+    if (DataManager::getInstance().my_data.high_score < play_score) DataManager::getInstance().my_data.high_score = play_score;
+
 }

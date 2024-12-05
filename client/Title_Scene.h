@@ -31,5 +31,7 @@ public:
     void update() override;
     void network() override;
     LRESULT CALLBACK windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
+    void rank_recv();
 };
 

@@ -10,42 +10,17 @@ Lobby_Scene::Lobby_Scene(HWND hwnd, HBITMAP hBufferBitmap, HDC hBufferDC, SOCKET
 	main_screen = &ResourceManager::getInstance().main_screen;
 	item_check = &ResourceManager::getInstance().item_check;
 
-	// 6. 랭킹 받기
-	char recvBuf[BUFSIZE];
-	int recvLen = recv(*m_sock, recvBuf, sizeof(SC_RANKING_PACKET), 0);
-	if (recvLen <= 0) {
-		std::cerr << "랭킹 받기 실패" << std::endl;
-	}
-	else {
-		SC_RANKING_PACKET* resPacket = reinterpret_cast<SC_RANKING_PACKET*>(recvBuf);
-		DataManager::getInstance().rank_arr[0].hs = resPacket->hs1;
-		strcpy(DataManager::getInstance().rank_arr[0].id, resPacket->id1);
-
-		DataManager::getInstance().rank_arr[1].hs = resPacket->hs2;
-		strcpy(DataManager::getInstance().rank_arr[1].id, resPacket->id2);
-
-		DataManager::getInstance().rank_arr[2].hs = resPacket->hs3;
-		strcpy(DataManager::getInstance().rank_arr[2].id, resPacket->id3);
-
-		DataManager::getInstance().rank_arr[3].hs = resPacket->hs4;
-		strcpy(DataManager::getInstance().rank_arr[3].id, resPacket->id4);
-
-		DataManager::getInstance().rank_arr[4].hs = resPacket->hs5;
-		strcpy(DataManager::getInstance().rank_arr[4].id, resPacket->id5);
-
-	}
-
-	DataManager::getInstance().my_item[0].rt = { 661, 175, 687, 196 };
+	DataManager::getInstance().my_item[0].rt = { 661, 175, 689, 202 };
 	DataManager::getInstance().my_item[0].buy = false;
 	DataManager::getInstance().my_item[0].buy_cnt = 0;
 	DataManager::getInstance().my_item[0].price = 500;
 
-	DataManager::getInstance().my_item[1].rt = { 663, 224, 687, 249 };
+	DataManager::getInstance().my_item[1].rt = { 661, 224, 689, 251 };
 	DataManager::getInstance().my_item[1].buy = false;
 	DataManager::getInstance().my_item[1].buy_cnt = 0;
 	DataManager::getInstance().my_item[1].price = 1000;
 
-	DataManager::getInstance().my_item[2].rt = { 661, 272, 685, 299 };
+	DataManager::getInstance().my_item[2].rt = { 661, 272, 689, 299 };
 	DataManager::getInstance().my_item[2].buy = false;
 	DataManager::getInstance().my_item[2].buy_cnt = 0;
 	DataManager::getInstance().my_item[2].price = 500;
@@ -170,7 +145,7 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		POINT mypt = { mx,my };
 		if (PtInRect(&create_room_button, mypt)) { //create room
 			ssystem->playSound(click_sound, 0, false, &channel);
-			printf("방만들귀\n");
+			printf("방을 만들었습니다.\n");
 			//방만들기를 눌렀을때 처리
 			DataManager::getInstance().room_master = true;
 			strcpy(DataManager::getInstance().ROOM_ID, DataManager::getInstance().my_data.ID); //참가 방아이디를 내아이디로
@@ -179,6 +154,7 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			roomPacket.size = sizeof(CS_JOIN_ROOM_PACKET);
 			roomPacket.type = CS_JOIN_ROOM;
 			strcpy(roomPacket.id, DataManager::getInstance().ROOM_ID);
+			for (int ii = 0; ii < 3; ++ii) roomPacket.item[ii] = DataManager::getInstance().my_item[ii].buy;
 
 			if (send(*m_sock, reinterpret_cast<char*>(&roomPacket), sizeof(roomPacket), 0) == SOCKET_ERROR) {
 				std::cerr << "Send failed." << std::endl;
@@ -198,7 +174,7 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		}
 		if (PtInRect(&join_room_button, mypt)) { //join room
 			ssystem->playSound(click_sound, 0, false, &channel);
-			printf("방참가하귀\n");
+			printf("기존 방에 참가하겠습니다.\n");
 			//방 참가하기를 눌렀을때 처리
 			DataManager::getInstance().room_master = false;
 			WideCharToMultiByte(CP_ACP, 0, join_room_id, -1, DataManager::getInstance().ROOM_ID, sizeof(DataManager::getInstance().ROOM_ID), NULL, NULL);
@@ -225,7 +201,7 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			}
 			else {
 				SC_ROOM_CHANGE_PACKET* roomPacket = reinterpret_cast<SC_ROOM_CHANGE_PACKET*>(recvBuf);
-				std::cout <<"헿: "<< roomPacket->other_pl << std::endl;
+				std::cout <<"참가한 방 ID: "<< roomPacket->other_pl << std::endl;
 				if (strcmp(roomPacket->other_pl, "cant_join")==0) { 
 					MessageBox(
 						NULL,
@@ -256,14 +232,14 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 					if (DataManager::getInstance().my_item[i].price <= DataManager::getInstance().my_data.coin) {
 						DataManager::getInstance().my_item[i].buy = TRUE;
 						DataManager::getInstance().my_data.coin -= DataManager::getInstance().my_item[i].price;
-						DataManager::getInstance().my_item[i].buy_cnt++;
+						DataManager::getInstance().my_item[i].buy_cnt = (DataManager::getInstance().my_item[i].buy_cnt+1)%2;
 					}
 					else;
 				}
 				else {
 					DataManager::getInstance().my_item[i].buy = FALSE;
 					DataManager::getInstance().my_data.coin += DataManager::getInstance().my_item[i].price;
-					DataManager::getInstance().my_item[i].buy_cnt++;
+					DataManager::getInstance().my_item[i].buy_cnt = (DataManager::getInstance().my_item[i].buy_cnt + 1) % 2;
 				}
 			}
 		}

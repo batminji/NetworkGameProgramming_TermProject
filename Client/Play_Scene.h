@@ -55,6 +55,9 @@ private :
     //½ºÅ³Å° ´­·µ´õ¿°?
     bool skill_key_down = false;
 
+    //°ÔÀÓ¿À¹ö µÆ¾î¿°?
+    bool game_over_screen = false;
+
     
 public:
 
@@ -80,4 +83,5 @@ public:
     void handle_player_data(const uint8_t* packetData);
     void handle_object_data(const uint8_t* packetData);
 
+    void player_data_update();
 };

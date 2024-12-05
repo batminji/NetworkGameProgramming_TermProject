@@ -174,6 +174,8 @@ private:
     std::vector<Enemy> enemies;
     std::vector<Enemy_Bullet> e_bullets;
     std::vector<Item> drop_Items;
+public:
+    bool equipment[3] = { false,false,false };
     
 public:
     int clear_set = 0; //몇세트 클리어?
@@ -351,7 +353,7 @@ public:
             if (PtInRect(&player_rt, { eb.GetX(),eb.GetY()}) == 1 && p1->zombieCount() < 1) {
                 if ((healer) && (!(healer->getSkill()))) {//힐러의 보호막이 켜져있지않을때??
                     //커비 하트 깎기
-                    heart = max(heart - 1, 0);
+                   heart = max(heart - 1, 0);
 
                     // 커비 잠시 무적모드 활성화 zombie_cnt를 1로
                     p1->setZombieCnt(1);
@@ -389,14 +391,14 @@ public:
             RECT player_rt = { DEFXPOS - 25, p1->getY() - 25, DEFXPOS + 25, p1->getY() + 25 };
             RECT item_rt = {eb.GetX(),eb.GetY(),eb.GetX()+50,eb.GetY() + 50 };
             RECT intersection;
-            if (IntersectRect(&intersection, &player_rt, &item_rt) && p1->zombieCount() < 1) {
+            if (IntersectRect(&intersection, &player_rt, &item_rt)) {
 
-                if (eb.getType() == ITEM_COIN) get_coin += 10;
+                if (eb.getType() == ITEM_COIN) get_coin += 10 * ((int)equipment[1]+1);
                 if(eb.getType() == ITEM_DUAL&&!p1->isDual()) {
                     p1->setDual(true);
                     push_evt_queue(CANCEL_DUAL, 5000, p1->getID());
                 }
-                if(eb.getType() == ITEM_MAGNET&&p1->isMagnet()){
+                if(eb.getType() == ITEM_MAGNET&& !p1->isMagnet()){
                     p1->setMagnet(true);
                     push_evt_queue(CANCEL_MAGNET, 5000, p1->getID());
                 }
@@ -405,13 +407,13 @@ public:
 
             // p2의 충돌체크
             player_rt = { DEFXPOS - 25, p2->getY() - 25, DEFXPOS + 25, p2->getY() + 25 };
-            if (PtInRect(&player_rt, { eb.GetX(),eb.GetY() }) == 1 && p2->zombieCount() < 1) {
-                if (eb.getType() == ITEM_COIN) get_coin += 10;
+            if (PtInRect(&player_rt, { eb.GetX(),eb.GetY() }) == 1) {
+                if (eb.getType() == ITEM_COIN) get_coin += 10 * ((int)equipment[1] + 1);
                 if (eb.getType() == ITEM_DUAL && !p2->isDual()) {
                     p2->setDual(true);
                     push_evt_queue(CANCEL_DUAL, 5000, p2->getID());
                 }
-                if (eb.getType() == ITEM_MAGNET && p2->isMagnet()) {
+                if (eb.getType() == ITEM_MAGNET && !p2->isMagnet()) {
                     p2->setMagnet(true);
                     push_evt_queue(CANCEL_MAGNET, 5000, p2->getID());
                 }
@@ -454,7 +456,11 @@ public:
             int mid3 = 0;
             if (clear_set % 4 == 2) mid3 = 1;
             //중간몬스터생성
-            enemies.push_back({ ENEMY_1,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10) });
+            if(clear_set % 4 == 0 )enemies.push_back({ ENEMY_1,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10) });
+            else if(clear_set % 4 == 1 )enemies.push_back({ ENEMY_2,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10) });
+            else enemies.push_back({ ENEMY_3,100,180,50 + (clear_set % 4 * 10) + (clear_stage * 10) });
+
+            
             //작은 몬스터 생성
             enemies.push_back({ ENEMY_0,220,100,10 + (clear_stage * 5) });
             enemies.push_back({ ENEMY_0,280,265,10 + (clear_stage * 5) });
@@ -515,9 +521,13 @@ public:
 
 
     // Getter - Setter
-    unsigned short getP1Y() { return p1->getY(); }
-    unsigned short getP2Y() { return p2->getY(); }
-    std::string getP1ID() { return p1->getID(); }
+    unsigned short getP1Y() { if (p1 == nullptr) return 300; return p1->getY(); }
+    unsigned short getP2Y() { if (p2 == nullptr) return 300; return p2->getY(); }
+    std::string getP1ID() 
+    { 
+        if (p1 == nullptr) return "";
+        return p1->getID(); 
+    }
     std::string getP2ID()
     {
         if (p2 == nullptr) return "";
@@ -541,6 +551,7 @@ public:
         return ret;
     }
     unsigned short getHeart() { return heart; }
+    void setHeart(unsigned short h) { heart = h; }
     unsigned int getScore() { return score; }
     void addScore(unsigned short i)
     {
@@ -793,25 +804,7 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
         res.this_skillEnd = roomInfo[id]->getP2()->getSkill();
         res.other_skillEnd = roomInfo[id]->getP1()->getSkill();
     }
-
-    // std::cout << id << "의 y좌표: " << res.this_y << std::endl;
     int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_MOVE_PACKET), 0);
-    if (ret == SOCKET_ERROR) { // 에러 처리
-        int error = WSAGetLastError();
-        SERVER_err_display("send failed");
-        SERVER_err_display(error);  // 오류 코드 출력
-        return false;
-    }
-    return true;
-}
-
-bool send_player_state_change_packet(SOCKET& s, std::string& id)
-{
-    SC_PLAYER_STATE_CHANGE_PACKET res;
-    res.size = sizeof(SC_PLAYER_STATE_CHANGE_PACKET);
-    res.type = SC_PLAYER_STATE_CHANGE;
-
-    int ret = send(s, reinterpret_cast<char*>(&res), sizeof(SC_PLAYER_STATE_CHANGE_PACKET), 0);
     if (ret == SOCKET_ERROR) { // 에러 처리
         int error = WSAGetLastError();
         SERVER_err_display("send failed");
@@ -841,12 +834,6 @@ bool send_object_move_packet(SOCKET& s, std::string& id)
     return true;
 }
 
-bool send_object_change_packet()
-{
-    return true;
-}
-
-
 bool process_packet(char* packet, SOCKET& s, std::string& id)
 {
     switch (packet[2]) // 여기 정확하게 어디 들어오는지 봐야 할듯
@@ -872,6 +859,10 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
                     roomInfo[id] = new Room(); // roomInfo에 새로운 방 추가
                     roomInfo[id]->setP1(&players[id]);
                     roomInfo[id]->setDealer(id);
+                    for (int i = 0; i < 3; ++i)roomInfo[id]->equipment[i] = p->item[i];
+                    if (p->item[0])players[id].setCoin(players[id].getCoin() - 500);
+                    if (p->item[1])players[id].setCoin(players[id].getCoin()-1000);
+                    if (p->item[2])players[id].setCoin(players[id].getCoin()-500);
                     std::cout << "Player " << id << " created and joined new room " << id << std::endl;
                 }
             }
@@ -899,6 +890,7 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     case CS_ROOM_STATE: // 방 정보 변경
     {
         auto t_room = roomInfo[id];
+        if (t_room == nullptr)break;
         CS_ROOM_STATE_PACKET* p = reinterpret_cast<CS_ROOM_STATE_PACKET*>(packet);
         if (t_room->getisPlaying()) {
             if (id == t_room->getP2ID()) {
@@ -937,21 +929,18 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
 {
     char recv_buf[BUFSIZE];
     std::string pid;
+    std::string owner_id;
 
     // 로그인 처리 단계
     {
         // 1. 로그인 패킷 받기
         ZeroMemory(recv_buf, sizeof(recv_buf));
         int ret = recv(s, recv_buf, sizeof(CS_LOGIN_PACKET), MSG_WAITALL);
-        if (ret == SOCKET_ERROR) { // 에러처리
+        if (ret == SOCKET_ERROR || ret == 0) { // 에러 -> 종료
             int error = WSAGetLastError();
             SERVER_err_display("recv() failed");
             SERVER_err_display(error);  // 오류 코드 출력
-            closesocket(s);
-            return -1;
-        }
-        else if (ret == 0) {
-            std::cout << "클라이언트가 접속을 종료하다." << std::endl;
+            std::cout << "클라이언트 연결 해제" << std::endl;
             closesocket(s);
             return 0;
         }
@@ -972,10 +961,14 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                 // 2-1. 참여할 방의 플레이어 아이디 recv하기.
                 ZeroMemory(recv_buf, sizeof(recv_buf));
                 int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), MSG_WAITALL);
-                if (ret == SOCKET_ERROR) { // 에러처리
+                if (ret == SOCKET_ERROR || ret == 0) { // 에러처리
                     int error = WSAGetLastError();
                     SERVER_err_display("recv() failed");
                     SERVER_err_display(error);  // 오류 코드 출력
+                    std::cout << "클라이언트 연결 해제" << std::endl;
+                    closesocket(s);
+                    players[pid].setPlaying(false); //접속하지 않은 아이디
+                    return 0;
                 }
                 while (true) {
                     process_packet(recv_buf, s, pid);
@@ -986,25 +979,60 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                     else if (roomInfo.find(pid) == roomInfo.end()) {
                         ZeroMemory(recv_buf, sizeof(recv_buf));
                         int ret = recv(s, recv_buf, sizeof(CS_JOIN_ROOM_PACKET), MSG_WAITALL);
-                        if (ret == SOCKET_ERROR) { // 에러처리
+                        if (ret == SOCKET_ERROR || ret == 0) { // 에러처리
                             int error = WSAGetLastError();
                             SERVER_err_display("recv() failed");
                             SERVER_err_display(error);  // 오류 코드 출력
+                            std::cout << "클라이언트 연결 해제" << std::endl;
+                            closesocket(s);
+                            players[pid].setPlaying(false); //접속하지 않은 아이디
+                            return 0;
                         }
                     }
                     else {
                         ZeroMemory(recv_buf, sizeof(recv_buf));
                         int ret = recv(s, recv_buf, sizeof(CS_ROOM_STATE_PACKET), MSG_WAITALL);
-                        if (ret == SOCKET_ERROR) { // 에러처리
+                        if (ret == SOCKET_ERROR || ret == 0) { // 에러처리
                             int error = WSAGetLastError();
                             SERVER_err_display("recv() failed");
                             SERVER_err_display(error);  // 오류 코드 출력
+                            std::cout << "클라이언트 연결 해제" << std::endl;
+
+                            auto p = roomInfo[pid];
+                            
+                            // 방에 아무도 없을 때 -> 방지우고 나지우고 종료
+                            if (p->getP2() == nullptr || p->getP1() == nullptr) {
+                                roomLock.lock();
+                                roomInfo.erase(pid);
+                                roomLock.unlock();
+                                players[pid].setPlaying(false); //접속하지 않은 아이디
+                                delete p;
+                                closesocket(s);
+                            }
+                            else { // 방에 누가 있을때 -> 방장바꾸고 나지우고 종료
+                                if (p->getP1ID() == pid) { // 내가방장
+                                    roomInfo[pid]->setP1(nullptr); // change admin
+                                    players[pid].setPlaying(false);
+                                    closesocket(s);
+                                }
+                                else {
+                                    roomInfo[pid]->setP2(nullptr);
+                                    players[pid].setPlaying(false);
+                                    closesocket(s);
+                                }
+                            }
+                            
+                            return 0;
                         }
                     }
                 }
 
                 if (true == roomInfo[pid]->getisPlaying()) {
                     std::cout << pid << " 플레이씬 넘어가기" << std::endl;
+                    //구매 장비에 따른 초기세팅
+                    if (roomInfo[pid]->equipment[0]) roomInfo[pid]->setHeart(static_cast<unsigned short>(4));
+                    if (roomInfo[pid]->equipment[2]) players[pid].setSkillCount(10);
+                    owner_id = roomInfo[pid]->getP1ID();
                     break; // 게임 시작
                 }
             }
@@ -1015,35 +1043,83 @@ int client_thread(SOCKET s) // 클라이언트와의 통신 스레드
                 push_evt_queue(MOVE_PLAYER_BULLET, 100, pid); // 총알이동
                 push_evt_queue(CREATE_SET, 0, pid); // 세트를 클리어했는지 체크하는 이벤트
                 push_evt_queue(AI_MOVE, 100, pid); //몬스터이동
+                push_evt_queue(FIRE_ENEMY_BULLET, 0, pid); // 적총알발사
             }
             push_evt_queue(FIRE_PLAYER_BULLET, 0, pid); // 총알발사
-            push_evt_queue(FIRE_ENEMY_BULLET, 0, pid); // 적총알발사
+
+            bool flag = false;
             send_player_move_packet(s, pid);
             while (true) {
-                if (roomInfo[pid]->getHeart() == 0) break; // 게임 종료
-
                 send_object_move_packet(s, pid);
+                if (flag) break;
+                if (roomInfo[pid]->getHeart() == 0 || roomInfo[pid]->getisPlaying() == false) {
+                    flag = true;
+                    break;
+                }
+                
 
                 // recv.CS_MOVE_PACKET
                 ZeroMemory(recv_buf, sizeof(recv_buf));
                 int ret = recv(s, recv_buf, sizeof(CS_MOVE_PACKET), MSG_WAITALL);
-                if (ret == SOCKET_ERROR) { // 에러처리
+                if (ret == SOCKET_ERROR || ret == 0) { // 에러처리
                     int error = WSAGetLastError();
                     SERVER_err_display("recv() failed");
                     SERVER_err_display(error);  // 오류 코드 출력
+                    std::cout << "클라이언트 연결 해제" << std::endl;
+
+                    auto p = roomInfo[pid];
+
+                    // 방에 아무도 없을 때 -> 방지우고 나지우고 종료
+                    if (p->getP2() == nullptr || p->getP1() == nullptr) {
+                        roomLock.lock();
+                        roomInfo.erase(pid);
+                        roomLock.unlock();
+                        players[pid].setPlaying(false); //접속하지 않은 아이디
+                        delete p;
+                        closesocket(s);
+                    }
+                    else { // 방에 누가 있을때 
+                        if (p->getP1ID() == pid) { // 내가방장
+                            roomInfo[pid]->setP1(nullptr); 
+                            players[pid].setPlaying(false);
+                            closesocket(s);
+                        }
+                        else {
+                            roomInfo[pid]->setP2(nullptr);
+                            players[pid].setPlaying(false);
+                            closesocket(s);
+                        }
+                    }
+                    return 0;
                 }
                 process_packet(recv_buf, s, pid);
+              
             }
             
-            // 게임 종료 -> 랭킹 등록
-            auto score = roomInfo[pid]->getScore();
-            if (players[pid].getHigh_score() < score)
-                players[pid].setHighScore(score);
-            if (roomInfo[pid]->getP1ID() == pid) { // 방장만
+            // 게임 종료 -> 랭킹 등록: 방장이 알아서 처리하도록
+            if (owner_id == pid) { // 방장만
+                auto score = roomInfo[pid]->getScore();
+                auto coin = roomInfo[pid]->getCoin();
+                auto other_id = roomInfo[pid]->getP2ID();
+
+                // 코인 세팅
+                players[pid].setCoin(players[pid].getCoin() + coin);
+                players[other_id].setCoin(players[other_id].getCoin() + coin);
+
+                // 최고점수 세팅
+                if (players[pid].getHigh_score() < score)
+                    players[pid].setHighScore(score);
+                if (players[other_id].getHigh_score() < score)
+                    players[other_id].setHighScore(score);
+
+                // 저장 및 초기화
                 save_all_player_info();
                 auto p = roomInfo[pid];
                 roomInfo.erase(pid);
                 roomInfo.erase(p->getP2ID());
+                players[pid].reset();
+                players[other_id].reset();
+
                 delete p;
             }
         }
@@ -1079,25 +1155,28 @@ void addSkillCount(OTYPE type, std::string& id)
     {
     case P1_BULLET:
         roomInfo[id]->getP1()->addSkillCount();
+        roomInfo[id]->getP1()->setSkillCount(min(roomInfo[id]->getP1()->getSkillCount(), SKILL_CNT));
         roomInfo[id]->addScore(DAMAGE);
+        break;
     case P1_SKILLBULLET:
         roomInfo[id]->getP1()->addSkillCount();
+        roomInfo[id]->getP1()->setSkillCount(min(roomInfo[id]->getP1()->getSkillCount(),SKILL_CNT));
         roomInfo[id]->addScore(DAMAGE * 2);
+        
         break;
 
     case P2_BULLET:
-        roomInfo[id]->getP1()->addSkillCount();
+        roomInfo[id]->getP2()->addSkillCount();
+        roomInfo[id]->getP2()->setSkillCount(min(roomInfo[id]->getP2()->getSkillCount(), SKILL_CNT));
         roomInfo[id]->addScore(DAMAGE);
+        break;
+
     case P2_SKILLBULLET:
         roomInfo[id]->getP2()->addSkillCount();
+        roomInfo[id]->getP2()->setSkillCount(min(roomInfo[id]->getP2()->getSkillCount(), SKILL_CNT));
         roomInfo[id]->addScore(DAMAGE * 2);
         break;
     }
-}
-
-void push_evt_queue(EVENT& evt)
-{
-    evt_queue.push(evt);
 }
 
 // task 처리하는 스레드 -> 룸 당 하나였으면 좋겠는데 어떻게 하면 좋을지 모르겠음.
@@ -1106,7 +1185,10 @@ void ai_thread()
     while (true) {
         EVENT ev;
         if (task_queue.empty() || !task_queue.try_pop(ev)) continue;
-        if (roomInfo[ev.room_id] == nullptr)continue;
+        if (roomInfo[ev.room_id] == nullptr) {
+            roomInfo.erase(ev.room_id);
+            continue;
+        }
 
         switch (ev.evt_type) {
         case FIRE_PLAYER_BULLET:
@@ -1139,6 +1221,7 @@ void ai_thread()
             break;
 
         case CREATE_SET:
+           // std::cout << "자석여부:" << players[ev.room_id].isMagnet() <<std::endl;
             if (roomInfo[ev.room_id]->getEnemy_cnt() < 1) { 
                 roomInfo[ev.room_id]->clear_set++;
                 if (roomInfo[ev.room_id]->clear_set % 4 == 0 && roomInfo[ev.room_id]->clear_set != 0) roomInfo[ev.room_id]->clear_stage++;

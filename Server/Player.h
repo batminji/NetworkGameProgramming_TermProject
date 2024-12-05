@@ -54,10 +54,12 @@ public:
     void setID(char* str) { id = std::string(str); }
     void setSocket(SOCKET& s) { this->s = s; }
     unsigned short getCoin() { return coin; }
+    void setCoin(unsigned int new_coin) { coin = new_coin; }
     unsigned int getHigh_score() { return high_score; }
     bool getSkill() { return isSkill; }
     void setSkill(bool b) { isSkill = b; }
     void addSkillCount() { skillCount++; }
+    void setSkillCount(unsigned short new_skill_cnt) { skillCount = new_skill_cnt; }
     void setZombieCnt(short new_zombie_cnt) { zombie_cnt = new_zombie_cnt; }
     short zombieCount() { return zombie_cnt; }
 
@@ -65,8 +67,21 @@ public:
     bool isDual() {return dual_eat; }
     void setMagnet(bool c) { magnet_eat = c; }
     void setDual(bool c) { dual_eat = c; }
+    SOCKET& getSocket() { return s; }
 
     unsigned short getSkillCount() { return skillCount; }
     void resetSkillCount() { skillCount -= SKILL_CNT; }
     void setHighScore(unsigned int h) { high_score = h; }
+    void reset()
+    {
+        y = 300;
+        zombie_cnt = 0; //1 이상이 되면 잠시 무적모드, 1이상이 되면 1프레임에 1씩 점점 올려서 30이 되면 다시 좀비카운트를 0으로,
+
+        // 게임을 실행중일 때 
+        isSkill = false;
+        skillCount = 0; // 몇마리를 잡았는지.
+
+        magnet_eat = false;
+        dual_eat = false;
+    }
 };
