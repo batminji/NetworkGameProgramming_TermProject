@@ -7,14 +7,12 @@ Framework::~Framework()
 
 void Framework::render(LPVOID param)
 {
-	//std::lock_guard ll{ m_scene->scene_lock };
 	if (m_scene != nullptr)
 		m_scene->render(param);
 }
 
 void Framework::update()
 {
-	//std::lock_guard ll{ m_scene->scene_lock };
 	m_scene->update();
 
 	if (current_scene != m_scene->next_scene) {
@@ -55,8 +53,6 @@ void Framework::update()
 		{
 			std::cout << "room to play 전환" << std::endl;
 			// Room_Scene에서 플레이어 데이터를 가져옴
-			/*Player master_player()
-			Player join_player = *dynamic_cast<Room_Scene*>(m_scene)->getJoinPlayer();*/
 			if (dynamic_cast<Room_Scene*>(m_scene)->master_player->who_is_me) {
 				//std::cout << "마스터는 저예염: 나:"<< dynamic_cast<Room_Scene*>(m_scene)->master_player->job <<"  니:"<<dynamic_cast<Room_Scene*>(m_scene)->join_player->job << std::endl;
 				Player master_player(dynamic_cast<Room_Scene*>(m_scene)->master_player->job, TRUE);
@@ -69,7 +65,6 @@ void Framework::update()
 				delete tmp;
 			}
 			else if(dynamic_cast<Room_Scene*>(m_scene)->join_player->who_is_me){
-				//std::cout << "전 마스터가 아니에염: 나:" << dynamic_cast<Room_Scene*>(m_scene)->master_player->job << "  니:" << dynamic_cast<Room_Scene*>(m_scene)->join_player->job << std::endl;
 				Player master_player(dynamic_cast<Room_Scene*>(m_scene)->master_player->job, FALSE);
 				Player join_player(dynamic_cast<Room_Scene*>(m_scene)->join_player->job, TRUE);
 
@@ -99,7 +94,6 @@ void Framework::update()
 
 void Framework::network()
 {
-//	std::lock_guard ll{ m_scene->scene_lock };
 	if (m_scene != nullptr)
 		m_scene->network();
 }

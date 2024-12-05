@@ -210,8 +210,6 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             if (PtInRect(&game_over_rt, mypt)) {
                 channel->stop();
                 gameover_sound->release();
-                //  ssystem->createSound("main_bgm.OGG", FMOD_LOOP_NORMAL, 0, &main_bgm);
-                //  ssystem->playSound(main_bgm, 0, false, &channel);
                 player_data_update();
                 next_scene = LOBBY_SCENE;
             }
@@ -228,7 +226,6 @@ LRESULT Play_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             // TODO 스킬 썼다는 패킷 보내야 함.
             skill_key_down = true;
             // 총알의 타입 변경 흠... 근데 흠...
-            //ssystem->playSound(skill_sound, 0, false, &channel);
         }
     }
         break;
@@ -302,21 +299,17 @@ int Play_Scene::recv_process()
             break; // 전체 패킷이 아직 도착하지 않은 경우 대기
         }
 
-        // std::cout << "size: " << resPacket->size << ", Type: " << resPacket->type;
 
         switch (resPacket->type) {
         case SC_PLAYER_MOVE:
-           // std::cout << "플레이어 데이터 수신: " << resPacket->type << std::endl;
             handle_player_data(recvBuffer.data());
             break;
         case SC_OBJECT_MOVE:
-           // std::cout << "오브젝트 데이터 수신: " << resPacket->type << std::endl;
             handle_object_data(recvBuffer.data());
             break;
         case SC_ROOM_CHANGE:
             break;
         default:
-           // std::cout << "알 수 없는 패킷 타입: " << resPacket->type << std::endl;
             break;
         }
 
@@ -331,7 +324,6 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
 {
     // 패킷 데이터 구조체로 변환
     const SC_PLAYER_MOVE_PACKET* resPacket = reinterpret_cast<const SC_PLAYER_MOVE_PACKET*>(packetData);
-    // cout << "현재 실행중인 함수 : recv_player(7)    받은 패킷타입 :" << resPacket->type << endl;
     // 데이터 갱신
     heart_cnt = resPacket->hp;
     play_score = resPacket->score;
@@ -389,7 +381,6 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
            temp_enemys.push_back({ 4,resPacket->objs_x[i] ,resPacket->objs_y[i] ,resPacket->objs_hp[i] });
            break;
 
-           //cout << resPacket->objs_type[i] << " " << resPacket->objs_x[i] << " " << resPacket->objs_y[i] << endl;
        case ENEMY_BULLETS: {
            bullet temp_bullet(resPacket->objs_x[i], resPacket->objs_y[i], 0, 3);
            temp_bullets.push_back(temp_bullet);
@@ -435,16 +426,9 @@ void Play_Scene::handle_object_data(const uint8_t* packetData)
        }
    }
    {
-      // std::unique_lock<std::mutex> b_lock(bullets_mutex);
        std::swap(bullets, temp_bullets);
-     //  b_lock.unlock();
-     //std::unique_lock<std::mutex> e_lock(enemys_mutex);
        std::swap(enemys, temp_enemys);
-    
        std::swap(Items, temp_items);
-
-     //  e_lock.unlock();
-       
    }
 }
 
