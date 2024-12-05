@@ -786,10 +786,12 @@ bool send_player_move_packet(SOCKET& s, std::string& id)
     res.skillCnt = players[id].getSkillCount();
     res.coin = roomInfo[id]->getCoin();
     if (roomInfo[id]->getP1ID() == id) { // 내가 p1이군
-        res.skillEnd = roomInfo[id]->getP1()->getSkill();
+        res.this_skillEnd = roomInfo[id]->getP1()->getSkill();
+        res.other_skillEnd = roomInfo[id]->getP2()->getSkill();
     }
     else {
-        res.skillEnd = roomInfo[id]->getP2()->getSkill();
+        res.this_skillEnd = roomInfo[id]->getP2()->getSkill();
+        res.other_skillEnd = roomInfo[id]->getP1()->getSkill();
     }
 
     // std::cout << id << "의 y좌표: " << res.this_y << std::endl;

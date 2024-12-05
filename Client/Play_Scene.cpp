@@ -340,16 +340,20 @@ void Play_Scene::handle_player_data(const uint8_t* packetData)
         // 현재 플레이어가 마스터인 경우
         master_player->y = resPacket->this_y;
         join_player->y = resPacket->other_y;
-        if (resPacket->skillEnd)master_player->skill = true;
+        if (resPacket->this_skillEnd)master_player->skill = true;
         else master_player->skill = false;
+        if (resPacket->other_skillEnd)join_player->skill = true;
+        else join_player->skill = false;
         master_player->skill_cnt = resPacket->skillCnt;
     }
     else {
         // 현재 플레이어가 조인한 클라이언트인 경우
         join_player->y = resPacket->this_y;
         master_player->y = resPacket->other_y;
-        if (resPacket->skillEnd)join_player->skill = true;
+        if (resPacket->this_skillEnd)join_player->skill = true;
         else join_player->skill = false;
+        if (resPacket->other_skillEnd)master_player->skill = true;
+        else master_player->skill = false;
         join_player->skill_cnt = resPacket->skillCnt;
     }
 }

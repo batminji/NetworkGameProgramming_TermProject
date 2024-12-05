@@ -223,7 +223,7 @@ int Room_Scene::room_data_update()
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.ID, -1, user_name[0], sizeof(DataManager::getInstance().my_data.ID));
                 MultiByteToWideChar(CP_ACP, 0, DataManager::getInstance().my_data.otherID, -1, user_name[1], sizeof(DataManager::getInstance().my_data.otherID));
 
-                if (strlen(roomPacket->other_pl) >= 1)
+                if (roomPacket->other_pl != "cant_join")
                     join_player->room = TRUE;
             }
             else if (join_player->who_is_me) {

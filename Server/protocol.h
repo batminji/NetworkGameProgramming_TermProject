@@ -64,7 +64,8 @@ struct SC_PLAYER_MOVE_PACKET { // todo: 여기 수정
 	unsigned short other_y;
 	unsigned short hp;
 	unsigned int score;
-	bool skillEnd;
+	bool this_skillEnd;
+	bool other_skillEnd;
 	unsigned short skillCnt;
 	unsigned int coin;
 };
