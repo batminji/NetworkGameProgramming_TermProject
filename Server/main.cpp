@@ -5,7 +5,7 @@
 // 전방선언 라인
 enum TASK_TYPE { FIRE_PLAYER_BULLET, MOVE_PLAYER_BULLET, FIRE_ENEMY_BULLET, 
     AI_MOVE, SKILL_END , BULLET_DELETE, CREATE_SET, ENABLE_COLLISION,
-    CANCEL_MAGNET , CANCEL_DUAL }; // 뭐가 있을까?
+    CANCEL_MAGNET , CANCEL_DUAL }; 
 void push_evt_queue(TASK_TYPE ev, int time, std::string& rid);
 void addSkillCount(OTYPE type, std::string& id);
 
@@ -91,7 +91,7 @@ public:
     }
     void ai_move()
     {
-        // todo: 여기 ai 로직 넣어줘
+     
      
         if (type == ENEMY_0) {
 
@@ -168,7 +168,7 @@ private:
     unsigned short heart = 3; // 음수가 없..?
     unsigned int get_coin = 0; //게임에서 획득한 코인의 양
 
-    std::mutex update_lock; // todo: 락을 분리할지 고민하기
+    std::mutex update_lock; 
 
     std::vector<Player_Bullet> p_bullets;
     std::vector<Enemy> enemies;
@@ -466,7 +466,7 @@ public:
             enemies.push_back({ ENEMY_0,280,265,10 + (clear_stage * 5) });
             enemies.push_back({ ENEMY_0,220,450,10 + (clear_stage * 5) });
 
-            // std::cout <<"몬스터 생성!"<< enemies[0].getType() << " " << enemies[0].getPosition().first << enemies[0].getPosition().second << std::endl;
+           
         }
         else { //보스세트
             //큰몬스터
@@ -836,7 +836,7 @@ bool send_object_move_packet(SOCKET& s, std::string& id)
 
 bool process_packet(char* packet, SOCKET& s, std::string& id)
 {
-    switch (packet[2]) // 여기 정확하게 어디 들어오는지 봐야 할듯
+    switch (packet[2])
     {
     case CS_JOIN_ROOM:
     {
@@ -877,8 +877,6 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
     {
         CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
         players[id].setY(p->y);
-        if (true == p->keyDown)
-            //std::cout << "발싸: " << players[id].getSkillCount() << std::endl;
         if ((true == p->keyDown) && (false == players[id].getSkill()) && (players[id].getSkillCount() >= SKILL_CNT)) {// 스킬사용시.
             players[id].setSkill(true);
             push_evt_queue(SKILL_END, SKILL_TIME, id);
@@ -1190,7 +1188,6 @@ void ai_thread()
             break;
 
         case CREATE_SET:
-           // std::cout << "자석여부:" << players[ev.room_id].isMagnet() <<std::endl;
             if (roomInfo[ev.room_id]->getEnemy_cnt() < 1) { 
                 roomInfo[ev.room_id]->clear_set++;
                 if (roomInfo[ev.room_id]->clear_set % 4 == 0 && roomInfo[ev.room_id]->clear_set != 0) roomInfo[ev.room_id]->clear_stage++;

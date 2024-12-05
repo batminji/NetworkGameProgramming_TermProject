@@ -68,7 +68,7 @@ enum OTYPE // 오브젝트 타입 정의.
 
 // 상수
 constexpr int ID_LEN = 20;
-constexpr int MAX_OBJ_NUM = 100; // todo: 여기 상의
+constexpr int MAX_OBJ_NUM = 100; 
 constexpr int SERVERPORT = 9000;
 constexpr int BUFSIZE = 4096; 
 constexpr unsigned short MOVE_DIST = -10;
