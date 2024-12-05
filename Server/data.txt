@@ -1,10 +1,10 @@
-batminji 8040 17680
+batminji 8100 17680
 ffff 130 1750
 b 0 0
 awewqqt 0 0
 bbb 0 230
 asdf 0 0
-jongman 150 1335
+jongman 210 1335
 ccc 28464 700
 eee 0 300
 ddd 0 140

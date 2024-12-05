@@ -878,7 +878,7 @@ bool process_packet(char* packet, SOCKET& s, std::string& id)
         CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
         players[id].setY(p->y);
         if (true == p->keyDown)
-            std::cout << "¹ß½Î: " << players[id].getSkillCount() << std::endl;
+            //std::cout << "¹ß½Î: " << players[id].getSkillCount() << std::endl;
         if ((true == p->keyDown) && (false == players[id].getSkill()) && (players[id].getSkillCount() >= SKILL_CNT)) {// ½ºÅ³»ç¿ë½Ã.
             players[id].setSkill(true);
             push_evt_queue(SKILL_END, SKILL_TIME, id);

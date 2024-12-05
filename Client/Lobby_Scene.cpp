@@ -141,7 +141,7 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	{
 		int mx = LOWORD(lParam);
 		int my = HIWORD(lParam);
-		std::cout << mx << " " << my << std::endl;
+	
 		POINT mypt = { mx,my };
 		if (PtInRect(&create_room_button, mypt)) { //create room
 			ssystem->playSound(click_sound, 0, false, &channel);
@@ -174,7 +174,7 @@ LRESULT Lobby_Scene::windowproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		}
 		if (PtInRect(&join_room_button, mypt)) { //join room
 			ssystem->playSound(click_sound, 0, false, &channel);
-			printf("기존 방에 참가하겠습니다.\n");
+			printf("기존 방에 참가합니다.\n");
 			//방 참가하기를 눌렀을때 처리
 			DataManager::getInstance().room_master = false;
 			WideCharToMultiByte(CP_ACP, 0, join_room_id, -1, DataManager::getInstance().ROOM_ID, sizeof(DataManager::getInstance().ROOM_ID), NULL, NULL);
