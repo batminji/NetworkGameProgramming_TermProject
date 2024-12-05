@@ -67,8 +67,21 @@ public:
     bool isDual() {return dual_eat; }
     void setMagnet(bool c) { magnet_eat = c; }
     void setDual(bool c) { dual_eat = c; }
+    SOCKET& getSocket() { return s; }
 
     unsigned short getSkillCount() { return skillCount; }
     void resetSkillCount() { skillCount -= SKILL_CNT; }
     void setHighScore(unsigned int h) { high_score = h; }
+    void reset()
+    {
+        y = 300;
+        zombie_cnt = 0; //1 이상이 되면 잠시 무적모드, 1이상이 되면 1프레임에 1씩 점점 올려서 30이 되면 다시 좀비카운트를 0으로,
+
+        // 게임을 실행중일 때 
+        isSkill = false;
+        skillCount = 0; // 몇마리를 잡았는지.
+
+        magnet_eat = false;
+        dual_eat = false;
+    }
 };
